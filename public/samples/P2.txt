@@ -1,0 +1,35 @@
+Interviewer: Hi, thank you for joining us today. Could you please introduce yourself and tell us a little about your background?
+
+Participant: Hi, I'm Maria. I'm a graphic designer with over eight years of experience. I specialize in UI/UX design and have a keen interest in testing new applications to see how they can improve workflow and design processes.
+
+Interviewer: It's great to have you here, Maria. Today, we’re discussing your experience with our new web application. Let’s start with your initial thoughts. What was your first impression of the application?
+
+Participant: My first impression was quite positive. The interface is sleek and modern, which is always a good start. The layout is intuitive, and I could easily find my way around without much effort.
+
+Interviewer: That’s wonderful to hear. Can you describe your experience using the primary features of the application?
+
+Participant: Absolutely. I mainly used the design collaboration tools. I found it very easy to upload my designs and share them with my team. The feedback and annotation features were particularly useful. It allowed us to have clear and concise discussions directly on the designs.
+
+Interviewer: Did you face any challenges while using the application?
+
+Participant: The only challenge I encountered was with the file upload size limit. Some of my larger design files took a bit longer to upload, and occasionally, I had to compress them, which reduced the quality. Increasing the file size limit would be helpful.
+
+Interviewer: That's good to know. Was there any feature that stood out to you as especially useful or innovative?
+
+Participant: The live collaboration feature was fantastic. Being able to see my team's feedback in real-time and make instant changes was incredibly efficient. It felt almost like working together in the same room, which is crucial for remote teams.
+
+Interviewer: Interesting. How does this application compare to other tools you’ve used in the past?
+
+Participant: Compared to other tools, this application feels more integrated and less fragmented. Other tools often require multiple plugins or additional software for the same level of functionality. This application brings everything into one place, which is very convenient.
+
+Interviewer: If you could change or add one thing to this application, what would it be?
+
+Participant: I would love to see more robust version control features. Being able to track changes more granularly and revert to previous versions without losing any data would be extremely useful. Also, an in-app chat feature could enhance communication further.
+
+Interviewer: Those are great suggestions. We’ll definitely consider them for future updates. Would you recommend this application to your colleagues? Why or why not?
+
+Participant: Yes, I would recommend it. The application offers a lot of powerful features that can significantly improve collaboration and productivity. Its user-friendly design and seamless integration make it a great tool for any design team.
+
+Interviewer: Thank you so much for your time and insights, Maria. Your feedback is very valuable to us as we work on enhancing the application.
+
+Participant: You're welcome! I'm happy to provide my input.

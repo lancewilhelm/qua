@@ -1,0 +1,35 @@
+Interviewer: Hi, thank you for joining us today. Could you please introduce yourself and tell us a little about your background?
+
+Participant: Hi, I'm Lisa. I'm a data analyst with six years of experience in the finance industry. I work with various data tools to analyze financial trends and generate reports for decision-making.
+
+Interviewer: Thanks for being here, Lisa. Today, we’re going to discuss your experience with our new web application. Let’s start with your first impressions. How did you find the overall look and feel of the application?
+
+Participant: My first impression was very positive. The interface is clean and modern, and the dashboard is easy to navigate. I found the color scheme and layout quite pleasing and professional.
+
+Interviewer: That’s wonderful to hear. Can you describe your experience using the primary features of the application?
+
+Participant: Sure. I mainly used the data visualization tools. Importing datasets was fairly straightforward, and I liked the variety of visualization options available. Creating charts and graphs was intuitive, and the drag-and-drop functionality made it easy to customize my reports.
+
+Interviewer: Did you face any challenges while using the application?
+
+Participant: The only challenge I encountered was with the customization of complex visualizations. For some advanced charts, I found the customization options a bit limited. Adding more advanced customization features would be beneficial.
+
+Interviewer: That's good to know. Was there any feature that stood out to you as especially useful or innovative?
+
+Participant: The predictive analytics feature was impressive. Being able to apply predictive models directly within the application and visualize potential outcomes was extremely useful for my work. It saved me time from having to use separate tools for this purpose.
+
+Interviewer: How does this application compare to other tools you’ve used in the past?
+
+Participant: Compared to other tools, this application is more integrated and user-friendly. It combines data analysis and visualization in one platform, which reduces the need to switch between different applications. The real-time collaboration feature is also a major advantage.
+
+Interviewer: If you could change or add one thing to this application, what would it be?
+
+Participant: I would like to see more integration with external data sources. Adding APIs for financial databases and other industry-specific data sources would make it even more powerful. Additionally, more advanced data cleaning tools would be helpful.
+
+Interviewer: Those are great suggestions. We’ll definitely consider them for future updates. Would you recommend this application to your colleagues? Why or why not?
+
+Participant: Yes, I would recommend it. The application offers powerful data visualization and predictive analytics features that can significantly enhance data analysis workflows. Its user-friendly design and integration capabilities make it a valuable tool for data analysts.
+
+Interviewer: Thank you so much for your time and insights, Lisa. Your feedback is very valuable to us as we work on enhancing the application.
+
+Participant: You're welcome! I'm happy to provide my input.
