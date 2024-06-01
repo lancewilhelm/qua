@@ -92,7 +92,7 @@ function getCodesGroupsByLevel(codes) {
         </div>
 
         <div class="codes">
-            <CodesTabGroup
+            <CodebookCodesGroup
                 v-for="(c, i) in parsedCodes"
                 :key="c.id"
                 :code="c"

@@ -17,8 +17,6 @@ const newProj = ref({
 })
 const editProj = ref({})
 const deleteProj = ref({})
-const editTagInput = ref('')
-const newTagInput = ref('')
 
 // Fetch projects
 const { data: projects } = await useAsyncData('projects', async () => {
@@ -39,6 +37,7 @@ function toggleNewProjectModal() {
 }
 
 async function createNewProject() {
+    if (newProj.value.name === '') return
     const { data, error } = await supabase
         .from('projects')
         .insert({
@@ -70,7 +69,6 @@ function openEditProjectModal(project) {
 
 function closeEditProjectModal() {
     editProj.value = {}
-    editTagInput.value = ''
     showEditProjModal.value = false
 }
 
@@ -129,16 +127,6 @@ async function deleteProject() {
     deleteConfirmInput.value = ''
     showDeleteProjModal.value = false
 }
-
-function deleteEditTag(event) {
-    const tag = event.target.parentElement.textContent.trim()
-    editProj.value.tags = editProj.value.tags.filter((t) => t !== tag)
-}
-
-function deleteNewTag(event) {
-    const tag = event.target.parentElement.textContent.trim()
-    newProj.value.tags = newProj.value.tags.filter((t) => t !== tag)
-}
 </script>
 
 <template>
@@ -157,83 +145,15 @@ function deleteNewTag(event) {
         <button id="submit-btn" type="submit" @click="toggleNewProjectModal">
             <Icon name="fa6-solid:circle-plus" /> create new project
         </button>
-        <Modal
-            v-if="showEditProjModal"
-            :show-modal="showEditProjModal"
-            @close="closeEditProjectModal"
-            @submit="updateProject"
-        >
-            <h2>Edit Project</h2>
-            <form class="form">
-                <div class="project-edit-label">name</div>
-                <input
-                    v-model="editProj.name"
-                    type="text"
-                    placeholder="project Name"
-                    name="name"
-                />
-                <div class="project-edit-label">descritpion</div>
-                <textarea
-                    v-model="editProj.description"
-                    placeholder="project Description"
-                    name="description"
-                    rows="7"
-                    maxlength="250"
-                />
-                <div class="project-edit-label">tags</div>
-                <div class="tags-edit">
-                    <input
-                        ref="tagInput"
-                        v-model="editTagInput"
-                        type="text"
-                        class="tag-input"
-                        placeholder="enter tag"
-                        name="tags"
-                        @keydown.enter.stop="
-                            () => {
-                                if (editTagInput !== '') {
-                                    editProj.tags.push(editTagInput.trim())
-                                    editTagInput = ''
-                                }
-                            }
-                        "
-                    />
-                    <div class="tags-box">
-                        <span
-                            v-for="tag in editProj.tags"
-                            :key="tag"
-                            class="tag"
-                            >{{ tag }}
-                            <i class="fa-solid fa-xmark" @click="deleteEditTag"
-                        /></span>
-                    </div>
-                </div>
-                <div class="modal-btns">
-                    <button
-                        type="button"
-                        class="modal-btn"
-                        @click="closeEditProjectModal"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="button"
-                        class="modal-btn"
-                        @click="updateProject"
-                    >
-                        Save
-                    </button>
-                </div>
-            </form>
-        </Modal>
-        <Modal
+        <BaseModal
             v-if="showDeleteProjModal"
             :show-modal="showDeleteProjModal"
             @close="closeDeleteProject"
         >
             <div class="font-mono font-bold text-lg">Delete Project</div>
             <div class="font-mono">
-                Are you sure? This will delete all files and codes associated and cannot be undone.
+                Are you sure? This will delete all files and codes associated
+                and cannot be undone.
             </div>
             <div class="font-mono">
                 Type "{{ deleteProj.name }}" to confirm.
@@ -255,73 +175,19 @@ function deleteNewTag(event) {
             <button class="modal-btn" @click="closeDeleteProject">
                 cancel
             </button>
-        </Modal>
-        <Modal
-            v-if="showNewProjectModal"
-            :show-modal="showNewProjectModal"
-            @close="closeNewProjectModal"
+        </BaseModal>
+        <ProjectModal
+            v-model:project="editProj"
+            v-model:show-modal="showEditProjModal"
+            @submit="updateProject"
+            @close="closeEditProjectModal"
+        />
+        <ProjectModal
+            v-model:project="newProj"
+            v-model:show-modal="showNewProjectModal"
             @submit="createNewProject"
-        >
-            <div class="font-mono font-bold text-lg">New Project</div>
-            <form class="form">
-                <div class="project-edit-label">name</div>
-                <input
-                    v-model="newProj.name"
-                    type="text"
-                    placeholder="project name"
-                    name="name"
-                />
-                <div class="project-edit-label">descritpion</div>
-                <textarea
-                    v-model="newProj.description"
-                    placeholder="project description"
-                    name="description"
-                    rows="7"
-                    maxlength="250"
-                />
-                <div class="project-edit-label">tags</div>
-                <div class="tags-edit">
-                    <input
-                        ref="tagInput"
-                        v-model="newTagInput"
-                        type="text"
-                        class="tag-input"
-                        placeholder="enter tag"
-                        name="tags"
-                        @keydown.enter.stop="
-                            () => {
-                                if (newTagInput !== '') {
-                                    newProj.tags.push(newTagInput)
-                                    newTagInput = ''
-                                }
-                            }
-                        "
-                    />
-                    <div class="tags-box">
-                        <span v-for="tag in newProj.tags" :key="tag" class="tag"
-                            >{{ tag }}
-                            <i class="fa-solid fa-xmark" @click="deleteNewTag"
-                        /></span>
-                    </div>
-                </div>
-                <div class="modal-btns">
-                    <button
-                        type="button"
-                        class="modal-btn"
-                        @click="closeNewProjectModal"
-                    >
-                        cancel
-                    </button>
-                    <button
-                        type="button"
-                        class="modal-btn"
-                        @click="createNewProject"
-                    >
-                        create
-                    </button>
-                </div>
-            </form>
-        </Modal>
+            @close="closeNewProjectModal"
+        />
     </div>
 </template>
 
@@ -368,48 +234,6 @@ function deleteNewTag(event) {
 
 #submit-btn {
     width: 400px;
-}
-
-.tag {
-    background-color: var(--main-color);
-    color: var(--bg-color);
-    border-radius: var(--radius);
-    padding: 0.2rem 0.5rem;
-    margin: 0.2rem;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-.tag i {
-    cursor: pointer;
-}
-
-.tag i:hover {
-    color: var(--error-color);
-}
-
-.tag i:active {
-    color: var(--error-extra-color);
-}
-
-.tags-box {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    align-self: center;
-}
-
-.tags-edit {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-}
-
-.tag-input {
-    width: 150px;
-    margin-right: 0.5rem;
 }
 
 .delete-btn {

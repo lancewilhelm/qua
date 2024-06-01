@@ -480,7 +480,7 @@ function handleCodeClick(event, segment) {
                 >
             </div>
         </div>
-        <ContextMenu
+        <BaseContextMenu
             v-if="showContextMenu"
             :event="contextMenuEvent"
             @close="
@@ -511,9 +511,9 @@ function handleCodeClick(event, segment) {
                     <div><i class="fa-solid fa-caret-right" /></div>
                 </button>
             </div>
-        </ContextMenu>
+        </BaseContextMenu>
 
-        <ContextMenu
+        <BaseContextMenu
             v-if="showSecondMenu"
             :event="expanderMenuEvent"
             :level="1"
@@ -522,9 +522,9 @@ function handleCodeClick(event, segment) {
             <!-- <button @click="showSelectCode">show</button> -->
             <button @click="openEditSegmentModal">edit code</button>
             <button @click="deleteCodeInstance">delete instance</button>
-        </ContextMenu>
+        </BaseContextMenu>
 
-        <Modal v-if="showNewCodeModal" @close="showNewCodeModal = false" @submit="addCodeInstance">
+        <BaseModal v-if="showNewCodeModal" @close="showNewCodeModal = false" @submit="addCodeInstance">
             <div class="code-modal-title">quote</div>
             <div class="scroll-container">
                 <div class="code-modal-selected-text">
@@ -545,9 +545,9 @@ function handleCodeClick(event, segment) {
                 </button>
                 <button class="modal-btn" @click="addCodeInstance">add</button>
             </div>
-        </Modal>
+        </BaseModal>
 
-        <Modal
+        <BaseModal
             v-if="showEditSegmentModal"
             @close="showEditSegmentModal = false"
             @submit="handleEditCodeSubmit"
@@ -575,7 +575,7 @@ function handleCodeClick(event, segment) {
                     add
                 </button>
             </div>
-        </Modal>
+        </BaseModal>
     </div>
 </template>
 

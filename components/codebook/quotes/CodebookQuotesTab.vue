@@ -14,7 +14,7 @@ const selectedCode = ref({});
 
 <template>
   <div class="quotes-tab">
-    <CodePanel
+    <CodebookCodesPanel
       v-if="codePanelWidth > 0"
       v-model:codes="codes"
       v-model:selected-code="selectedCode"
@@ -22,12 +22,12 @@ const selectedCode = ref({});
       :on-left="true"
       :square-top="true"
     />
-    <ResizeBar
+    <BaseResizeBar
       v-model:element-width="codePanelWidth"
       :min-width="250"
       :on-left="true"
     />
-    <QuotesPanel
+    <CodebookQuotesPanel
       :selected-code="selectedCode"
       :files-map="filesMap"
     />

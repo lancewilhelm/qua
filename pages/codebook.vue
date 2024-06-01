@@ -69,19 +69,6 @@ const parsedCodes = computed(() => {
     return sortedRootItems
 })
 
-// function getAllChildren(file) {
-//     let children = []
-//     if (file.folder && file.children.length > 0) {
-//         for (const c of file.children) {
-//             children.push(c)
-//             if (c.type === 'folder') {
-//                 children = children.concat(getAllChildren(c))
-//             }
-//         }
-//     }
-//     return children
-// }
-
 function getCodesHeight(codes) {
     let height = 0
     for (let code of codes) {
@@ -120,12 +107,12 @@ function getCodesHeight(codes) {
                 Quotes
             </div>
         </div>
-        <QuotesTab
+        <CodebookQuotesTab
             v-if="activeTab === 'quotes'"
             v-model:codes="codes"
             :files-map="filesMap"
         />
-        <CodesTab
+        <CodebookCodesTab
             v-else-if="activeTab === 'codes'"
             v-model:codes="codes"
             v-model:parsed-codes="parsedCodes"

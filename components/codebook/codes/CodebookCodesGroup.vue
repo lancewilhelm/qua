@@ -49,7 +49,7 @@ const props = defineProps({
             <div>{{ code.code }}</div>
         </div>
         <div v-if="code.group" class="children">
-            <CodesTabGroup
+            <CodebookCodesGroup
                 v-for="(c, i) in code.children"
                 :key="c.id"
                 :code="c"

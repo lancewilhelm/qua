@@ -327,7 +327,7 @@ function onDrop(e, code) {
             @contextmenu.prevent="handleOpenContextMenu"
         >
             <div v-if="parsedCodes.length > 0" class="codes">
-                <CodePanelItem
+                <CodebookCodesPanelItem
                     v-for="c in filterCodes(parsedCodes)"
                     :key="c.id"
                     v-model:dragged-code="draggedCode"
@@ -353,7 +353,7 @@ function onDrop(e, code) {
             </div>
         </div>
 
-        <ContextMenu
+        <BaseContextMenu
             v-if="showContextMenu"
             :event="contextMenuEvent"
             @close="showContextMenu = false"
@@ -364,9 +364,9 @@ function onDrop(e, code) {
             </button>
             <button @click="showNewCodeModal = true">new code</button>
             <button @click="showNewCodeGroupModal = true">new group</button>
-        </ContextMenu>
+        </BaseContextMenu>
 
-        <Modal
+        <BaseModal
             v-if="showNewCodeModal"
             title="New Code"
             @close="showNewCodeModal = false"
@@ -381,7 +381,7 @@ function onDrop(e, code) {
             />
             <div class="code-color">
                 <div class="input-label">color</div>
-                <ColorPicker v-model:current-color="newCode.color" />
+                <BaseColorPicker v-model:current-color="newCode.color" />
             </div>
             <div class="modal-btns">
                 <button
@@ -400,9 +400,9 @@ function onDrop(e, code) {
                     submit
                 </button>
             </div>
-        </Modal>
+        </BaseModal>
 
-        <Modal
+        <BaseModal
             v-if="showNewCodeGroupModal"
             title="New Code Group"
             @close="showNewCodeGroupModal = false"
@@ -431,9 +431,9 @@ function onDrop(e, code) {
                     submit
                 </button>
             </div>
-        </Modal>
+        </BaseModal>
 
-        <Modal
+        <BaseModal
             v-if="showEditModal"
             title="Edit Code"
             @close="showEditModal = false"
@@ -453,7 +453,7 @@ function onDrop(e, code) {
             />
             <div v-if="!contextMenuCode.group" class="code-color">
                 <div class="input-label">color</div>
-                <ColorPicker v-model:current-color="editCode.color" />
+                <BaseColorPicker v-model:current-color="editCode.color" />
             </div>
             <div class="modal-btns">
                 <button
@@ -471,9 +471,9 @@ function onDrop(e, code) {
                     submit
                 </button>
             </div>
-        </Modal>
+        </BaseModal>
 
-        <Modal
+        <BaseModal
             v-if="showDeleteModal"
             title="Delete Code"
             @close="showDeleteModal = false"
@@ -503,7 +503,7 @@ function onDrop(e, code) {
                     delete
                 </button>
             </div>
-        </Modal>
+        </BaseModal>
     </div>
 </template>
 

@@ -362,16 +362,16 @@ function handleSelected(item) {
             <div class="instruction">drag and drop a file here</div>
         </div>
 
-        <ContextMenu
+        <BaseContextMenu
             v-if="showContextMenu"
             :event="contextMenuEvent"
             @close="showContextMenu = false"
         >
             <button @click="openRenameModal">rename</button>
             <button @click="showDeleteModal = true">delete</button>
-        </ContextMenu>
+        </BaseContextMenu>
 
-        <Modal v-if="showDeleteModal" @close="showDeleteModal = false">
+        <BaseModal v-if="showDeleteModal" @close="showDeleteModal = false">
             <div class="modal-file-name">
                 <Icon name="fa6-solid:file-lines" />
                 {{ contextMenuFile.name }}
@@ -386,9 +386,9 @@ function handleSelected(item) {
                 </button>
                 <button class="modal-btn" @click="deleteFile">delete</button>
             </div>
-        </Modal>
+        </BaseModal>
 
-        <Modal
+        <BaseModal
             v-if="showRenameModal"
             @close="closeRenameModal"
             @submit="renameFile"
@@ -414,7 +414,7 @@ function handleSelected(item) {
                 </button>
                 <button class="modal-btn" @click="renameFile">rename</button>
             </div>
-        </Modal>
+        </BaseModal>
     </div>
 </template>
 

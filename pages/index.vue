@@ -31,7 +31,6 @@ const handleRegister = async () => {
         alert('Passwords do not match')
         return
     }
-    console.log(registerEmail.value)
     const { data, error } = await supabase.auth.signUp({
         email: registerEmail.value,
         password: registerPassword.value,

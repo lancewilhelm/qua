@@ -1,6 +1,4 @@
 <script setup>
-import { parse } from 'vue/compiler-sfc';
-
 definePageMeta({
     middleware: 'auth',
 })
@@ -41,7 +39,7 @@ await supabase
             :width="filePanelWidth"
         />
 
-        <ResizeBar
+        <BaseResizeBar
             v-model:element-width="filePanelWidth"
             :min-width="150"
             :on-left="true"
@@ -55,14 +53,14 @@ await supabase
             v-model:selected-code="selectedCode"
         />
 
-        <ResizeBar
+        <BaseResizeBar
             v-model:element-width="codePanelWidth"
             :min-width="250"
             :on-left="false"
             :config-attribute="'editor_code_panel_width'"
         />
 
-        <CodePanel
+        <CodebookCodesPanel
             v-model:codes="codes"
             v-model:selected-code="selectedCode"
             :width="codePanelWidth"
