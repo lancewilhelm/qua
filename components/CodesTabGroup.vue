@@ -50,7 +50,7 @@ const props = defineProps({
         </div>
         <div v-if="code.group" class="children">
             <CodesTabGroup
-                v-for="(c, i) in code.codes"
+                v-for="(c, i) in code.children"
                 :key="c.id"
                 :code="c"
                 :depth="depth + 1"

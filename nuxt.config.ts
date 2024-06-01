@@ -32,6 +32,12 @@ export default defineNuxtConfig({
                     rel: 'stylesheet',
                     href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&family=Poppins:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap',
                 },
+                {
+                    rel: 'icon',
+                    type: 'image/svg+xml',
+                    id: 'favicon',
+                    href: '/favicon.svg',
+                },
             ],
         },
     },

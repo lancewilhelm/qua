@@ -25,12 +25,6 @@ const logout = async () => {
                     <div class="tooltip">projects</div>
                 </NuxtLink>
             </div>
-            <div v-if="loggedIn" class="link-btn">
-                <NuxtLink to="/dashboard">
-                    <Icon name="fa6-solid:chart-line" />
-                    <div class="tooltip">dashboard</div>
-                </NuxtLink>
-            </div>
         </div>
         <span v-if="projectStore.currentProject && loggedIn" class="splitter" />
         <div
@@ -50,18 +44,6 @@ const logout = async () => {
                 <NuxtLink to="/codebook">
                     <Icon name="fa6-solid:book" />
                     <div class="tooltip">codebook</div>
-                </NuxtLink>
-            </div>
-            <div class="link-btn">
-                <NuxtLink to="/graph">
-                    <Icon name="fa6-solid:circle-nodes" />
-                    <div class="tooltip">graph</div>
-                </NuxtLink>
-            </div>
-            <div class="link-btn">
-                <NuxtLink to="/export">
-                    <Icon name="fa6-solid:file-export" />
-                    <div class="tooltip">export</div>
                 </NuxtLink>
             </div>
         </div>

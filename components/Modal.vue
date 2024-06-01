@@ -25,7 +25,6 @@ onMounted(() => {
             'button, a, input, textarea'
         )
     )
-    console.log(focusableElements)
     // focus the first element
     focusableElements[0].focus()
 })

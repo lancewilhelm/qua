@@ -54,7 +54,7 @@ const parsedCodes = computed(() => {
     codes.value.forEach((c) => {
         const newCode = { ...c }
         if (newCode.group) {
-            newCode.codes = []
+            newCode.children = []
         }
         codeMap.set(newCode.id, newCode)
     })
@@ -64,7 +64,7 @@ const parsedCodes = computed(() => {
         if (newCode.parent) {
             const parent = codeMap.get(newCode.parent)
             if (parent) {
-                parent.codes.push(newCode)
+                parent.children.push(newCode)
             }
         } else {
             rootItems.push(newCode)
@@ -262,7 +262,7 @@ async function handleEditSubmit() {
 
 async function handleDeleteSubmit() {
     if (contextMenuCode.value.group) {
-        if (contextMenuCode.value.codes.length > 0) {
+        if (contextMenuCode.value.children.length > 0) {
             alert('The group must be empty first before deleting')
             showDeleteModal.value = false
             return

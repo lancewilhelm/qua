@@ -46,8 +46,8 @@ function onDrop(e, code) {
 
 function getAllChildren(code) {
     let children = []
-    if (code.group && code.codes.length > 0) {
-        for (const c of code.codes) {
+    if (code.group && code.children.length > 0) {
+        for (const c of code.children) {
             children.push(c)
             if (c.group) {
                 children = children.concat(getAllChildren(c))
@@ -95,7 +95,7 @@ function getAllChildren(code) {
                 {{ code.code }}
             </div>
             <div
-                v-if="code.group && code.codes.length > 0"
+                v-if="code.group && code.children.length > 0"
                 class="child-colors"
             >
                 <div
@@ -109,14 +109,14 @@ function getAllChildren(code) {
             </div>
         </div>
         <div
-            v-if="code.group && code.codes.length > 0 && groupOpen"
+            v-if="code.group && code.children.length > 0 && groupOpen"
             class="children-container"
         >
             <span class="left-bar" :style="{ left: `${10 + level * 15}px` }" />
             <div class="children">
                 <div v-if="groupOpen" class="children">
                     <CodePanelItem
-                        v-for="c in code.codes"
+                        v-for="c in code.children"
                         :key="c.id"
                         v-model:dragged-code="draggedCode"
                         v-model:drop-target="dropTarget"

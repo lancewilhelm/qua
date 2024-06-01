@@ -1,4 +1,4 @@
-import { defineStore, skipHydrate } from 'pinia'
+import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 
 interface Config {
@@ -48,7 +48,7 @@ export const useConfigStore = defineStore('config', () => {
     }
 
     return {
-        config: skipHydrate(config),
+        config,
         setConfig,
         patchConfig,
         fetchConfig,

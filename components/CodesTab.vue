@@ -20,18 +20,6 @@ const elementWidth = computed(() => {
     return props.width / (props.columns + 1)
 })
 
-// function getCodesChildren(codes) {
-//     const children = []
-//     for (const code of codes) {
-//         if (!code.group) {
-//             children.push(code)
-//         } else if (code.group) {
-//             children.push(...getCodesChildren(code.codes))
-//         }
-//     }
-//     return children
-// }
-
 function getCodesGroupsByLevel(codes) {
     const groupsByLevelMap = new Map()
     let groups = codes.filter((code) => code.group)
@@ -40,7 +28,7 @@ function getCodesGroupsByLevel(codes) {
     while (groups.length > 0) {
         groupsByLevelMap.set(level, groups.length)
         for (const group of groups) {
-            nextLevelGroups.push(...group.codes.filter((code) => code.group))
+            nextLevelGroups.push(...group.children.filter((code) => code.group))
         }
         groups = nextLevelGroups
         nextLevelGroups = []

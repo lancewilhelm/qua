@@ -70,6 +70,7 @@ function openEditProjectModal(project) {
 
 function closeEditProjectModal() {
     editProj.value = {}
+    editTagInput.value = ''
     showEditProjModal.value = false
 }
 
@@ -188,10 +189,10 @@ function deleteNewTag(event) {
                         class="tag-input"
                         placeholder="enter tag"
                         name="tags"
-                        @keyup.enter.prevent="
+                        @keydown.enter.stop="
                             () => {
                                 if (editTagInput !== '') {
-                                    editProj.tags.push(editTagInput)
+                                    editProj.tags.push(editTagInput.trim())
                                     editTagInput = ''
                                 }
                             }
@@ -232,7 +233,7 @@ function deleteNewTag(event) {
         >
             <div class="font-mono font-bold text-lg">Delete Project</div>
             <div class="font-mono">
-                Are you sure? This action cannot be undone.
+                Are you sure? This will delete all files and codes associated and cannot be undone.
             </div>
             <div class="font-mono">
                 Type "{{ deleteProj.name }}" to confirm.
@@ -287,7 +288,7 @@ function deleteNewTag(event) {
                         class="tag-input"
                         placeholder="enter tag"
                         name="tags"
-                        @keyup.enter.prevent="
+                        @keydown.enter.stop="
                             () => {
                                 if (newTagInput !== '') {
                                     newProj.tags.push(newTagInput)

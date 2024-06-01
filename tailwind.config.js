@@ -2,9 +2,7 @@ const animate = require("tailwindcss-animate")
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ["class"],
-  safelist: ["dark"],
-  prefix: "",
+  darkMode: false,
 
   theme: {
     container: {
@@ -13,23 +11,26 @@ module.exports = {
       screens: {
         "2xl": "1400px",
       },
+    },
     fontFamily: {
-        'mono': ['Roboto Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
-        'alt': ['Poppins', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
-      },
+      mono: ['"Roboto Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
+      alt: ['Poppins', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
     },
     extend: {
+      spacing: {
+        '4.5': '1.125rem',
+      },
       colors: {
         bg: "var(--bg-color)",
         main: "var(--main-color)",
         caret: "var(--caret-color)",
         sub: "var(--sub-color)",
-        subAlt: "var(--sub-alt-color)",
+        'sub-alt': "var(--sub-alt-color)",
         text: "var(--text-color)",
         error: "var(--error-color)",
-        errorExtra: "var(--error-extra-color)",
-        colorfulError: "var(--colorful-error-color)",
-        colorfulErrorExtra: "var(--colorful-error-extra-color)",
+        'error-extra': "var(--error-extra-color)",
+        'colorful-error': "var(--colorful-error-color)",
+        'colorful-error-extra': "var(--colorful-error-extra-color)",
       },
       borderRadius: {
         xl: "calc(var(--radius) + 4px)",

@@ -47,7 +47,7 @@ const parsedCodes = computed(() => {
     codes.value.forEach((c) => {
         const newCode = { ...c }
         if (newCode.group) {
-            newCode.codes = []
+            newCode.children = []
         }
         codeMap.set(newCode.id, newCode)
     })
@@ -57,7 +57,7 @@ const parsedCodes = computed(() => {
         if (newCode.parent) {
             const parent = codeMap.get(newCode.parent)
             if (parent) {
-                parent.codes.push(newCode)
+                parent.children.push(newCode)
             }
         } else {
             rootItems.push(newCode)
@@ -71,8 +71,8 @@ const parsedCodes = computed(() => {
 
 // function getAllChildren(file) {
 //     let children = []
-//     if (file.folder && file.files.length > 0) {
-//         for (const c of file.files) {
+//     if (file.folder && file.children.length > 0) {
+//         for (const c of file.children) {
 //             children.push(c)
 //             if (c.type === 'folder') {
 //                 children = children.concat(getAllChildren(c))
@@ -86,7 +86,7 @@ function getCodesHeight(codes) {
     let height = 0
     for (let code of codes) {
         if (code.group) {
-            const depth = getCodesHeight(code.codes)
+            const depth = getCodesHeight(code.children)
             if (depth > height) {
                 height = depth
             }

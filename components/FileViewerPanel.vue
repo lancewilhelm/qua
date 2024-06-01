@@ -330,8 +330,8 @@ function handleEditorKeydown(event) {
 
 function getAllChildren(code) {
     let children = []
-    if (code.group && code.codes.length > 0) {
-        for (const c of code.codes) {
+    if (code.group && code.children.length > 0) {
+        for (const c of code.children) {
             children.push(c)
             if (c.group) {
                 children = children.concat(getAllChildren(c))

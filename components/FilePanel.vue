@@ -11,6 +11,7 @@ const props = defineProps({
 })
 
 const supabase = useSupabaseClient()
+const configStore = useConfigStore()
 const projectStore = useProjectStore()
 const showDeleteModal = ref(false)
 const showRenameModal = ref(false)
@@ -20,14 +21,14 @@ const showContextMenu = ref(false)
 const contextMenuEvent = ref(false)
 const editFile = ref({})
 const contextMenuFile = ref({})
-const draggedFile = ref(null)
+const draggedFiles = ref(null)
 const dropTarget = ref(null)
 const dragOver = ref(false)
 const uploadTarget = ref(null)
 let dragCounter = 0
 
 watch(dropTarget, () => {
-    if (draggedFile.value && dropTarget.value) {
+    if (draggedFiles.value && dropTarget.value) {
         handleDrop()
     }
 })
@@ -39,7 +40,7 @@ const parsedFiles = computed(() => {
     files.value.forEach((f) => {
         const newF = { ...f }
         if (newF.folder) {
-            newF.files = []
+            newF.children = []
         }
         fileMap.set(newF.id, newF)
     })
@@ -49,7 +50,7 @@ const parsedFiles = computed(() => {
         if (newF.parent) {
             const parent = fileMap.get(newF.parent)
             if (parent) {
-                parent.files.push(newF)
+                parent.children.push(newF)
             }
         } else {
             rootItems.push(newF)
@@ -70,14 +71,11 @@ await supabase
         files.value = res.data
     })
 
-function handleDrop() {
-    if (
-        draggedFile.value &&
-        (dropTarget.value.folder || dropTarget.value === 'root')
-    ) {
-        updateFileLocation(draggedFile.value, dropTarget.value)
-        draggedFile.value = null
-        dropTarget.value = null
+function handleDrop({ items, target }) {
+    // console.log('Dropped items:', items)
+    // console.log('Drop target:', target)
+    if (items && (target.folder || target === 'root')) {
+        updateFileLocation(items, target)
     }
 }
 
@@ -170,9 +168,12 @@ function handleFileUpload(event) {
     }
 }
 
-function openContextMenu(event) {
-    contextMenuEvent.value = event
-    showContextMenu.value = true
+function openContextMenu({ event, target }) {
+    if (target !== 'root') {
+        contextMenuEvent.value = event
+        contextMenuFile.value = target
+        showContextMenu.value = true
+    }
 }
 
 function openRenameModal() {
@@ -257,23 +258,26 @@ async function createFolder() {
     }
 }
 
-async function updateFileLocation(file, target) {
-    if (file.id === target.id) {
+async function updateFileLocation(fs, target) {
+    // check to see if any of the files is the target and return
+    if (fs.some((f) => f.id === target.id)) {
         return
     }
-    const patch = {
-        parent: target.id ? target.id : null,
-    }
-    const { error } = await supabase
-        .from('files')
-        .update(patch)
-        .eq('id', file.id)
+
+    const patch = fs.map((f) => {
+        return {
+            id: f.id,
+            parent: target.id ? target.id : null,
+        }
+    })
+
+    const { error } = await supabase.from('files').upsert(patch)
     if (error) {
         console.error(error)
     } else {
         files.value = files.value.map((f) => {
-            if (f.id === file.id) {
-                return { ...f, parent: patch.parent }
+            if (fs.some((file) => file.id === f.id)) {
+                return { ...f, parent: target.id ? target.id : null }
             } else {
                 return f
             }
@@ -299,6 +303,12 @@ function getRootClass() {
         'drag-over': dragOver.value,
     }
 }
+
+function handleSelected(item) {
+    if (!item.folder) {
+        currentFile.value = item
+    }
+}
 </script>
 
 <template>
@@ -319,28 +329,26 @@ function getRootClass() {
                 <Icon name="fa6-solid:folder-plus" />
             </button>
         </div>
-        <div v-if="parsedFiles?.length > 0" class="files-container">
-            <div class="files">
-                <FilePanelItem
-                    v-for="f in parsedFiles"
-                    :key="f.id"
-                    v-model:current-file="currentFile"
-                    v-model:dragged-file="draggedFile"
-                    v-model:drop-target="dropTarget"
-                    v-model:context-menu-file="contextMenuFile"
-                    :file="f"
-                    :level="0"
-                    draggable="true"
-                    @contextmenu.prevent="openContextMenu($event)"
-                    @upload-file="uploadFile"
-                />
-            </div>
-            <div
-                :class="getRootClass()"
-                @dragenter.prevent="onDragEnter('root')"
-                @dragleave.prevent="onDragLeave('root')"
-                @drop.prevent="onDrop($event, 'root')"
-            />
+        <div v-if="parsedFiles?.length > 0" class="files-container flex grow">
+            <DraggableContainer
+                @onDrop="handleDrop"
+                @onContextMenu="openContextMenu"
+            >
+                <DraggableItem
+                    v-for="file in parsedFiles"
+                    :key="file.id"
+                    :item="file"
+                    :children="file.children ? file.children : []"
+                    :depth="0"
+                    @onDrop="handleDrop"
+                    @selected="handleSelected"
+                    @onContextMenu="openContextMenu"
+                >
+                    <template #default="{ item, isOpen }">
+                        <FilePanelItem :file="item" :is-open="isOpen" />
+                    </template>
+                </DraggableItem>
+            </DraggableContainer>
         </div>
         <div
             v-if="parsedFiles?.length == 0 || !parsedFiles"
@@ -423,12 +431,6 @@ function getRootClass() {
     border-width: 3px 0 3px 3px;
 }
 
-.files-container {
-    flex: 1;
-    display: grid;
-    grid-template-rows: auto 1fr;
-}
-
 .files {
     display: flex;
     width: 100%;
@@ -466,6 +468,10 @@ function getRootClass() {
 }
 
 .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     padding: 10px;
     margin: 10px 0;
     border: none;
@@ -477,6 +483,10 @@ function getRootClass() {
     color: var(--text-color);
     transition: var(--transition);
     box-shadow: 4px 6px 0px rgba(0, 0, 0, 1);
+}
+
+.action-btn .icon {
+    margin-right: 0;
 }
 
 .action-btn:hover {
