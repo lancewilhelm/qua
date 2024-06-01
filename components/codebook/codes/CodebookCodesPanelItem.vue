@@ -115,7 +115,7 @@ function getAllChildren(code) {
             <span class="left-bar" :style="{ left: `${10 + level * 15}px` }" />
             <div class="children">
                 <div v-if="groupOpen" class="children">
-                    <CodePanelItem
+                    <CodebookCodesPanelItem
                         v-for="c in code.children"
                         :key="c.id"
                         v-model:dragged-code="draggedCode"

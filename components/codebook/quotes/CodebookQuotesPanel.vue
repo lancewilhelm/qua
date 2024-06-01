@@ -25,7 +25,7 @@ const props = defineProps({
       <div
         class="quotes-content"
       >
-        <QuoteItem
+        <CodebookQuotesItem
           v-for="instance in selectedCode.code_instances"
           :key="instance.id"
           :instance="instance"

@@ -15,7 +15,7 @@ const showThemePicker = ref(false)
                 <span>{{ configStore.config.theme }}</span>
             </div>
         </div>
-        <ThemePicker v-if="showThemePicker" @close="showThemePicker = false" />
+        <BaseThemePicker v-if="showThemePicker" @close="showThemePicker = false" />
     </div>
 </template>
 
