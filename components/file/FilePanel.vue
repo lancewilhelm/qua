@@ -11,7 +11,6 @@ const props = defineProps({
 })
 
 const supabase = useSupabaseClient()
-const configStore = useConfigStore()
 const projectStore = useProjectStore()
 const showDeleteModal = ref(false)
 const showRenameModal = ref(false)
@@ -72,6 +71,9 @@ await supabase
     })
 
 function handleDrop({ items, target }) {
+    if (items.length === 0) {
+        return
+    }
     // console.log('Dropped items:', items)
     // console.log('Drop target:', target)
     if (items && (target.folder || target === 'root')) {
@@ -259,7 +261,6 @@ async function createFolder() {
 }
 
 async function updateFileLocation(fs, target) {
-    // check to see if any of the files is the target and return
     if (fs.some((f) => f.id === target.id)) {
         return
     }
@@ -282,18 +283,6 @@ async function updateFileLocation(fs, target) {
                 return f
             }
         })
-    }
-}
-
-function onDragEnter(file) {
-    dragCounter++
-    dragOver.value = true
-}
-
-function onDragLeave(file) {
-    dragCounter--
-    if (dragCounter === 0) {
-        dragOver.value = false
     }
 }
 
@@ -322,7 +311,7 @@ function handleSelected(item) {
                 <Icon name="fa6-solid:folder-plus" />
             </button>
         </div>
-        <div v-if="parsedFiles?.length > 0" class="files-container flex grow">
+        <div v-if="parsedFiles?.length > 0" class="flex grow">
             <DraggableContainer
                 @onDrop="handleDrop"
                 @onContextMenu="openContextMenu"

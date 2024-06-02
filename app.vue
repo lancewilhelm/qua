@@ -5,7 +5,7 @@ const user = useSupabaseUser()
 const configStore = useConfigStore()
 
 if (configStore.config.random_theme) {
-    const themes = JSON.parse(JSON.stringify(themesList)).sort((a, b) =>
+    const themes = JSON.parse(JSON.stringify(themesList)).sort((a: { name: string; }, b: { name: any; }) =>
         a.name.localeCompare(b.name)
     )
     const randomTheme = themes[Math.floor(Math.random() * themes.length)]
