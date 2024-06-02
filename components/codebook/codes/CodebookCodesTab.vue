@@ -39,19 +39,19 @@ function getCodesGroupsByLevel(codes) {
 </script>
 
 <template>
-    <div class="codes-tab">
-        <div class="stats">
-            <span class="divider" />
-            <div class="stat">
-                <div class="title">total codes</div>
-                <div class="value">
+    <div class="flex flex-col h-full">
+        <div class="flex bg-main font-mono justify-center">
+            <span class="w-px my-2 bg-sub-alt" />
+            <div class="flex flex-col items-center p-2.5">
+                <div class="text-sm text-sub-alt">total codes</div>
+                <div class="text-2xl font-black text-sub-alt">
                     {{ codes.length }}
                 </div>
             </div>
-            <span class="divider" />
-            <div class="stat">
-                <div class="title">total code groups</div>
-                <div class="value">
+            <span class="w-px my-2 bg-sub-alt" />
+            <div class="flex flex-col items-center p-2.5">
+                <div class="text-sm text-sub-alt">total code groups</div>
+                <div class="text-2xl font-black text-sub-alt">
                     {{
                         getCodesGroupsByLevel(parsedCodes)
                             .values()
@@ -60,38 +60,38 @@ function getCodesGroupsByLevel(codes) {
                     }}
                 </div>
             </div>
-            <span class="divider" />
+            <span class="w-px my-2 bg-sub-alt" />
             <div
                 v-for="(item, index) in getCodesGroupsByLevel(parsedCodes)
                     .values()
                     .toArray()"
                 :key="index"
-                class="levels"
+                class="flex"
             >
-                <div class="stat">
-                    <div class="title">level {{ index }} groups</div>
-                    <div class="value">
+                <div class="flex flex-col items-center p-2.5">
+                    <div class="text-sm text-sub-alt">level {{ index }} groups</div>
+                    <div class="text-2xl font-black text-sub-alt">
                         {{ item }}
                     </div>
                 </div>
-                <span class="divider" />
+                <span class="w-px my-2 bg-sub-alt" />
             </div>
         </div>
 
-        <div class="codes-header">
-            <div v-for="i in columns" :key="i - 1" class="codes-header-element">
+        <div class="flex bg-main text-sub-alt font-mono p-2.5 border-t-1 border-bg">
+            <div v-for="i in columns" :key="i - 1" class="flex flex-col items-center">
                 <div
                     v-if="i <= columns"
                     :style="{ width: elementWidth + 'px' }"
-                    class="title"
+                    class="text-sm text-sub-alt"
                 >
                     level {{ i - 1 }}
                 </div>
-                <!-- <div v-else class="title">codes</div> -->
+                <!-- <div v-else class="text-sm text-sub-alt">codes</div> -->
             </div>
         </div>
 
-        <div class="codes">
+        <div class="border-3 border-main">
             <CodebookCodesGroup
                 v-for="(c, i) in parsedCodes"
                 :key="c.id"
@@ -105,67 +105,3 @@ function getCodesGroupsByLevel(codes) {
         </div>
     </div>
 </template>
-
-<style scoped>
-.codes-tab {
-    display: flex;
-    flex-direction: column;
-    grid-row: content;
-    height: 100%;
-}
-
-.stats {
-    display: flex;
-    background-color: var(--main-color);
-    font-family: var(--font-family);
-    justify-content: center;
-}
-
-.levels {
-    display: flex;
-}
-
-.stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-}
-
-.stat .value {
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: var(--sub-alt-color);
-}
-
-.stat .title {
-    font-size: 0.8rem;
-    color: var(--sub-alt-color);
-}
-
-.divider {
-    width: 1px;
-    margin: 5px 0;
-    background-color: var(--sub-alt-color);
-}
-
-.codes-header {
-    display: flex;
-    background-color: var(--main-color);
-    color: var(--sub-alt-color);
-    font-family: var(--font-family);
-    padding: 10px;
-    border-top: 1px solid var(--bg-color);
-}
-
-.codes-header-element {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 1rem;
-}
-
-.codes {
-    border: 3px solid var(--main-color);
-}
-</style>

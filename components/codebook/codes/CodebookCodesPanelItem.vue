@@ -19,13 +19,6 @@ const dragOver = ref(false)
 const groupOpen = ref(false)
 let dragCounter = 0
 
-function getCodeClass() {
-    return {
-        code: true,
-        'drag-over': dragOver.value,
-    }
-}
-
 function onDragEnter() {
     dragCounter++
     dragOver.value = true
@@ -59,9 +52,9 @@ function getAllChildren(code) {
 </script>
 
 <template>
-    <div class="code-panel-item">
+    <div class="flex flex-col cursor-pointer font-mono text-sm">
         <div
-            :class="getCodeClass()"
+            :class="['flex flex-row grow p-1.5', { 'bg-sub-alt': dragOver }]"
             :style="{
                 paddingLeft: `${10 + level * 15}px`,
                 'background-color': code.color,
@@ -76,7 +69,7 @@ function getAllChildren(code) {
             @drop.prevent="onDrop($event, code)"
             @contextmenu.prevent="contextMenuCode = code"
         >
-            <div class="icon">
+            <div class="mr-1.5">
                 <Icon
                     v-if="code.group"
                     name="fa6-solid:angle-right"
@@ -87,7 +80,6 @@ function getAllChildren(code) {
                 />
             </div>
             <div
-                class="code-name"
                 :style="{
                     'font-weight': code.group ? 'bold' : 'inherit',
                 }"
@@ -96,36 +88,35 @@ function getAllChildren(code) {
             </div>
             <div
                 v-if="code.group && code.children.length > 0"
-                class="child-colors"
+                class="flex ml-2.5 items-center gap-2"
             >
                 <div
-                    v-for="c in getAllChildren(code).filter(
-                        (c) => c.type === 'code'
-                    )"
+                    v-for="c in getAllChildren(code).filter((c) => !c.folder)"
                     :key="c.id"
-                    class="child-color"
+                    class="w-3 h-3 rounded-full"
                     :style="{ backgroundColor: c.color }"
                 />
             </div>
         </div>
         <div
             v-if="code.group && code.children.length > 0 && groupOpen"
-            class="children-container"
+            class="flex relative"
         >
-            <span class="left-bar" :style="{ left: `${10 + level * 15}px` }" />
-            <div class="children">
-                <div v-if="groupOpen" class="children">
-                    <CodebookCodesPanelItem
-                        v-for="c in code.children"
-                        :key="c.id"
-                        v-model:dragged-code="draggedCode"
-                        v-model:drop-target="dropTarget"
-                        v-model:context-menu-code="contextMenuCode"
-                        v-model:selected-code="selectedCode"
-                        :code="c"
-                        :level="level + 1"
-                    />
-                </div>
+            <span
+                class="absolute z-10 top-0 bottom-0 w-px bg-text"
+                :style="{ left: `${10 + level * 15}px` }"
+            />
+            <div v-if="groupOpen" class="grow">
+                <CodebookCodesPanelItem
+                    v-for="c in code.children"
+                    :key="c.id"
+                    v-model:dragged-code="draggedCode"
+                    v-model:drop-target="dropTarget"
+                    v-model:context-menu-code="contextMenuCode"
+                    v-model:selected-code="selectedCode"
+                    :code="c"
+                    :level="level + 1"
+                />
             </div>
         </div>
     </div>
@@ -157,31 +148,5 @@ function getAllChildren(code) {
 .children-container {
     display: flex;
     position: relative;
-}
-
-.left-bar {
-    position: absolute;
-    z-index: 1;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background-color: var(--text-color);
-}
-
-.children {
-    flex-grow: 1;
-}
-
-.child-colors {
-    display: flex;
-    margin-left: 10px;
-    align-items: center;
-    gap: 5px;
-}
-
-.child-color {
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
 }
 </style>

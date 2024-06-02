@@ -23,13 +23,6 @@ if (favoriteThemesNames.value) {
 }
 displayName.value = configStore.config.display_name
 
-function getThemeBtnClass(theme) {
-    return {
-        'theme-btn': true,
-        active: configStore.config.theme === theme.name,
-    }
-}
-
 function handleChangeTheme(theme) {
     setTheme(theme.name)
     configStore.patchConfig({ theme: theme.name })
@@ -83,335 +76,246 @@ function setRandomTheme(random) {
 </script>
 
 <template>
-    <div class="settings-page narrow-width scroll">
-        <div class="settings-group-title">profile</div>
-        <div class="settings-group">
-            <div class="group-section">
-                <div class="section-title">
-                    <Icon name="fa6-solid:signature" /> display name
+    <div class="grid gap-8 narrow-width scroll">
+        <div class="text-3xl font-black font-mono text-main">profile</div>
+        <SettingsGroupSection
+            title="display name"
+            icon="fa6-solid:signature"
+            description="The name you wish to be displayed on various parts of the site. Also the name others see when on collaborative projects. Examples, Jim Bob, Thicken Nugget, Lance, etc."
+        >
+            <SettingsInput
+                config-parameter="display_name"
+                placeholder="displayname"
+            />
+        </SettingsGroupSection>
+        <div class="text-3xl font-black font-mono text-main">code page</div>
+        <div class="grid gap-8">
+            <SettingsGroupSection
+                title="font size"
+                icon="fa6-solid:text-height"
+                description="The size of the font on the code page. Examples, 12px, 1rem, etc."
+            >
+                <SettingsInput
+                    config-parameter="code_font_size"
+                    placeholder="font size"
+                />
+            </SettingsGroupSection>
+            <SettingsGroupSection
+                title="font family"
+                icon="fa6-solid:people-group"
+                description="The font family of the code on the code page. Examples, monospace, sans-serif, serif, etc."
+            >
+                <SettingsInput
+                    config-parameter="code_font_family"
+                    placeholder="font family"
+                />
+            </SettingsGroupSection>
+            <SettingsGroupSection
+                title="line height"
+                icon="fa6-solid:arrow-down-up-across-line"
+                description="The height of the lines on the code page. Examples, 1.2, 1.5, 2.0, etc."
+            >
+                <SettingsInput
+                    config-parameter="code_line_height"
+                    placeholder="line height"
+                />
+            </SettingsGroupSection>
+            <SettingsGroupSection
+                title="line numbers"
+                icon="fa6-solid:arrow-down-1-9"
+                description="Whether or not to display line numbers on the code page. Examples, true, false."
+            >
+                <SettingsBooleanButtons configParameter="code_line_numbers" />
+            </SettingsGroupSection>
+
+            <SettingsGroupSection
+                title="editor theme"
+                icon="fa6-solid:brush"
+                description="The theme of the code editor."
+            >
+                <div class="grid gap-2 grid-cols-3">
+                    <div class="flex flex-col items-center">
+                        <Icon
+                            name="fa6-solid:caret-down"
+                            :class="[
+                                'text-3xl text-main opacity-0 transition-opacity duration-300',
+                                {
+                                    'opacity-100':
+                                        configStore.config.editor_theme ===
+                                        'light',
+                                },
+                            ]"
+                        />
+                        <button
+                            class="editor-theme-light"
+                            @click="
+                                configStore.patchConfig({
+                                    editor_theme: 'light',
+                                })
+                            "
+                        >
+                            light
+                        </button>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <Icon
+                            name="fa6-solid:caret-down"
+                            :class="[
+                                'text-3xl text-main opacity-0 transition-opacity duration-300',
+                                {
+                                    'opacity-100':
+                                        configStore.config.editor_theme ===
+                                        'dark',
+                                },
+                            ]"
+                        />
+                        <button
+                            class="editor-theme-dark"
+                            @click="
+                                configStore.patchConfig({
+                                    editor_theme: 'dark',
+                                })
+                            "
+                        >
+                            dark
+                        </button>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <Icon
+                            name="fa6-solid:caret-down"
+                            :class="[
+                                'text-3xl text-main opacity-0 transition-opacity duration-300',
+                                {
+                                    'opacity-100':
+                                        configStore.config.editor_theme ===
+                                        'theme',
+                                },
+                            ]"
+                        />
+                        <button
+                            class="editor-theme-theme"
+                            @click="
+                                configStore.patchConfig({
+                                    editor_theme: 'theme',
+                                })
+                            "
+                        >
+                            theme
+                        </button>
+                    </div>
                 </div>
-                <div class="section-text">
-                    The name you wish to be displayed on various parts of the
-                    site. Also the name others see when on collaborative
-                    projects. Examples, Jim Bob, Thicken Nugget, Lance, etc.
-                </div>
-                <div class="section-buttons">
-                    <input
-                        v-model="displayName"
-                        type="text"
-                        placeholder="displayname"
-                    />
-                    <button
-                        class="save-btn"
-                        @click="
-                            configStore.patchConfig({
-                                display_name: configStore.config.display_name,
-                            })
-                        "
-                    >
-                        <Icon name="fa6-solid:floppy-disk" />
-                    </button>
-                </div>
-            </div>
+            </SettingsGroupSection>
+
+            <SettingsGroupSection
+                title="new code random color"
+                icon="fa6-solid:brush"
+                description="Whether or not to assign a random color to a new code"
+            >
+                <SettingsBooleanButtons
+                    configParameter="new_code_random_color"
+                />
+            </SettingsGroupSection>
         </div>
-        <div class="settings-group-title">code page</div>
-        <div class="settings-group">
-            <div class="group-section">
-                <div class="section-title">
-                    <Icon name="fa6-solid:text-height" /> font size
-                </div>
-                <div class="section-text">
-                    The size of the font on the code page. Examples, 12px, 16px,
-                    20px, etc.
-                </div>
-                <div class="section-buttons">
-                    <input
-                        v-model="configStore.config.code_font_size"
-                        type="number"
-                        placeholder="font size"
-                    />
-                    <button
-                        class="save-btn"
-                        @click="
-                            configStore.patchConfig({
-                                code_font_size:
-                                    configStore.config.code_font_size,
-                            })
-                        "
-                    >
-                        <Icon name="fa6-solid:floppy-disk" />
-                    </button>
-                </div>
-            </div>
-            <div class="group-section">
-                <div class="section-title">
-                    <Icon name="fa6-solid:people-group" /> font family
-                </div>
-                <div class="section-text">
-                    The font family of the code on the code page. Examples,
-                    monospace, sans-serif, serif, etc.
-                </div>
-                <div class="section-buttons">
-                    <input
-                        v-model="configStore.config.code_font_family"
-                        type="text"
-                        placeholder="font family"
-                    />
-                    <button
-                        class="save-btn"
-                        @click="
-                            configStore.patchConfig({
-                                code_font_family:
-                                    configStore.config.code_font_family,
-                            })
-                        "
-                    >
-                        <Icon name="fa6-solid:floppy-disk" />
-                    </button>
-                </div>
-            </div>
-            <div class="group-section">
-                <div class="section-title">
-                    <Icon name="fa6-solid:arrow-down-up-across-line" /> line
-                    height
-                </div>
-                <div class="section-text">
-                    The height of the lines on the code page. Examples, 1.2,
-                    1.5, 2.0, etc.
-                </div>
-                <div class="section-buttons">
-                    <input
-                        v-model="configStore.config.code_line_height"
-                        type="number"
-                        placeholder="line height"
-                    />
-                    <button
-                        class="save-btn"
-                        @click="
-                            configStore.patchConfig({
-                                code_line_height:
-                                    configStore.config.code_line_height,
-                            })
-                        "
-                    >
-                        <Icon name="fa6-solid:floppy-disk" />
-                    </button>
-                </div>
-            </div>
-            <div class="group-section">
-                <div class="section-title">
-                    <Icon name="fa6-solid:arrow-down-1-9" /> line numbers
-                </div>
-                <div class="section-text">
-                    Whether or not to display line numbers on the code page.
-                    Examples, true, false.
-                </div>
-                <div class="section-buttons">
-                    <button
-                        :class="{
-                            active: configStore.config.code_line_numbers,
-                            'section-button': true,
-                        }"
-                        @click="
-                            configStore.patchConfig({ code_line_numbers: true })
-                        "
-                    >
-                        true
-                    </button>
-                    <button
-                        :class="{
-                            active: !configStore.config.code_line_numbers,
-                            'section-button': true,
-                        }"
-                        @click="
-                            configStore.patchConfig({
-                                code_line_numbers: false,
-                            })
-                        "
-                    >
-                        false
-                    </button>
-                </div>
-            </div>
-            <div class="group-section">
-                <div class="section-title">editor theme</div>
-                <div class="section-text">The theme of the code editor.</div>
-                <div class="section-buttons editor-theme-btns">
-                    <button
-                        :class="{
-                            active: configStore.config.editor_theme === 'light',
-                            'editor-theme-light': true,
-                            'editor-theme-btn': true,
-                        }"
-                        @click="
-                            configStore.patchConfig({ editor_theme: 'light' })
-                        "
-                    >
-                        light
-                    </button>
-                    <button
-                        :class="{
-                            active: configStore.config.editor_theme === 'dark',
-                            'editor-theme-dark': true,
-                            'editor-theme-btn': true,
-                        }"
-                        @click="
-                            configStore.patchConfig({ editor_theme: 'dark' })
-                        "
-                    >
-                        dark
-                    </button>
-                    <button
-                        :class="{
-                            active: configStore.config.editor_theme === 'theme',
-                            'editor-theme-theme': true,
-                            'editor-theme-btn': true,
-                        }"
-                        @click="
-                            configStore.patchConfig({ editor_theme: 'theme' })
-                        "
-                    >
-                        theme
-                    </button>
-                </div>
-            </div>
-            <div class="group-section">
-                <div class="section-title">
-                    <Icon name="fa6-solid:brush" /> new code random color
-                </div>
-                <div class="section-text">
-                    Whether or not to assign a random color to a new code
-                </div>
-                <div class="section-buttons">
-                    <button
-                        :class="{
-                            active: configStore.config.new_code_random_color,
-                            'section-button': true,
-                        }"
-                        @click="
-                            configStore.patchConfig({
-                                new_code_random_color: true,
-                            })
-                        "
-                    >
-                        true
-                    </button>
-                    <button
-                        :class="{
-                            active: !configStore.config.new_code_random_color,
-                            'section-button': true,
-                        }"
-                        @click="
-                            configStore.patchConfig({
-                                new_code_random_color: false,
-                            })
-                        "
-                    >
-                        false
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="settings-group-title">login</div>
+
+        <div class="text-3xl font-black font-mono text-main">login</div>
         <div class="settings-group">TBD</div>
-        <div class="settings-group-title">theme</div>
-        <div class="settings-group">
-            <div class="group-section">
-                <div class="section-title">random theme</div>
-                <div class="section-text">
-                    Random theme on every reload of the webpage
-                </div>
-                <div class="section-buttons">
-                    <button
-                        :class="{
-                            active: configStore.config.random_theme,
-                            'section-button': true,
-                        }"
-                        @click="setRandomTheme(true)"
-                    >
-                        true
-                    </button>
-                    <button
-                        :class="{
-                            active: !configStore.config.random_theme,
-                            'section-button': true,
-                        }"
-                        @click="setRandomTheme(false)"
-                    >
-                        false
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div v-if="favoriteThemes" class="favorite theme-btns">
+        <div class="text-3xl font-black font-mono text-main">theme</div>
+        <SettingsGroupSection
+            title="random theme"
+            icon="fa6-solid:brush"
+            description="Random theme on every reload of the webpage"
+        >
+            <SettingsBooleanButtons configParameter="random_theme" />
+        </SettingsGroupSection>
+
+        <div
+            v-if="favoriteThemes"
+            class="opacity-100 grid gap-2 grid-cols-theme-buttons"
+        >
             <button
                 v-for="theme in favoriteThemes"
                 :key="theme"
-                :class="getThemeBtnClass(theme)"
+                :class="[
+                    'group grid grid-cols-3 text-base font-semibold m-0 items-center',
+                    {
+                        'scale-105 border-3 border-main':
+                            configStore.config.theme === theme.name,
+                    },
+                ]"
                 :style="{
                     'background-color': theme.bgColor,
                     color: theme.mainColor,
                 }"
                 @click="handleChangeTheme(theme)"
             >
-                <div class="theme-btn-star">
+                <div class="flex items-start opacity-100">
                     <IconCSS
                         name="fa6-solid:star"
                         size="1.2em"
                         @click.stop="toggleFavoriteTheme(theme.name)"
                     />
                 </div>
-                <div class="theme-btn-name">
+                <div class="mx-2.5 justify-self-center">
                     {{ theme.name }}
                 </div>
-                <div class="theme-btn-colors">
+                <div
+                    :class="['flex grid-cols-3 gap-1 items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-50', { 'opacity-100': configStore.config.theme === theme.name }]"
+                >
                     <div
-                        class="theme-btn-color"
+                        class="w-4 h-4 rounded-full"
                         :style="{ 'background-color': theme.mainColor }"
                     />
                     <div
-                        class="theme-btn-color"
+                        class="w-4 h-4 rounded-full"
                         :style="{ 'background-color': theme.subColor }"
                     />
                     <div
-                        class="theme-btn-color"
+                        class="w-4 h-4 rounded-full"
                         :style="{ 'background-color': theme.textColor }"
                     />
                 </div>
             </button>
         </div>
-        <div class="theme-btns">
+        <div class="grid gap-2 grid-cols-theme-buttons">
             <button
                 v-for="theme of nonFavoriteThemes"
                 :key="theme"
-                :class="getThemeBtnClass(theme)"
+                :class="[
+                    'group grid grid-cols-3 text-base font-semibold m-0 items-center',
+                    {
+                        'scale-105 border-3 border-main':
+                            configStore.config.theme === theme.name,
+                    },
+                ]"
                 :style="{
                     'background-color': theme.bgColor,
                     color: theme.mainColor,
                 }"
                 @click="handleChangeTheme(theme)"
             >
-                <div class="theme-btn-star">
+                <div class="flex items-start opacity-0">
                     <IconCSS
                         name="fa6-regular:star"
                         size="1.2em"
                         @click.stop="toggleFavoriteTheme(theme.name)"
                     />
                 </div>
-                <div class="theme-btn-name">
+                <div class="mx-2.5 justify-self-center">
                     {{ theme.name }}
                 </div>
-                <div class="theme-btn-colors">
+                <div
+                    :class="['flex grid-cols-3 gap-1 items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-50', { 'opacity-100': configStore.config.theme === theme.name }]"
+                >
                     <div
-                        class="theme-btn-color"
+                        class="w-4 h-4 rounded-full"
                         :style="{ 'background-color': theme.mainColor }"
                     />
                     <div
-                        class="theme-btn-color"
+                        class="w-4 h-4 rounded-full"
                         :style="{ 'background-color': theme.subColor }"
                     />
                     <div
-                        class="theme-btn-color"
+                        class="w-4 h-4 rounded-full"
                         :style="{ 'background-color': theme.textColor }"
                     />
                 </div>
@@ -419,156 +323,3 @@ function setRandomTheme(random) {
         </div>
     </div>
 </template>
-
-<style scoped>
-input {
-    width: 100%;
-}
-
-.settings-page {
-    display: grid;
-    gap: 2rem;
-    height: fit-content;
-}
-
-.settings-group {
-    display: grid;
-    gap: 2rem;
-}
-
-.settings-group-title {
-    font-size: 1.5rem;
-    font-weight: 900;
-    font-family: var(--font-family);
-    color: var(--main-color);
-}
-
-.group-section {
-    display: grid;
-    grid-template-areas:
-        'title buttons'
-        'text buttons';
-    grid-template-rows: auto 1fr;
-    grid-template-columns: 1.5fr 1fr;
-    row-gap: 0.5rem;
-    column-gap: 2rem;
-    align-items: center;
-}
-
-.section-title {
-    grid-area: title;
-    font-weight: 600;
-    font-family: var(--font-family);
-    color: var(--main-color);
-    font-size: 1.2rem;
-}
-
-.section-text {
-    grid-area: text;
-    font-family: var(--font-family);
-}
-
-.section-buttons {
-    grid-area: buttons;
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-}
-
-.section-button.active {
-    background-color: var(--main-color);
-    color: var(--bg-color);
-}
-
-.save-btn {
-    display: flex;
-    margin-left: 0.5rem;
-    aspect-ratio: 1 / 1;
-}
-
-.theme-btns {
-    display: grid;
-    gap: 0.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-}
-
-.theme-btn {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin: 0;
-    align-items: center;
-    border: 3px solid transparent;
-}
-
-.theme-btn.active {
-    border: 3px solid;
-    transform: scale(1.05);
-}
-
-.theme-btn-star {
-    display: flex;
-    align-items: flex-start;
-    opacity: 0;
-}
-
-.favorite .theme-btn-star {
-    opacity: 1;
-}
-
-.theme-btn-name {
-    margin: 0 10px;
-}
-
-.theme-btn-colors {
-    display: flex;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.2rem;
-    align-items: center;
-    justify-content: flex-end;
-    align-content: center;
-    opacity: 0;
-}
-
-.theme-btn-color {
-    width: 1em;
-    height: 1em;
-    border-radius: 50%;
-}
-
-.theme-btn:hover {
-    cursor: pointer;
-    z-index: 1;
-}
-
-.theme-btn:hover .theme-btn-star {
-    opacity: 1;
-}
-
-.theme-btn:hover .theme-btn-colors {
-    opacity: 1;
-}
-
-.theme-btn.active .theme-btn-colors {
-    opacity: 1;
-}
-
-.editor-theme-btns {
-    display: grid;
-    gap: 0.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-}
-
-.editor-theme-btn {
-    border: 3px solid transparent;
-}
-
-.editor-theme-btn:hover {
-    background-color: var(--sub-color);
-}
-
-.editor-theme-btn.active {
-    border: 3px solid var(--main-color);
-}
-</style>

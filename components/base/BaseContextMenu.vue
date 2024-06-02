@@ -8,6 +8,10 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
+    bgColor: {
+        type: String,
+        default: 'white',
+    },
 })
 
 const emit = defineEmits(['close'])
@@ -21,7 +25,7 @@ const computedPosition = computed(() => {
         }
     } else if (props.level === 1) {
         let t = props.event.target
-        while (t.className !== 'context-menu-code') {
+        while (!t.classList.contains('context-menu-code')) {
             t = t.parentElement
         }
         const boundingRect = t.getBoundingClientRect()
@@ -51,55 +55,12 @@ document.addEventListener('keydown', (event) => {
 function closeContextMenu(event) {
     emit('close')
 }
+
 </script>
 
 <template>
-    <div class="context-menu" :style="computedPosition">
+    <div class="flex flex-col z-50 shadow-46-solid transition-all duration-300 max-w-xs [&>button]:flex [&>button]:bg-transparent [&>button]:p-2 [&>button]:shadow-none [&>button]:rounded-none [&>button]:m-0 [&>button]:justify-start [&>button]:text-base [&>button]:text-black [&>button:hover]:bg-text [&>button:hover]:text-bg [&>button:active]:bg-sub [&>button:active]:text-bg [&>button:active]:transform-none"
+        :style="[{ backgroundColor: bgColor }, computedPosition ]">
         <slot />
     </div>
 </template>
-
-<style>
-.context-menu {
-    display: flex;
-    flex-direction: column;
-    z-index: 1000;
-    background-color: white;
-    box-shadow: 4px 6px 0px rgba(0, 0, 0, 1);
-    /* border: 1px solid var(--main-color); */
-    transition: var(--transition);
-    max-width: 300px;
-}
-
-.context-menu:active {
-    transform: translate(2px, 3px);
-    box-shadow: 2px 3px 0px rgba(0, 0, 0, 1);
-}
-
-.context-menu button {
-    display: flex;
-    background: none;
-    border: none;
-    padding: 8px 8px;
-    cursor: pointer;
-    border-radius: 0;
-    justify-content: flex-start;
-    box-shadow: none;
-    margin: 0;
-    font-size: 1rem;
-    background-color: white;
-    color: #000000;
-    text-align: left;
-}
-
-.context-menu button:hover {
-    background-color: var(--text-color);
-    color: var(--bg-color);
-}
-
-.context-menu button:active {
-    background-color: var(--sub-color);
-    color: var(--bg-color);
-    transform: none;
-}
-</style>

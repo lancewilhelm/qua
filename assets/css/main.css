@@ -49,7 +49,6 @@ button {
   gap: 10px;
   padding: 10px;
   margin: 5px 0;
-  border: none;
   cursor: pointer;
   border-radius: 10px;
   background-color: var(--sub-alt-color);
@@ -126,8 +125,12 @@ a {
   border-radius: 3.5px;
 }
 
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 ::selection {
   background-color: var(--main-color);
   color: var(--bg-color);
-  border: 3px solid var(--sub-color);
+  outline: 3px solid var(--sub-color);
 }

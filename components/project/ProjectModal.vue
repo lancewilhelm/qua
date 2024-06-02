@@ -27,6 +27,7 @@ function closeModal() {
             <input
                 v-model="project.name"
                 type="text"
+                autocomplete="off"
                 placeholder="project name"
                 name="name"
             />
@@ -43,6 +44,7 @@ function closeModal() {
                 <input
                     v-model="tagInput"
                     type="text"
+                    autocomplete="off"
                     class="w-36 mr-2"
                     placeholder="enter tag"
                     name="tags"

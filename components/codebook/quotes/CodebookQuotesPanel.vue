@@ -12,18 +12,18 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="quotes-panel">
-    <div class="title-bar">
-      <div class="title">
+  <div class="overflow-hidden w-full flex flex-col items-stretch font-mono border-main rounded-br-lg border-y-3 border-r-3">
+    <div class="grid grid-cols-quote-item bg-main p-2">
+      <div class="font-bold text-sub-alt">
         File
       </div>
-      <div class="title">
+      <div class="font-bold text-sub-alt">
         Quote
       </div>
     </div>
-    <div class="quotes-scroll-container">
+    <div class="w-full h-full overflow-y-auto mr-px">
       <div
-        class="quotes-content"
+        class="flex flex-col"
       >
         <CodebookQuotesItem
           v-for="instance in selectedCode.code_instances"
@@ -34,68 +34,16 @@ const props = defineProps({
       </div>
       <div
         v-if="!selectedCode.code"
-        class="feedback"
+        class="flex justify-center items-center h-full text-lg font-bold text-sub"
       >
         select a code to see quotes
       </div>
       <div
         v-else-if="selectedCode.code_instances && selectedCode.code_instances.length === 0"
-        class="feedback"
+        class="flex justify-center items-center h-full text-lg font-bold text-sub"
       >
         no quotes found for this code
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.quotes-panel {
-    overflow: hidden;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    white-space: pre-wrap;
-    font-size: 0.9rem;
-    font-family: var(--font-family);
-    border: solid var(--main-color);
-    border-radius: 0 0 var(--radius) 0;
-    border-width: 3px 3px 3px 0;
-}
-
-.quotes-scroll-container {
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    margin-right: 0.5px;
-}
-
-.quotes-content {
-    display: flex;
-    flex-direction: column;
-}
-
-.title-bar {
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    background-color: var(--main-color);
-    padding: 5px 0;
-}
-
-.title {
-    font-weight: bold;
-    color: var(--sub-alt-color);
-    text-align: left;
-}
-
-.feedback {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--sub-color);
-}
-</style>

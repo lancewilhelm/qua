@@ -297,13 +297,6 @@ function onDragLeave(file) {
     }
 }
 
-function getRootClass() {
-    return {
-        'root-drop-target': true,
-        'drag-over': dragOver.value,
-    }
-}
-
 function handleSelected(item) {
     if (!item.folder) {
         currentFile.value = item
@@ -312,20 +305,20 @@ function handleSelected(item) {
 </script>
 
 <template>
-    <div class="file-panel" :style="{ width: width + 'px' }">
-        <div class="action-btns">
+    <div class="flex flex-col bg-sub text-text items-stretch overflow-x-hidden rounded-tl-lg rounded-bl-lg border-main border-y-3 border-l-3" :style="{ width: width + 'px' }">
+        <div class="flex justify-center gap-2">
             <input
                 id="file"
                 type="file"
                 name="file"
-                class="inputfile"
+                class="hidden"
                 accept=".txt"
                 @change="handleFileUpload"
             />
-            <label for="file" class="action-btn"
+            <button for="file"
                 ><Icon name="fa6-solid:cloud-arrow-up"
-            /></label>
-            <button class="action-btn" @click="createFolder">
+            /></button>
+            <button @click="createFolder">
                 <Icon name="fa6-solid:folder-plus" />
             </button>
         </div>
@@ -352,14 +345,14 @@ function handleSelected(item) {
         </div>
         <div
             v-if="parsedFiles?.length == 0 || !parsedFiles"
-            class="file-instructions"
+            class="flex flex-col items-center justify-center font-mono text-text h-full text-sm"
             @drop.prevent="onDrop($event, 'root')"
         >
-            <div class="instruction">
+            <div>
                 click <Icon name="fa6-solid:cloud-arrow-up" /> to upload
             </div>
-            <div class="instruction">or</div>
-            <div class="instruction">drag and drop a file here</div>
+            <div>or</div>
+            <div>drag and drop a file here</div>
         </div>
 
         <BaseContextMenu
@@ -372,19 +365,19 @@ function handleSelected(item) {
         </BaseContextMenu>
 
         <BaseModal v-if="showDeleteModal" @close="showDeleteModal = false">
-            <div class="modal-file-name">
+            <div class="font-mono font-bold mb-2">
                 <Icon name="fa6-solid:file-lines" />
                 {{ contextMenuFile.name }}
             </div>
-            <div class="modal-text warning">
+            <div class="font-mono text-left text-base mb-2 text-error font-bold">
                 Are you sure you want to delete this
                 {{ contextMenuFile.folder ? 'folder' : 'file' }}?
             </div>
-            <div class="modal-btns">
-                <button class="modal-btn" @click="showDeleteModal = false">
+            <div class="grid grid-cols-2 gap-4">
+                <button class="grow" @click="showDeleteModal = false">
                     cancel
                 </button>
-                <button class="modal-btn" @click="deleteFile">delete</button>
+                <button class="grow" @click="deleteFile">delete</button>
             </div>
         </BaseModal>
 
@@ -393,7 +386,7 @@ function handleSelected(item) {
             @close="closeRenameModal"
             @submit="renameFile"
         >
-            <div class="modal-file-name">
+            <div class="font-mono font-bold mb-2">
                 <Icon
                     v-if="!contextMenuFile.folder"
                     name="fa6-solid:file-lines"
@@ -401,136 +394,21 @@ function handleSelected(item) {
                 <Icon v-if="contextMenuFile.folder" name="fa6-solid:folder" />
                 {{ contextMenuFile.name }}
             </div>
-            <div class="input-label">new name</div>
+            <div class="font-mono text-main text-left">new name</div>
             <input
                 v-model="editFile.name"
+                class="mb-4"
                 type="text"
+                autocomplete="off"
                 placeholder="filename"
                 name="filename"
             />
-            <div class="modal-btns">
-                <button class="modal-btn" @click="closeRenameModal">
+            <div class="grid grid-cols-2 gap-4">
+                <button class="grow" @click="closeRenameModal">
                     cancel
                 </button>
-                <button class="modal-btn" @click="renameFile">rename</button>
+                <button class="grow" @click="renameFile">rename</button>
             </div>
         </BaseModal>
     </div>
 </template>
-
-<style scoped>
-.file-panel {
-    background-color: var(--sub-color);
-    color: var(--text-color);
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    overflow-x: hidden;
-    border-radius: var(--radius) 0 0 var(--radius);
-    border: solid var(--main-color);
-    border-width: 3px 0 3px 3px;
-}
-
-.files {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    align-self: flex-start;
-}
-
-.root-drop-target {
-    flex: 1;
-}
-
-.drag-over {
-    background-color: var(--sub-alt-color);
-}
-
-.file-instructions {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-family);
-    color: var(--text-color);
-    height: 100%;
-    font-size: 0.9rem;
-}
-
-.inputfile {
-    display: none;
-}
-
-.action-btns {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-.action-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 10px;
-    margin: 10px 0;
-    border: none;
-    cursor: pointer;
-    border-radius: 10px;
-    background-color: var(--sub-alt-color);
-    font-family: var(--font-family);
-    font-size: 1.2rem;
-    color: var(--text-color);
-    transition: var(--transition);
-    box-shadow: 4px 6px 0px rgba(0, 0, 0, 1);
-}
-
-.action-btn .icon {
-    margin-right: 0;
-}
-
-.action-btn:hover {
-    background-color: var(--text-color);
-    color: var(--bg-color);
-}
-
-.action-btn:active {
-    background-color: var(--sub-color);
-    color: var(--bg-color);
-    transform: translate(2px, 3px);
-    box-shadow: 2px 3px 0px rgba(0, 0, 0, 1);
-}
-
-.modal-file-name {
-    font-family: var(--font-family);
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
-
-.modal-text {
-    font-family: var(--font-family);
-    text-align: center;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-}
-
-.warning {
-    color: var(--error-color);
-}
-
-.modal-btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-.modal-btn {
-    flex: 1;
-}
-
-.input-label {
-    font-family: var(--font-family);
-    color: var(--main-color);
-    text-align: left;
-}
-</style>

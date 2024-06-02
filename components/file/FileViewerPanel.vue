@@ -43,7 +43,7 @@ watch(codePanelSelectedCode, (code) => {
 
 function processCodePanelSelection(code) {
     if (
-        window.getSelection().anchorNode.parentNode.className ===
+        window.getSelection().anchorNode.parentNode.id ===
         'editor-segment'
     ) {
         editorSelection.value.text = window.getSelection().toString()
@@ -215,7 +215,7 @@ function calculateOffset(node, offset) {
             totalOffset += currentNode.textContent.length
         } else {
             currentNode = currentNode.parentNode
-            if (currentNode === document.querySelector('.editor-content')) {
+            if (currentNode === document.getElementById('editor-content')) {
                 break
             }
         }
@@ -419,33 +419,43 @@ function handleCodeClick(event, segment) {
 
 <template>
     <div
-        :class="{
-            'editor-panel': true,
-            'editor-theme-light': configStore.config.editor_theme === 'light',
-            'editor-theme-dark': configStore.config.editor_theme === 'dark',
-            'editor-theme-theme': configStore.config.editor_theme === 'theme',
-        }"
-    >
-        <div
-            :class="{
-                'editor-scroll-container': true,
+        :class="[
+            'overflow-hidden w-full flex items-center justify-start whitespace-pre-wrap text-base font-mono border-main border-y-3',
+            {
                 'editor-theme-light':
                     configStore.config.editor_theme === 'light',
                 'editor-theme-dark': configStore.config.editor_theme === 'dark',
                 'editor-theme-theme':
                     configStore.config.editor_theme === 'theme',
-            }"
-        >
-            <div
-                :class="{
-                    'editor-content': true,
+            },
+        ]"
+    >
+        <div
+            :class="[
+                'w-full h-full overflow-y-auto mr-px',
+                {
                     'editor-theme-light':
                         configStore.config.editor_theme === 'light',
                     'editor-theme-dark':
                         configStore.config.editor_theme === 'dark',
                     'editor-theme-theme':
                         configStore.config.editor_theme === 'theme',
-                }"
+                },
+            ]"
+        >
+            <div
+                id="editor-content"
+                :class="[
+                    'self-start p-2.5 outline-0 outline-transparent',
+                    {
+                        'editor-theme-light':
+                            configStore.config.editor_theme === 'light',
+                        'editor-theme-dark':
+                            configStore.config.editor_theme === 'dark',
+                        'editor-theme-theme':
+                            configStore.config.editor_theme === 'theme',
+                    },
+                ]"
                 contenteditable="true"
                 spellcheck="false"
                 @keydown="handleEditorKeydown"
@@ -496,20 +506,17 @@ function handleCodeClick(event, segment) {
             >
                 new code
             </button>
-            <div
-                v-if="editorRightClickContext === 'code'"
-                class="context-menu-codes"
-            >
-                <button
+            <div v-if="editorRightClickContext === 'code'" class="grid">
+                <div
                     v-for="c in selectedSegment.codes"
                     :key="c"
-                    class="context-menu-code"
                     :style="{ 'background-color': c.color }"
+                    class="context-menu-code group grid grid-cols-color-picker gap-2 p-1 cursor-pointer hover:font-bold hover:text-bg transition-all duration-50"
                     @click.stop="handleOpenCodeExpander($event, c)"
                 >
-                    <div>{{ c.code }}</div>
-                    <div><i class="fa-solid fa-caret-right" /></div>
-                </button>
+                    <div class="group-active:scale-95 group-active:translate-x-2px group-active:translate-y-3px transtion-all duration-300">{{ c.code }}</div>
+                    <div><Icon name="fa6-solid:caret-right" /></div>
+                </div>
             </div>
         </BaseContextMenu>
 
@@ -517,6 +524,7 @@ function handleCodeClick(event, segment) {
             v-if="showSecondMenu"
             :event="expanderMenuEvent"
             :level="1"
+            :bg-color="selectedCode.color"
             @close="showSecondMenu = false"
         >
             <!-- <button @click="showSelectCode">show</button> -->
@@ -524,10 +532,14 @@ function handleCodeClick(event, segment) {
             <button @click="deleteCodeInstance">delete instance</button>
         </BaseContextMenu>
 
-        <BaseModal v-if="showNewCodeModal" @close="showNewCodeModal = false" @submit="addCodeInstance">
-            <div class="code-modal-title">quote</div>
-            <div class="scroll-container">
-                <div class="code-modal-selected-text">
+        <BaseModal
+            v-if="showNewCodeModal"
+            @close="showNewCodeModal = false"
+            @submit="addCodeInstance"
+        >
+            <div class="font-mono text-main font-bold text-base mb-2">quote</div>
+            <div class="overflow-y-auto max-h-96 h-full">
+                <div class="font-mono text-text font-base mb-4">
                     {{ codeModalText.trim() }}
                 </div>
             </div>
@@ -539,11 +551,11 @@ function handleCodeClick(event, segment) {
                 lines="2"
                 @keydown.enter.prevent="addCodeInstance"
             />
-            <div class="modal-btns">
-                <button class="modal-btn" @click="showNewCodeModal = false">
+            <div class="grid grid-cols-2 gap-4">
+                <button class="grow" @click="showNewCodeModal = false">
                     cancel
                 </button>
-                <button class="modal-btn" @click="addCodeInstance">add</button>
+                <button class="grow" @click="addCodeInstance">add</button>
             </div>
         </BaseModal>
 
@@ -552,13 +564,13 @@ function handleCodeClick(event, segment) {
             @close="showEditSegmentModal = false"
             @submit="handleEditCodeSubmit"
         >
-            <div class="code-modal-title">quote</div>
-            <div class="scroll-container">
-                <div class="code-modal-selected-text">
+            <div class="font-mono text-main font-bold text-base mb-2">quote</div>
+            <div class="overflow-y-auto max-h-96 h-full">
+                <div class="font-mono text-text font-base mb-4">
                     {{ editCode.data }}
                 </div>
             </div>
-            <div class="code-modal-title">code</div>
+            <div class="font-mono text-main font-bold text-base mb-2">code</div>
             <textarea
                 ref="codeModalInput"
                 v-model="editCode.code"
@@ -567,94 +579,14 @@ function handleCodeClick(event, segment) {
                 lines="2"
                 @keydown.enter.prevent="handleEditCodeSubmit"
             />
-            <div class="modal-btns">
-                <button class="modal-btn" @click="showEditSegmentModal = false">
+            <div class="grid grid-cols-2 gap-4">
+                <button class="grow" @click="showEditSegmentModal = false">
                     cancel
                 </button>
-                <button class="modal-btn" @click="handleEditCodeSubmit">
+                <button class="grow" @click="handleEditCodeSubmit">
                     add
                 </button>
             </div>
         </BaseModal>
     </div>
 </template>
-
-<style scoped>
-.editor-panel {
-    overflow: hidden;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    white-space: pre-wrap;
-    font-size: 0.9rem;
-    font-family: var(--font-family);
-    border: solid var(--main-color);
-    border-width: 3px 0 3px 0;
-}
-
-.editor-scroll-container {
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    margin-right: 0.5px;
-}
-
-.editor-content {
-    align-self: flex-start;
-    padding: 10px;
-}
-
-.line-numbers {
-    align-self: flex-start;
-    background-color: var(--sub-color);
-    color: var(--bg-color);
-    text-align: right;
-    padding-right: 10px;
-}
-
-[contenteditable] {
-    outline: 0px solid transparent;
-}
-
-.code-modal-title {
-    font-family: var(--font-family);
-    color: var(--main-color);
-    font-weight: 700;
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-}
-
-.scroll-container {
-    overflow-y: auto;
-    max-height: 400px;
-    height: 100%;
-}
-
-.code-modal-selected-text {
-    font-family: var(--font-family);
-    color: var(--text-color);
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-}
-
-.context-menu-codes {
-    display: grid;
-}
-
-.context-menu-code {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0.5rem;
-}
-
-.modal-btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-.modal-btn {
-    flex: 1;
-}
-</style>

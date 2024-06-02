@@ -31,7 +31,7 @@ await supabase
 </script>
 
 <template>
-    <div class="code-page full-width no-scroll">
+    <div class="grid grid-row-content h-full grid-cols-code-page full-width no-scroll">
         <FilePanel
             v-model:files="files"
             v-model:current-file="currentFile"
@@ -68,12 +68,3 @@ await supabase
         />
     </div>
 </template>
-
-<style scoped>
-.code-page {
-    display: grid;
-    grid-template-columns: auto auto 1fr auto auto;
-    grid-row: content;
-    height: 100%;
-}
-</style>

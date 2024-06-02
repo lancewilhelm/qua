@@ -77,7 +77,7 @@ function resizeSidePanel(event) {
 
 <template>
     <div
-        class="resize-handle"
+        class="flex items-center justify-center min-w-2 cursor-ew-resize bg-main text-bg"
         @mousedown.prevent="resizeSidePanel"
         @touchstart.prevent="resizeSidePanel"
     >
@@ -85,7 +85,7 @@ function resizeSidePanel(event) {
             v-if="
                 (elementWidth > 0 && onLeft) || (elementWidth == 0 && !onLeft)
             "
-            class="resize-handle-btn"
+            class="grid items-center justify-center cursor-pointer text-xs transition-all duration-300 hover:text-sub"
             @click.stop="onLeft ? (elementWidth = 0) : (elementWidth = 275)"
         >
             <Icon name="fa6-solid:caret-left" />
@@ -96,7 +96,7 @@ function resizeSidePanel(event) {
             v-if="
                 (elementWidth == 0 && onLeft) || (elementWidth > 0 && !onLeft)
             "
-            class="resize-handle-btn"
+            class="grid items-center justify-center cursor-pointer text-xs transition-all duration-300 hover:text-sub"
             @click.stop="onLeft ? (elementWidth = 275) : (elementWidth = 0)"
         >
             <Icon name="fa6-solid:caret-right" />
@@ -105,28 +105,3 @@ function resizeSidePanel(event) {
         </div>
     </div>
 </template>
-
-<style scoped>
-.resize-handle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 8px;
-    cursor: ew-resize;
-    background-color: var(--main-color);
-    color: var(--bg-color);
-}
-
-.resize-handle-btn {
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    cursor: pointer;
-    font-size: 0.7em;
-    transition: var(--transition);
-}
-
-.resize-handle-btn:hover {
-    color: var(--sub-color);
-}
-</style>

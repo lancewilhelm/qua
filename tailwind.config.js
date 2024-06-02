@@ -17,8 +17,45 @@ module.exports = {
       alt: ['Poppins', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
     },
     extend: {
+      gridTemplateColumns: {
+        'color-picker': '1fr auto',
+        'code-group': 'auto 1fr',
+        'quote-item': '1fr 3fr',
+        'code-page': 'auto auto 1fr auto auto',
+        '1.5fr-1fr': '1.5fr 1fr',
+        'theme-buttons': 'repeat(auto-fit, minmax(17rem, 1fr))',
+      },
+      gridTemplateRows: {
+        'grid': '[title-start] auto [projects-start] 1fr [new-proj-start] auto [new-proj-end]',
+        'auto-1fr': 'auto 1fr',
+      },
       spacing: {
         '4.5': '1.125rem',
+      },
+      gridColumn: {
+        'content': 'content',
+      },
+      gridRowStart: {
+        'content-end': 'content-end',
+        'padding-start': 'padding-start',
+      },
+      translate: {
+        '2px': '2px',
+        '3px': '3px',
+      },
+      borderWidth: {
+        '1': '1px',
+        '3': '3px'
+      },
+      boxShadow: {
+        '68-solid': '6px 8px 0px rgb(0, 0, 0)',
+        '46-solid': '4px 6px 0px rgb(0, 0, 0)',
+        '35-solid': '3px 5px 0px rgb(0, 0, 0)',
+        '23-solid': '2px 3px 0px rgb(0, 0, 0)',
+        '12-solid': '1px 2px 0px rgb(0, 0, 0)',
+      },
+      fontSize: {
+        'logo': ['2.5rem', '3.4rem'],
       },
       colors: {
         bg: "var(--bg-color)",

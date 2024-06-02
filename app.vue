@@ -34,13 +34,12 @@ if (user.value) {
 
 <style scoped>
 .app-content {
-    font-family: Roboto, Helvetica, Arial, sans-serif;
     min-height: 100vh;
     height: 100vh;
     width: 100%;
     justify-content: center;
     display: grid;
-    grid-template-rows: [page-start] var(--gutter) [padding-start] auto [content-start] 1fr [content-end] auto [page-end];
+    grid-template-rows: [padding-start] auto [content-start] 1fr [content-end] auto [page-end];
 }
 
 .content-grid {

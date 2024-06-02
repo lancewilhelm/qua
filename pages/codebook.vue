@@ -85,23 +85,21 @@ function getCodesHeight(codes) {
 
 <template>
     <div
-        :class="{
-            'code-book-page': true,
-            'full-width': true,
+        :class="['flex flex-col h-full full-width', {
             'no-scroll': activeTab === 'quotes',
             scroll: activeTab === 'codes',
-        }"
+        }]"
         ref="el"
     >
-        <div class="tabs">
+        <div class="flex px-2.5 text-base font-mono bg-main text-sub-alt rounded-tl-lg rounded-tr-lg border-b-1 border-bg">
             <div
-                :class="{ tab: true, active: activeTab === 'codes' }"
+                :class="['py-1 px-2 cursor-pointer transition-all duration-300 hover:bg-sub', { 'bg-sub': activeTab === 'codes' }]"
                 @click="activeTab = 'codes'"
             >
                 Codes
             </div>
             <div
-                :class="{ tab: true, active: activeTab === 'quotes' }"
+                :class="['py-1 px-2 cursor-pointer transition-all duration-300 hover:bg-sub', { 'bg-sub': activeTab === 'quotes' }]"
                 @click="activeTab = 'quotes'"
             >
                 Quotes
@@ -122,37 +120,3 @@ function getCodesHeight(codes) {
         />
     </div>
 </template>
-
-<style scoped>
-.code-book-page {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.tabs {
-    display: flex;
-    padding: 0 10px;
-    font-size: 1.2rem;
-    font-family: var(--font-family);
-    background-color: var(--main-color);
-    color: var(--sub-alt-color);
-    border-radius: var(--radius) var(--radius) 0
-        0;
-    border-bottom: 1px solid var(--bg-color);
-}
-
-.tab {
-    padding: 5px 10px;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.tab:hover {
-    background-color: var(--sub-color);
-}
-
-.tab.active {
-    background-color: var(--sub-color);
-}
-</style>

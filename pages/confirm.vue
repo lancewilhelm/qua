@@ -23,5 +23,3 @@ watch(
         <div class="font-mono flex">Redirecting...</div>
     </div>
 </template>
-
-<style scoped></style>

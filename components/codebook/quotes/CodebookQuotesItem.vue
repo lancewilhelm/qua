@@ -12,7 +12,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="quote-item">
+  <div class="grid items-center justify-start text-sm bg-sub-alt border-b-3 border-main p-2.5 grid-cols-quote-item whitespace-pre-line">
     <div class="file-name">
       {{ filesMap.get(instance.file_id.toString()).name }}
     </div>
@@ -21,18 +21,3 @@ const props = defineProps({
     </div>
   </div>
 </template>
-
-<style scoped>
-.quote-item {
-    display: grid;
-    align-items: center;
-    justify-content: flex-start;
-    white-space: pre-wrap;
-    font-size: 0.9rem;
-    font-family: var(--font-family);
-    background-color: var(--sub-alt-color);
-    border-bottom: 3px solid var(--main-color);
-    padding: 10px;
-    grid-template-columns: 1fr 3fr;
-}
-</style>

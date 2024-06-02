@@ -147,6 +147,3 @@ function handleContextMenu(event) {
         </div>
     </div>
 </template>
-
-<style scoped>
-</style>
