@@ -2,6 +2,7 @@
 const codes = defineModel('codes')
 const currentFile = defineModel('currentFile')
 const triggerUpdateHighlights = defineModel('triggerUpdateHighlights')
+const triggerSaveCode = defineModel('triggerSaveCode')
 const codePanelSelectedCode = defineModel('selectedCode')
 
 const supabase = useSupabaseClient()
@@ -37,22 +38,11 @@ watch(triggerUpdateHighlights, (newVal) => {
     }
 })
 
-watch(codePanelSelectedCode, (code) => {
-    processCodePanelSelection(code)
-})
-
-function processCodePanelSelection(code) {
-    if (
-        window.getSelection().anchorNode.parentNode.id ===
-        'editor-segment'
-    ) {
-        editorSelection.value.text = window.getSelection().toString()
-        editorSelection.value.range = window.getSelection().getRangeAt(0)
-        newCode.value.code = code.code
-        newCode.value.color = code.color
-        addCodeInstance()
+watch(triggerSaveCode, (newVal) => {
+    if (newVal) {
+        triggerSaveCode.value = false
     }
-}
+})
 
 function openEditSegmentModal() {
     showEditSegmentModal.value = true

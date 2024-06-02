@@ -270,7 +270,8 @@ async function handleDeleteSubmit() {
 
 function handleSelected(item) {
     if (!item.group) {
-        emit('codeSelected', item)
+        // selectedCode.value = item
+        // emit('codeSelected')
     }
 }
 

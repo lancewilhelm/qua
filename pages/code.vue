@@ -12,6 +12,7 @@ const codes = ref([])
 const filePanelWidth = ref(configStore.config.editor_file_panel_width)
 const codePanelWidth = ref(configStore.config.editor_code_panel_width)
 const triggerUpdateHighlights = ref(false)
+const triggerSaveCode = ref(false)
 const selectedCode = ref({})
 
 // Fetch codes
@@ -50,6 +51,7 @@ await supabase
             v-model:current-file="currentFile"
             v-model:codes="codes"
             v-model:trigger-update-highlights="triggerUpdateHighlights"
+            v-model:trigger-save-code="triggerSaveCode"
             v-model:selected-code="selectedCode"
         />
 
