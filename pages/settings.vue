@@ -293,7 +293,7 @@ function setRandomTheme(random) {
                 }"
                 @click="handleChangeTheme(theme)"
             >
-                <div class="flex items-start opacity-0">
+                <div class="flex items-start opacity-0 hover:opacity-100">
                     <IconCSS
                         name="fa6-regular:star"
                         size="1.2em"
