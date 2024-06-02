@@ -1,4 +1,6 @@
 <script setup>
+import CodebookCodesPanelItem from './CodebookCodesPanelItem.vue'
+
 const codes = defineModel('codes')
 const selectedCode = defineModel('selectedCode')
 const props = defineProps({
@@ -15,7 +17,7 @@ const props = defineProps({
         default: false,
     },
 })
-const emit = defineEmits(['updateHighlights'])
+const emit = defineEmits(['updateHighlights', 'codeSelected'])
 
 const supabase = useSupabaseClient()
 const configStore = useConfigStore()
@@ -28,21 +30,11 @@ const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const showNewCodeModal = ref(false)
 const contextMenuEvent = ref(null)
-const dragOver = ref(false)
-const dropTarget = ref(null)
-const draggedCode = ref(null)
 const newCodeGroupName = ref('')
 const editCode = ref({})
 const newCode = ref({
     name: '',
     color: '',
-})
-let dragCounter = 0
-
-watch(dropTarget, () => {
-    if (draggedCode.value && dropTarget.value) {
-        handleDrop()
-    }
 })
 
 window.addEventListener('dragover', (e) => e.preventDefault())
@@ -84,7 +76,7 @@ function filterCodes(codes) {
 
     function filterCodeGroup(group) {
         const children = []
-        for (const c of group.codes) {
+        for (const c of group.children) {
             if (c.group) {
                 const childGroup = filterCodeGroup(c)
                 if (childGroup) {
@@ -153,46 +145,39 @@ function openEditModal() {
     showEditModal.value = true
 }
 
-function handleDrop() {
-    if (
-        draggedCode.value &&
-        (dropTarget.value.group || dropTarget.value === 'root')
-    ) {
-        updateCodeLocation(draggedCode.value, dropTarget.value)
-        draggedCode.value = null
-        dropTarget.value = null
-    }
-}
-
-async function updateCodeLocation(code, target) {
-    if (code.id === target.id) {
+async function updateCodeLocation(cs, target) {
+    if (cs.some((c) => c.id === target.id)) {
         return
     }
-    const { error } = await supabase
-        .from('codes')
-        .update({ parent: target.id ? target.id : null })
-        .eq('id', code.id)
-    if (error) {
-        console.error('Error updating code location:', error)
-    } else {
-        const index = codes.value.findIndex((c) => c.id === code.id)
-        codes.value[index] = {
-            ...codes.value[index],
+    const patch = cs.map((c) => {
+        return {
+            id: c.id,
             parent: target.id ? target.id : null,
         }
+    })
+    
+    const { error } = await supabase.from('codes').upsert(patch)
+    if (error) {
+        console.error(error)
+    } else {
+        codes.value = codes.value.map((c) => {
+            if (cs.some((code) => code.id === c.id)) {
+                return {
+                    ...c,
+                    parent: target.id ? target.id : null,
+                }
+            } else {
+                return c
+            }
+        })
     }
 }
 
-function handleOpenContextMenu(e) {
-    contextMenuEvent.value = e
+function openContextMenu({ event, target }) {
+    console.log(target)
+    contextMenuEvent.value = event
+    contextMenuCode.value = target
     showContextMenu.value = true
-}
-
-function getRootClass() {
-    return {
-        'root-drop-target': true,
-        'drag-over': dragOver.value,
-    }
 }
 
 async function handleNewCodeGroupSubmit() {
@@ -220,7 +205,6 @@ async function handleEditSubmit() {
     if (!editCode.value.group) {
         if (
             editCode.value.code.trim() === '' ||
-            editCode.value.color.trim() === '' ||
             (editCode.value.code === contextMenuCode.value.code &&
                 editCode.value.color === contextMenuCode.value.color)
         ) {
@@ -284,73 +268,78 @@ async function handleDeleteSubmit() {
     }
 }
 
-function onDragEnter() {
-    dragCounter++
-    dragOver.value = true
-}
-
-function onDragLeave() {
-    dragCounter--
-    if (dragCounter === 0) {
-        dragOver.value = false
+function handleSelected(item) {
+    if (!item.group) {
+        // selectedCode.value = item
+        // emit('codeSelected')
     }
 }
 
-function onDrop(e, code) {
-    dragCounter = 0
-    dragOver.value = false
-    dropTarget.value = code
+function handleDrop({ items, target }) {
+    if (items.length === 0) {
+        return
+    }
+    console.log(items, target)
+
+    if (items && (target.group || target === 'root')) {
+        updateCodeLocation(items, target)
+    }
 }
 </script>
 
 <template>
     <div
-        :class="{
-            'code-panel': true,
-            'editor-theme-light': configStore.config.editorTheme === 'light',
-            'editor-theme-dark': configStore.config.editorTheme === 'dark',
-            'editor-theme-theme': configStore.config.editorTheme === 'theme',
-            'left-side': onLeft,
-            'square-top': squareTop,
-        }"
+        :class="[
+            'flex flex-col items-stretch overflow-x-hidden border-main border-y-3 border-r-3 rounded-tr-lg rounded-br-lg',
+            {
+                'editor-theme-light':
+                    configStore.config.editorTheme === 'light',
+                'editor-theme-dark': configStore.config.editorTheme === 'dark',
+                'editor-theme-theme':
+                    configStore.config.editorTheme === 'theme',
+                'rounded-tl-lg rounded-bl-lg rounded-tr-none rounded-br-none border-r-none border-l-3':
+                    onLeft,
+                'rounded-tl-none': squareTop,
+            },
+        ]"
         :style="{ width: width + 'px' }"
-        @drop="handleFileDrop"
     >
         <input
             v-model="codeFilterInput"
             type="text"
-            class="search-input"
+            autocomplete="off"
+            class="m-2 p-1"
             placeholder="filter codes..."
         />
-        <div
-            class="codes-container"
-            @contextmenu.prevent="handleOpenContextMenu"
-        >
-            <div v-if="parsedCodes.length > 0" class="codes">
-                <CodebookCodesPanelItem
+        <div class="flex grow" v-if="parsedCodes.length > 0">
+            <DraggableContainer
+                @onDrop="handleDrop"
+                @onContextMenu="openContextMenu"
+            >
+                <DraggableItem
                     v-for="c in filterCodes(parsedCodes)"
                     :key="c.id"
-                    v-model:dragged-code="draggedCode"
-                    v-model:drop-target="dropTarget"
-                    v-model:context-menu-code="contextMenuCode"
-                    v-model:selected-code="selectedCode"
-                    :code="c"
-                    :level="0"
-                />
-            </div>
-            <div
-                :class="getRootClass()"
-                @dragenter.prevent="onDragEnter('root')"
-                @dragleave.prevent="onDragLeave('root')"
-                @drop.prevent="onDrop($event, 'root')"
-                @contextmenu.prevent="contextMenuCode = null"
-            />
-            <div
-                v-if="parsedCodes.length == 0 || !parsedCodes"
-                class="codes-instructions"
-            >
-                <div class="instruction">codes will appear here</div>
-            </div>
+                    :item="c"
+                    :children="c.children ? c.children : []"
+                    :depth="0"
+                    @onDrop="handleDrop"
+                    @selected="handleSelected"
+                    @onContextMenu="openContextMenu"
+                >
+                    <template #default="{ item, isOpen }">
+                        <CodebookCodesPanelItem
+                            :code="item"
+                            :is-open="isOpen"
+                        />
+                    </template>
+                </DraggableItem>
+            </DraggableContainer>
+        </div>
+        <div
+            v-if="parsedCodes.length == 0 || !parsedCodes"
+            class="flex flex-col items-center m-auto font-mono text-text text-sm"
+        >
+            <div class="instruction">codes will appear here</div>
         </div>
 
         <BaseContextMenu
@@ -358,8 +347,13 @@ function onDrop(e, code) {
             :event="contextMenuEvent"
             @close="showContextMenu = false"
         >
-            <button v-if="contextMenuCode" @click="openEditModal">edit</button>
-            <button v-if="contextMenuCode" @click="showDeleteModal = true">
+            <button v-if="contextMenuCode !== 'root'" @click="openEditModal">
+                edit
+            </button>
+            <button
+                v-if="contextMenuCode !== 'root'"
+                @click="showDeleteModal = true"
+            >
                 delete
             </button>
             <button @click="showNewCodeModal = true">new code</button>
@@ -372,20 +366,21 @@ function onDrop(e, code) {
             @close="showNewCodeModal = false"
             @submit="handleNewCodeSubmit"
         >
-            <div class="input-label">code name</div>
+            <div class="font-mono text-main text-left">code name</div>
             <textarea
                 id="new-code-name"
+                class="resize-y"
                 v-model="newCode.name"
                 rows="4"
                 placeholder="enter code..."
             />
             <div class="code-color">
-                <div class="input-label">color</div>
+                <div class="font-mono text-main text-left">color</div>
                 <BaseColorPicker v-model:current-color="newCode.color" />
             </div>
-            <div class="modal-btns">
+            <div class="grid grid-cols-2 gap-4">
                 <button
-                    class="modal-btn"
+                    class="grow"
                     @click="
                         () => {
                             showNewCodeModal = false
@@ -396,7 +391,7 @@ function onDrop(e, code) {
                 >
                     cancel
                 </button>
-                <button class="modal-btn" @click="handleNewCodeSubmit">
+                <button class="grow" @click="handleNewCodeSubmit">
                     submit
                 </button>
             </div>
@@ -408,16 +403,17 @@ function onDrop(e, code) {
             @close="showNewCodeGroupModal = false"
             @submit="handleNewCodeGroupSubmit"
         >
-            <div class="input-label">group name</div>
+            <div class="font-mono text-main text-left">group name</div>
             <input
                 id="new-code-group-name"
                 v-model="newCodeGroupName"
                 type="text"
+                autocomplete="off"
                 placeholder="enter group name..."
             />
-            <div class="modal-btns">
+            <div class="grid grid-cols-2 gap-4">
                 <button
-                    class="modal-btn"
+                    class="grow"
                     @click="
                         () => {
                             showNewCodeGroupModal = false
@@ -427,7 +423,7 @@ function onDrop(e, code) {
                 >
                     cancel
                 </button>
-                <button class="modal-btn" @click="handleNewCodeGroupSubmit">
+                <button class="grow" @click="handleNewCodeGroupSubmit">
                     submit
                 </button>
             </div>
@@ -439,25 +435,32 @@ function onDrop(e, code) {
             @close="showEditModal = false"
             @submit="handleEditSubmit"
         >
-            <div v-if="!contextMenuCode.group" class="input-label">
+            <div
+                v-if="!contextMenuCode.group"
+                class="font-mono text-main text-left"
+            >
                 code name
             </div>
-            <div v-if="contextMenuCode.group" class="input-label">
+            <div
+                v-if="contextMenuCode.group"
+                class="font-mono text-main text-left"
+            >
                 code group name
             </div>
             <textarea
                 id="edit-code-name"
+                class="resize-y"
                 v-model="editCode.code"
                 rows="4"
                 placeholder="enter code..."
             />
             <div v-if="!contextMenuCode.group" class="code-color">
-                <div class="input-label">color</div>
+                <div class="font-mono text-main text-left">color</div>
                 <BaseColorPicker v-model:current-color="editCode.color" />
             </div>
-            <div class="modal-btns">
+            <div class="grid grid-cols-2 gap-4">
                 <button
-                    class="modal-btn"
+                    class="grow"
                     @click="
                         () => {
                             showEditModal = false
@@ -467,9 +470,7 @@ function onDrop(e, code) {
                 >
                     cancel
                 </button>
-                <button class="modal-btn" @click="handleEditSubmit">
-                    submit
-                </button>
+                <button class="grow" @click="handleEditSubmit">submit</button>
             </div>
         </BaseModal>
 
@@ -478,18 +479,16 @@ function onDrop(e, code) {
             title="Delete Code"
             @close="showDeleteModal = false"
         >
-            <div class="input-label">
-                {{ contextMenuCode.code }}
-            </div>
-            <div class="modal-group-name">
+            <div class="font-mono text-main text-left">delete code</div>
+            <div class="font-mono font-bold mb-4 text-error">
                 Are you sure you want to delete the
                 {{ contextMenuCode.group ? 'group' : 'code' }} "{{
                     contextMenuCode.code
-                }}"?
+                }}"? This will also remove your highlighted instances.
             </div>
-            <div class="modal-btns">
+            <div class="grid grid-cols-2 gap-4">
                 <button
-                    class="modal-btn"
+                    class="grow"
                     @click="
                         () => {
                             showDeleteModal = false
@@ -499,82 +498,8 @@ function onDrop(e, code) {
                 >
                     cancel
                 </button>
-                <button class="modal-btn" @click="handleDeleteSubmit">
-                    delete
-                </button>
+                <button class="grow" @click="handleDeleteSubmit">delete</button>
             </div>
         </BaseModal>
     </div>
 </template>
-
-<style scoped>
-textarea {
-    resize: vertical;
-}
-.code-panel {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    overflow-x: hidden;
-    border-radius: 0 var(--radius) var(--radius)
-        0;
-    border: solid var(--main-color);
-    border-width: 3px 3px 3px 0;
-}
-
-.codes-container {
-    flex: 1;
-    display: grid;
-    grid-template-rows: auto 1fr;
-}
-
-.codes-instructions {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: auto auto;
-    font-family: var(--font-family);
-    color: var(--text-color);
-    font-size: 0.9rem;
-}
-
-.search-input {
-    margin: 5px;
-}
-
-.modal-group-name {
-    font-family: var(--font-family);
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
-
-.modal-btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-.modal-btn {
-    flex: 1;
-}
-
-.input-label {
-    font-family: var(--font-family);
-    color: var(--main-color);
-    text-align: left;
-}
-
-.drag-over {
-    background-color: var(--sub-alt-color);
-}
-
-.left-side {
-    border-radius: var(--radius) 0 0
-        var(--radius);
-    border-width: 3px 0 3px 3px;
-}
-
-.left-side.square-top {
-    border-radius: 0 0 0 var(--radius);
-}
-</style>

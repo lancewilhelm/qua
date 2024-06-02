@@ -64,7 +64,3 @@ function onDragLeave(event) {
         />
     </div>
 </template>
-
-<style scoped>
-
-</style>

@@ -130,9 +130,9 @@ async function deleteProject() {
 </script>
 
 <template>
-    <div class="projects-page full-width scroll">
+    <div class="grid grid-rows-grid text-center justify-center items-center justify-items-center full-width scroll">
         <div class="font-mono font-bold text-3xl">Projects</div>
-        <div v-if="projects?.length > 0" class="project-cards">
+        <div v-if="projects?.length > 0" class="flex flex-row flex-wrap justify-center">
             <ProjectCard
                 v-for="project of projects"
                 :key="project.id"
@@ -142,7 +142,7 @@ async function deleteProject() {
                 @open-project="openProject(project)"
             />
         </div>
-        <button id="submit-btn" type="submit" @click="toggleNewProjectModal">
+        <button id="submit-btn" @click="toggleNewProjectModal">
             <Icon name="fa6-solid:circle-plus" /> create new project
         </button>
         <BaseModal
@@ -158,21 +158,22 @@ async function deleteProject() {
             <div class="font-mono">
                 Type "{{ deleteProj.name }}" to confirm.
             </div>
-            <div class="delete-input">
+            <div class="flex flex-row justify-center items-center mt-4">
                 <input
                     v-model="deleteConfirmInput"
                     type="text"
+                    autocomplete="off"
                     placeholder="project name"
                 />
                 <button
                     v-if="deleteConfirmInput === deleteProj.name"
-                    class="delete-btn"
+                    class="bg-error text-bg border-none py-2 px-4 cursor-pointer ml-4"
                     @click="deleteProject"
                 >
                     Delete
                 </button>
             </div>
-            <button class="modal-btn" @click="closeDeleteProject">
+            <button class="grow" @click="closeDeleteProject">
                 cancel
             </button>
         </BaseModal>
@@ -190,77 +191,3 @@ async function deleteProject() {
         />
     </div>
 </template>
-
-<style scoped>
-.projects-page {
-    display: grid;
-    grid-template-rows: [title-start] auto [projects-start] 1fr [new-proj-start] auto [new-proj-end];
-    text-align: center;
-    justify-content: center;
-    align-items: start;
-    justify-items: center;
-}
-
-.project-cards {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.form {
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    grid-template-columns: [form-start] 1fr [form-end];
-}
-
-.project-edit-label {
-    font-family: var(--font-family);
-    color: var(--main-color);
-    text-align: left;
-}
-
-.form textarea {
-    resize: vertical;
-}
-
-.new-proj-form {
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    grid-template-columns: [form-start] 1fr [form-end];
-}
-
-#submit-btn {
-    width: 400px;
-}
-
-.delete-btn {
-    background-color: var(--error-color);
-    color: var(--bg-color);
-    border: none;
-    border-radius: var(--radius);
-    padding: 0.5rem 1rem;
-    margin-left: 1rem;
-    cursor: pointer;
-}
-
-.delete-input {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    margin-top: 1rem;
-}
-
-.modal-btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-.modal-btn {
-    flex: 1;
-}
-</style>

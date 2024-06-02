@@ -65,7 +65,7 @@ function createDragImage() {
     dragImage.style.zIndex = '9999'
     dragImage.style.display = 'flex'
     dragImage.style.flexDirection = 'column'
-    dragImage.style.width = configStore.config.editor_file_panel_width + 'px'
+    dragImage.style.width = '200px'
     dragImage.style.backgroundColor = 'var(--main-color)'
     dragImage.style.color = 'var(--text-color)'
     dragImage.style.fontFamily = 'var(--font-family)'
@@ -74,7 +74,7 @@ function createDragImage() {
 
     selectedItems.value.forEach((item) => {
         const clone = document.createElement('div')
-        clone.innerText = item.name
+        clone.innerText = item.name || item.code
         clone.style.margin = '0 5px'
         clone.style.padding = '5px'
         dragImage.appendChild(clone)
@@ -147,6 +147,3 @@ function handleContextMenu(event) {
         </div>
     </div>
 </template>
-
-<style scoped>
-</style>

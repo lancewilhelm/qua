@@ -35,9 +35,10 @@ onMounted(() => {
 window.addEventListener('mouseup', (e) => {
     if (
         showColorPicker.value &&
-        !e.target.className.includes('color-picker') &&
-        !e.target.className.includes('spectrum-map__color-cursor') &&
-        !e.target.className.includes('hue-color__hue-cursor')
+        (e.target.id === '' ||
+        (!e.target.id === 'color-picker-popup' &&
+        !e.target.id === 'color-cursor' &&
+        !e.target.id === 'hue-cursor'))
     ) {
         showColorPicker.value = false
     }
@@ -46,7 +47,7 @@ window.addEventListener('mouseup', (e) => {
 async function toggleColorPicker(e) {
     if (!showColorPicker.value) {
         const r = document
-            .querySelector('.color-picker-show-btn')
+            .getElementById('color-picker-show-button')
             .getBoundingClientRect()
         colorPickerPosition.value = {
             left: r.left + r.width + 5 + 'px',
@@ -62,8 +63,8 @@ async function toggleColorPicker(e) {
 }
 
 function createShadeSpectrum() {
-    const spectrumCanvas = document.querySelector(
-        '.spectrum-map__spectrum-canvas'
+    const spectrumCanvas = document.getElementById(
+        'spectrum-canvas'
     )
     const ctxSpectrum = spectrumCanvas.getContext('2d')
 
@@ -102,7 +103,7 @@ function createShadeSpectrum() {
 }
 
 function createHueSpectrum() {
-    const canvasHue = document.querySelector('.hue-color__hue-canvas')
+    const canvasHue = document.getElementById('hue-canvas')
     const ctxHue = canvasHue.getContext('2d')
 
     const hueGradient = ctxHue.createLinearGradient(0, 0, 0, canvasHue.height)
@@ -118,8 +119,8 @@ function createHueSpectrum() {
 }
 
 function getSpectrumColor(e) {
-    const spectrumCanvas = document.querySelector(
-        '.spectrum-map__spectrum-canvas'
+    const spectrumCanvas = document.getElementById(
+        'spectrum-canvas'
     )
     const spectrumRect = spectrumCanvas.getBoundingClientRect()
 
@@ -150,7 +151,7 @@ function getSpectrumColor(e) {
 }
 
 function getHueColor(e) {
-    const hueCanvas = document.querySelector('.hue-color__hue-canvas')
+    const hueCanvas = document.getElementById('hue-canvas')
     const hueRect = hueCanvas.getBoundingClientRect()
 
     let y = e.pageY - hueRect.top
@@ -193,10 +194,11 @@ function endGetHueColor() {
 </script>
 
 <template>
-    <div id="color-picker">
-        <input v-model="currentColor" type="text" />
+    <div id="color-picker" class="flex items-center">
+        <input v-model="currentColor" type="text" autcomplete="off" class="w-24 mr-2.5"/>
         <div
-            class="color-picker-show-btn"
+            id="color-picker-show-button"
+            class="w-8 h-8 rounded cursor-pointer"
             :style="{
                 'background-color': currentColor,
                 border: currentColorTinyColor.isValid()
@@ -214,27 +216,31 @@ function endGetHueColor() {
         </div>
         <div
             v-if="showColorPicker"
-            class="color-picker"
+            id="color-picker-popup"
+            class="font-mono fixed grid grid-cols-2 gap-3.5 p-2.5 box-border bg-bg rounded-lg shadow-46-solid grid-cols-color-picker"
             :style="colorPickerPosition"
         >
             <div
-                class="spectrum-map"
+                class="relative overflow-hidden cursor-pointer"
                 :style="{ height: height + 'px', width: height + 'px' }"
                 @mousedown="startGetSpectrumColor"
             >
                 <div
-                    class="spectrum-map__color-cursor"
+                    id="color-cursor"
+                    class="absolute z-10 h-4 w-4 rounded-full border-2 border-white bg-none box-border -ml-2 -mt-2 -mt-2" 
                     :style="{ left: spectrumX + 'px', top: spectrumY + 'px' }"
                 />
-                <canvas class="spectrum-map__spectrum-canvas" />
+                <canvas id="spectrum-canvas" class="absolute top-0 right-0 left-0 w-full h-full"/>
             </div>
             <div
-                class="hue-color"
+                id="hue-color"
+                class="relative w-2.5 m-auto cursor-pointer"
                 :style="{ height: height + 'px' }"
                 @mousedown="startGetHueColor"
             >
                 <div
-                    class="hue-color__hue-cursor"
+                    id="hue-cursor"
+                    class="absolute z-10 top-0 left-1/2 h-2 w-4 translate-y-1/2 rounded border-2 border-white bg-none box-border -ml-2 -mt-2"
                     :style="{
                         background: `hsl(${
                             currentColorTinyColor.toHsl().h
@@ -242,108 +248,8 @@ function endGetHueColor() {
                         top: hueY + 'px',
                     }"
                 />
-                <canvas class="hue-color__hue-canvas" :height="height + 'px'" />
+                <canvas id="hue-canvas" class="absolute top-0 right-0 bottom-0 left-0 w-full h-full rounded" :height="height + 'px'" />
             </div>
         </div>
     </div>
 </template>
-
-<style scroped>
-#color-picker {
-    display: flex;
-    align-items: center;
-}
-
-#color-picker input {
-    width: 100px;
-    margin-right: 10px;
-}
-
-.color-picker-show-btn {
-    width: 30px;
-    height: 30px;
-    border-radius: 7px;
-    cursor: pointer;
-}
-
-.undo-btn {
-    font-weight: 700;
-    color: var(--text-color);
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-.color-picker {
-    font-family: var(--font-family);
-    position: fixed;
-    display: grid;
-    grid-template-columns: 2fr auto;
-    grid-gap: 15px;
-    padding: 10px;
-    box-sizing: border-box;
-    background-color: var(--bg-color);
-    border-radius: 10px;
-    box-shadow: 4px 6px 0px rgba(0, 0, 0, 1);
-}
-
-.spectrum-map {
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-}
-
-.spectrum-map__color-cursor {
-    position: absolute;
-    z-index: 2;
-    height: 16px;
-    width: 16px;
-    margin-left: -8px;
-    margin-top: -8px;
-    border: 2px solid white;
-    border-radius: 100%;
-    background: none;
-    box-sizing: border-box;
-}
-
-.spectrum-map__spectrum-canvas {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #ccc;
-}
-
-.hue-color {
-    position: relative;
-    width: 10px;
-    margin: auto;
-    cursor: pointer;
-}
-
-.hue-color__hue-cursor {
-    position: absolute;
-    z-index: 2;
-    top: 0;
-    left: 50%;
-    height: 5px;
-    width: 15px;
-    transform: translate(-50%, -50%);
-    border: 2px solid white;
-    border-radius: 5px;
-    background: red;
-}
-
-.hue-color__hue-canvas {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 8px;
-}
-</style>

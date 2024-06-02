@@ -5,7 +5,7 @@ const user = useSupabaseUser()
 const configStore = useConfigStore()
 
 if (configStore.config.random_theme) {
-    const themes = JSON.parse(JSON.stringify(themesList)).sort((a, b) =>
+    const themes = JSON.parse(JSON.stringify(themesList)).sort((a: { name: string; }, b: { name: any; }) =>
         a.name.localeCompare(b.name)
     )
     const randomTheme = themes[Math.floor(Math.random() * themes.length)]
@@ -34,13 +34,12 @@ if (user.value) {
 
 <style scoped>
 .app-content {
-    font-family: Roboto, Helvetica, Arial, sans-serif;
     min-height: 100vh;
     height: 100vh;
     width: 100%;
     justify-content: center;
     display: grid;
-    grid-template-rows: [page-start] var(--gutter) [padding-start] auto [content-start] 1fr [content-end] auto [page-end];
+    grid-template-rows: [padding-start] auto [content-start] 1fr [content-end] auto [page-end];
 }
 
 .content-grid {

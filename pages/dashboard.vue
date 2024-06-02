@@ -5,17 +5,7 @@ definePageMeta({
 </script>
 
 <template>
-    <div class="dashboard-page full-width scroll">
+    <div class="flex flex-col items-center justify-center h-full full-width scroll">
         <h1>Dashboard</h1>
     </div>
 </template>
-
-<style scoped>
-.dashboard-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
-</style>

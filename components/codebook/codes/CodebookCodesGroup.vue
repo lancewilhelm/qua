@@ -29,14 +29,14 @@ const props = defineProps({
 
 <template>
     <div
-        :class="{ 'codes-tab-group': true, group: code.group }"
+        :class="['grid grid-cols-1', { 'grid-cols-code-group': code.group }]"
         :style="{
             borderTop: index > 0 ? '3px solid var(--main-color)' : 'none',
             borderLeft: depth > 0 ? '3px solid var(--main-color)' : 'none',
         }"
     >
         <div
-            class="codes-tab-group-element"
+            class="flex grow items-center p-2.5 font-mono"
             :style="{
                 width: code.group ? elementWidth + 'px' : 'none',
             }"
@@ -44,7 +44,7 @@ const props = defineProps({
             <span
                 v-if="!code.group"
                 :style="{ backgroundColor: code.color }"
-                class="code-color"
+                class="w-5 h-5 mr-2.5 rounded"
             />
             <div>{{ code.code }}</div>
         </div>
@@ -61,29 +61,3 @@ const props = defineProps({
         </div>
     </div>
 </template>
-
-<style scoped>
-.codes-tab-group {
-    display: grid;
-    grid-template-columns: 1fr;
-    font-family: var(--font-family);
-}
-
-.group {
-    grid-template-columns: auto 1fr;
-}
-
-.codes-tab-group-element {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    font-family: var(--font-family);
-    padding: 10px;
-}
-
-.code-color {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-}
-</style>

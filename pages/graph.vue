@@ -159,19 +159,7 @@ await supabase
 </script>
 
 <template>
-    <div class="graph-page full-width no-scroll">
+    <div class="flex flex-col items-center justify-center h-full rounded-lg border-3 border-main full-width no-scroll">
         <h1>Graph</h1>
     </div>
 </template>
-
-<style scoped>
-.graph-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    border: 3px solid var(--main-color);
-    height: 100%;
-}
-</style>

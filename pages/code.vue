@@ -12,6 +12,7 @@ const codes = ref([])
 const filePanelWidth = ref(configStore.config.editor_file_panel_width)
 const codePanelWidth = ref(configStore.config.editor_code_panel_width)
 const triggerUpdateHighlights = ref(false)
+const triggerSaveCode = ref(false)
 const selectedCode = ref({})
 
 // Fetch codes
@@ -31,7 +32,7 @@ await supabase
 </script>
 
 <template>
-    <div class="code-page full-width no-scroll">
+    <div class="grid grid-row-content h-full grid-cols-code-page full-width no-scroll">
         <FilePanel
             v-model:files="files"
             v-model:current-file="currentFile"
@@ -50,6 +51,7 @@ await supabase
             v-model:current-file="currentFile"
             v-model:codes="codes"
             v-model:trigger-update-highlights="triggerUpdateHighlights"
+            v-model:trigger-save-code="triggerSaveCode"
             v-model:selected-code="selectedCode"
         />
 
@@ -68,12 +70,3 @@ await supabase
         />
     </div>
 </template>
-
-<style scoped>
-.code-page {
-    display: grid;
-    grid-template-columns: auto auto 1fr auto auto;
-    grid-row: content;
-    height: 100%;
-}
-</style>

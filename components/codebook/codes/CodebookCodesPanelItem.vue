@@ -1,48 +1,14 @@
 <script setup>
-const draggedCode = defineModel('draggedCode')
-const dropTarget = defineModel('dropTarget')
-const contextMenuCode = defineModel('contextMenuCode')
-const selectedCode = defineModel('selectedCode')
-
 const props = defineProps({
     code: {
         type: Object,
         default: () => {},
     },
-    level: {
-        type: Number,
-        default: 0,
+    isOpen: {
+        type: Boolean,
+        default: false,
     },
 })
-
-const dragOver = ref(false)
-const groupOpen = ref(false)
-let dragCounter = 0
-
-function getCodeClass() {
-    return {
-        code: true,
-        'drag-over': dragOver.value,
-    }
-}
-
-function onDragEnter() {
-    dragCounter++
-    dragOver.value = true
-}
-
-function onDragLeave() {
-    dragCounter--
-    if (dragCounter === 0) {
-        dragOver.value = false
-    }
-}
-
-function onDrop(e, code) {
-    dragCounter = 0
-    dragOver.value = false
-    dropTarget.value = code
-}
 
 function getAllChildren(code) {
     let children = []
@@ -59,35 +25,22 @@ function getAllChildren(code) {
 </script>
 
 <template>
-    <div class="code-panel-item">
+    <div class="flex flex-col cursor-pointer font-mono text-sm">
         <div
-            :class="getCodeClass()"
-            :style="{
-                paddingLeft: `${10 + level * 15}px`,
-                'background-color': code.color,
-            }"
-            draggable="true"
-            @click="
-                code.group ? (groupOpen = !groupOpen) : (selectedCode = code)
-            "
-            @dragstart="draggedCode = code"
-            @dragenter.prevent="onDragEnter()"
-            @dragleave.prevent="onDragLeave()"
-            @drop.prevent="onDrop($event, code)"
-            @contextmenu.prevent="contextMenuCode = code"
+            :class="['flex flex-row grow p-1.5']"
+            :style="{ 'background-color': code.color }"
         >
-            <div class="icon">
+            <div class="mr-1.5">
                 <Icon
                     v-if="code.group"
                     name="fa6-solid:angle-right"
                     :style="{
-                        transform: groupOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                        transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
                         transition: 'transform 0.3s',
                     }"
                 />
             </div>
             <div
-                class="code-name"
                 :style="{
                     'font-weight': code.group ? 'bold' : 'inherit',
                 }"
@@ -96,36 +49,14 @@ function getAllChildren(code) {
             </div>
             <div
                 v-if="code.group && code.children.length > 0"
-                class="child-colors"
+                class="flex ml-2.5 items-center gap-2"
             >
                 <div
-                    v-for="c in getAllChildren(code).filter(
-                        (c) => c.type === 'code'
-                    )"
+                    v-for="c in getAllChildren(code).filter((c) => !c.folder)"
                     :key="c.id"
-                    class="child-color"
-                    :style="{ backgroundColor: c.color }"
+                    class="w-3 h-3 rounded-full"
+                    :style="{ backgroundColor: c.color, border: c.color === '' ? `1px solid var(--error-color)` : 'none' } "
                 />
-            </div>
-        </div>
-        <div
-            v-if="code.group && code.children.length > 0 && groupOpen"
-            class="children-container"
-        >
-            <span class="left-bar" :style="{ left: `${10 + level * 15}px` }" />
-            <div class="children">
-                <div v-if="groupOpen" class="children">
-                    <CodebookCodesPanelItem
-                        v-for="c in code.children"
-                        :key="c.id"
-                        v-model:dragged-code="draggedCode"
-                        v-model:drop-target="dropTarget"
-                        v-model:context-menu-code="contextMenuCode"
-                        v-model:selected-code="selectedCode"
-                        :code="c"
-                        :level="level + 1"
-                    />
-                </div>
             </div>
         </div>
     </div>
@@ -157,31 +88,5 @@ function getAllChildren(code) {
 .children-container {
     display: flex;
     position: relative;
-}
-
-.left-bar {
-    position: absolute;
-    z-index: 1;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background-color: var(--text-color);
-}
-
-.children {
-    flex-grow: 1;
-}
-
-.child-colors {
-    display: flex;
-    margin-left: 10px;
-    align-items: center;
-    gap: 5px;
-}
-
-.child-color {
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
 }
 </style>

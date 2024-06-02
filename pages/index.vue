@@ -15,7 +15,7 @@ const loginPassword = ref('')
 
 const redirectTo = `${useRuntimeConfig().public.baseUrl}/confirm`
 
-const signInWithOAuth = async (provider) => {
+const signInWithOAuth = async (provider: any) => {
     const { error } = await supabase.auth.signInWithOAuth({
         provider: provider,
         options: { redirectTo },
@@ -56,12 +56,13 @@ const signInWithPassword = async () => {
 </script>
 
 <template>
-    <div class="main-content full-width no-scroll">
-        <div class="register-form form">
-            <div class="form-title">register</div>
-            <form @submit.prevent="handleRegister">
+    <div class="grid h-full items-center justify-items-center grid-cols-2 full-width no-scroll">
+        <div class="grid w-60 font-mono">
+            <div class="text-text">register</div>
+            <form class="grid" @submit.prevent="handleRegister">
                 <input
                     id="registerEmail"
+                    autocomplete="off"
                     v-model="registerEmail"
                     type="email"
                     placeholder="email"
@@ -70,6 +71,7 @@ const signInWithPassword = async () => {
                 />
                 <input
                     id="registerVerifyEmail"
+                    autocomplete="off"
                     v-model="registerVerifyEmail"
                     type="email"
                     placeholder="verify email"
@@ -78,6 +80,7 @@ const signInWithPassword = async () => {
                 />
                 <input
                     id="password"
+                    autocomplete="off"
                     v-model="registerPassword"
                     type="password"
                     placeholder="password"
@@ -86,6 +89,7 @@ const signInWithPassword = async () => {
                 />
                 <input
                     id="registerVerifyPassword"
+                    autocomplete="off"
                     v-model="registerVerifyPassword"
                     type="password"
                     placeholder="verify password"
@@ -97,9 +101,9 @@ const signInWithPassword = async () => {
                 </button>
             </form>
         </div>
-        <div class="login-form form">
-            <div class="form-title">login</div>
-            <form @submit.prevent="signInWithPassword">
+        <div class="grid w-60 font-mono">
+            <div class="text-text">login</div>
+            <form class="grid" @submit.prevent="signInWithPassword">
                 <input
                     id="loginEmail"
                     v-model="loginEmail"
@@ -110,6 +114,7 @@ const signInWithPassword = async () => {
                 />
                 <input
                     id="loginPassword"
+                    autocomplete="off"
                     v-model="loginPassword"
                     type="password"
                     placeholder="password"
@@ -121,7 +126,7 @@ const signInWithPassword = async () => {
                     In
                 </button>
             </form>
-            <div id="or">or</div>
+            <div class="flex justify-center items-center my-2.5 font-mono text-sm text-main">or</div>
             <!-- <button @click="signInWithOAuth('google')">
                 <Icon name="fa6-brands:google" class="icon" /> Google Sign In
             </button> -->
@@ -131,38 +136,3 @@ const signInWithPassword = async () => {
         </div>
     </div>
 </template>
-
-<style scoped>
-.main-content {
-    height: 100%;
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    grid-template-columns: 1fr 1fr;
-}
-
-.form {
-    display: grid;
-    width: 240px;
-    font-family: 'Roboto mono', monospace;
-}
-
-.form-title {
-    color: var(--text-color);
-}
-
-form {
-    display: grid;
-    flex-direction: column;
-}
-
-#or {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 10px 0;
-    font-family: 'Roboto mono', monospace;
-    font-size: 0.8rem;
-    color: var(--main-color);
-}
-</style>

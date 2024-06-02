@@ -21,7 +21,7 @@ document.addEventListener('keydown', (event) => {
 onMounted(() => {
     // get a list of the elements that can be focused within modal-content
     const focusableElements = Array.from(
-        document.querySelector('.modal-content').querySelectorAll(
+        document.getElementById('modal-content').querySelectorAll(
             'button, a, input, textarea'
         )
     )
@@ -30,45 +30,16 @@ onMounted(() => {
 })
 
 function handleClickOutside(event) {
-    if (event.target.classList.contains('modal')) {
+    if (event.target.id === 'modal') {
         emit('close')
     }
 }
 </script>
 
 <template>
-    <div class="modal">
-        <div class="modal-content">
+    <div id="modal" class="fixed flex items-center justify-center z-10 left-0 top-0 w-full h-full overflow-auto bg-black/60">
+        <div id='modal-content' class="flex flex-col bg-bg p-5 rounded-lg w-96 shadow-68-solid text-text">
             <slot />
         </div>
     </div>
 </template>
-
-<style scoped>
-.modal {
-    position: fixed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    z-index: 2;
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-.modal-content {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--bg-color);
-    padding: 20px;
-    /* border: 3px solid var(--sub-color); */
-    border-radius: 10px;
-    width: 400px;
-    box-shadow: 6px 8px 0px rgba(0, 0, 0, 1);
-    color: var(--text-color);
-}
-</style>

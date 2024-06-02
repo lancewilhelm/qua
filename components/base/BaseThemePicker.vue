@@ -15,7 +15,7 @@ document.addEventListener('mousedown', handleClickOutside);
     });
 
 function handleClickOutside(event) {
-    if (event.target.classList.contains('theme-picker') || event.target.classList.contains('theme-picker-scroll')) {
+    if (event.target.id === 'theme-picker' || event.target.id === 'theme-picker-scroll') {
         emit('close');
     }
 };
@@ -36,32 +36,32 @@ function handleChangeTheme(theme) {
 </script>
 
 <template>
-  <div class="theme-picker">
-    <div class="theme-picker-scroll">
-      <div class="theme-picker-content">
+  <div id="theme-picker" class="fixed grid items-center justify-center z-10 left-0 top-0 w-full h-full overflow-auto bg-black/60">
+    <div id="theme-picker-scroll" class="grid items-center justify-center h-full">
+      <div id="theme-picker-content" class="grid bg-bg border-3 border-main rounded-lg h-[75vh] w-96 overflow-y-auto gap-1 py-2">
         <div
           v-for="theme in themes"
           :key="theme.name"
-          :class="getThemeBtnClass(theme)"
+          :class="['grid grid-cols-color-picker justify-center cursor-pointer px-2', { 'border-y-3 border-main': config.theme && config.theme === theme.name }]"
           @click="handleChangeTheme(theme)"
         >
-          <div class="name">
+          <div class="flex text-sm items-center font-bold">
             {{ theme.name }}
           </div>
           <div
-            class="theme-colors"
+            class="grid grid-cols-3 gap-1 items-center justify-center p-2 rounded-full"
             :style="{ 'background-color': theme.bgColor }"
           >
             <div
-              class="color"
+              class="w-4 h-4 rounded-full"
               :style="{ 'background-color': theme.mainColor }"
             />
             <div
-              class="color"
+              class="w-4 h-4 rounded-full"
               :style="{ 'background-color': theme.subColor }"
             />
             <div
-              class="color"
+              class="w-4 h-4 rounded-full"
               :style="{ 'background-color': theme.textColor }"
             />
           </div>
@@ -70,77 +70,3 @@ function handleChangeTheme(theme) {
     </div>
   </div>
 </template>
-
-<style scoped>
-.theme-picker {
-    position: fixed;
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    z-index: 2;
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-.theme-picker-scroll {
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    height: 100%;
-}
-
-.theme-picker-content {
-    display: grid;
-    background-color: var(--bg-color);
-    border: 3px solid var(--main-color);
-    border-radius: 10px;
-    height: 75vh;
-    width: 400px;
-    overflow-y: auto;
-    gap: 0.2rem;
-    padding: 0.5em 0;
-    /* box-shadow: 6px 8px 0px rgba(0, 0, 0, 1); */
-}
-
-.theme-btn {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0 1em;
-}
-
-.theme-btn.active {
-    border-top: 3px solid var(--main-color);
-    border-bottom: 3px solid var(--main-color);
-}
-
-.theme-btn .name {
-    display: flex;
-    font-size: 0.8rem;
-    align-items: center;
-    font-weight: 600;
-}
-
-.theme-colors {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 0.2rem;
-    align-items: center;
-    justify-content: center;
-    align-content: center;
-    padding: 0.5em;
-    border-radius: 1em;
-}
-
-.color {
-    width: 1em;
-    height: 1em;
-    border-radius: 50%;
-}
-</style>

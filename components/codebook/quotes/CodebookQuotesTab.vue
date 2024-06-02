@@ -13,7 +13,7 @@ const selectedCode = ref({});
 </script>
 
 <template>
-  <div class="quotes-tab">
+  <div class="flex grid-row-content h-full">
     <CodebookCodesPanel
       v-if="codePanelWidth > 0"
       v-model:codes="codes"
@@ -26,6 +26,7 @@ const selectedCode = ref({});
       v-model:element-width="codePanelWidth"
       :min-width="250"
       :on-left="true"
+      :config-attribute="'editor_code_panel_width'"
     />
     <CodebookQuotesPanel
       :selected-code="selectedCode"
@@ -33,11 +34,3 @@ const selectedCode = ref({});
     />
   </div>
 </template>
-
-<style scoped>
-.quotes-tab {
-    display: flex;
-    grid-row: content;
-    height: 100%;
-}
-</style>
