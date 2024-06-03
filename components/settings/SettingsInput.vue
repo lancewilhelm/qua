@@ -14,9 +14,17 @@ const props = defineProps({
     },
 })
 
+useEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        patchConfig()
+    }
+})
+
 const configStore = useConfigStore()
 const r_pre = ref(configStore.config[props.configParameter])
 const r = ref(configStore.config[props.configParameter])
+
+const mismatch = computed(() => r.value?.toString().trim() !== r_pre.value?.toString().trim())
 
 function patchConfig() {
     if (r.value.toString().trim() === r_pre.value.toString().trim()) return
@@ -33,7 +41,7 @@ function patchConfig() {
         <Icon name="fa6-solid:caret-up" class='drop-shadow-23-solid hover:text-sub active:translate-x-2px active:translate-y-3px active:drop-shadow-none transition-all' @click.prevent="r++" />
         <Icon name="fa6-solid:caret-down" class='drop-shadow-23-solid hover:text-sub active:translate-x-2px active:translate-y-3px active:drop-shadow-none transition-all' @click.prevent="r--" />
     </div>
-    <button :class="['flex ml-2 one-to-one border-3 border-transparent', {'!border-error': r.toString().trim() !== r_pre.toString().trim() }]" @click="patchConfig()">
+    <button :class="['flex ml-2 one-to-one border-3 border-transparent', {'!border-error': mismatch }]" @click="patchConfig()">
         <Icon name="fa6-solid:floppy-disk" />
     </button>
 </template>
