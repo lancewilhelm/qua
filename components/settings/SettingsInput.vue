@@ -24,10 +24,16 @@ const configStore = useConfigStore()
 const r_pre = ref(configStore.config[props.configParameter])
 const r = ref(configStore.config[props.configParameter])
 
-const mismatch = computed(() => r.value?.toString().trim() !== r_pre.value?.toString().trim())
+const mismatch = computed(() => {
+    if (r.value && r_pre.value) {
+        return r.value.toString().trim() !== r_pre.value.toString().trim()
+    } else {
+        return false
+    }
+})
 
 function patchConfig() {
-    if (r.value.toString().trim() === r_pre.value.toString().trim()) return
+    if (r.value.toString().trim() === r_pre.value?.toString().trim()) return
     const d: { [key: string]: any } = new Object()
     d[props.configParameter] = r.value.toString().trim()
     configStore.patchConfig(d)
