@@ -93,31 +93,33 @@ function setRandomTheme(random) {
             <SettingsGroupSection
                 title="font size"
                 icon="fa6-solid:text-height"
-                description="The size of the font on the code page. Examples, 12px, 1rem, etc."
+                description="The size of the font on the code page in pixels."
             >
                 <SettingsInput
                     config-parameter="code_font_size"
                     placeholder="font size"
-                />
-            </SettingsGroupSection>
-            <SettingsGroupSection
-                title="font family"
-                icon="fa6-solid:people-group"
-                description="The font family of the code on the code page. Examples, monospace, sans-serif, serif, etc."
-            >
-                <SettingsInput
-                    config-parameter="code_font_family"
-                    placeholder="font family"
+                    type="number"
                 />
             </SettingsGroupSection>
             <SettingsGroupSection
                 title="line height"
                 icon="fa6-solid:arrow-down-up-across-line"
-                description="The height of the lines on the code page. Examples, 1.2, 1.5, 2.0, etc."
+                description="The height of the lines on the code page in pixels. Typically the same or bigger than font size."
             >
                 <SettingsInput
                     config-parameter="code_line_height"
                     placeholder="line height"
+                    type="number"
+                />
+            </SettingsGroupSection>
+            <SettingsGroupSection
+                title="font family"
+                icon="fa6-solid:people-group"
+                description="The font family of the code on the code page. Examples, monospace, sans-serif, serif, Helvetica, etc."
+            >
+                <SettingsInput
+                    config-parameter="code_font_family"
+                    placeholder="font family"
                 />
             </SettingsGroupSection>
             <SettingsGroupSection

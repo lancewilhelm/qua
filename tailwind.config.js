@@ -3,7 +3,7 @@ const animate = require("tailwindcss-animate")
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: false,
-
+  mode: 'jit',
   theme: {
     container: {
       center: true,
@@ -51,6 +51,10 @@ module.exports = {
         '68-solid': '6px 8px 0px rgb(0, 0, 0)',
         '46-solid': '4px 6px 0px rgb(0, 0, 0)',
         '35-solid': '3px 5px 0px rgb(0, 0, 0)',
+        '23-solid': '2px 3px 0px rgb(0, 0, 0)',
+        '12-solid': '1px 2px 0px rgb(0, 0, 0)',
+      },
+      dropShadow: {
         '23-solid': '2px 3px 0px rgb(0, 0, 0)',
         '12-solid': '1px 2px 0px rgb(0, 0, 0)',
       },

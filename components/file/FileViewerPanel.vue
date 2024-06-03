@@ -436,7 +436,7 @@ function handleCodeClick(event, segment) {
     >
         <div
             :class="[
-                'w-full h-full overflow-y-auto mr-px',
+                'flex w-full h-full overflow-y-auto mr-px',
                 {
                     'editor-theme-light':
                         configStore.config.editor_theme === 'light',
@@ -447,6 +447,12 @@ function handleCodeClick(event, segment) {
                 },
             ]"
         >
+            <FileViewerPanelLineNumbers
+                v-if="
+                    configStore.config.code_line_numbers &&
+                    editorSegments.length > 0
+                "
+            />
             <div
                 id="editor-content"
                 :class="[
@@ -469,6 +475,10 @@ function handleCodeClick(event, segment) {
                     :key="segment.key"
                     class="editor-segment"
                     :style="{
+                        'font-size': configStore.config.code_font_size + 'px',
+                        'line-height':
+                            configStore.config.code_line_height + 'px',
+                        'font-family': configStore.config.code_font_family,
                         'background-color':
                             segment.codes.length > 0
                                 ? segment.codes[0].color
