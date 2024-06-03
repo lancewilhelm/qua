@@ -19,11 +19,11 @@ const r_pre = ref(configStore.config[props.configParameter])
 const r = ref(configStore.config[props.configParameter])
 
 function patchConfig() {
-    if (r.value.trim() === r_pre.value.trim()) return
+    if (r.value.toString().trim() === r_pre.value.toString().trim()) return
     const d: { [key: string]: any } = new Object()
-    d[props.configParameter] = r.value.trim()
+    d[props.configParameter] = r.value.toString().trim()
     configStore.patchConfig(d)
-    r_pre.value = r.value.trim()
+    r_pre.value = r.value.toString().trim()
 }
 </script>
 

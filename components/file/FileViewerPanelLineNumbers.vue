@@ -12,7 +12,7 @@ const computeLines = () => {
     lineHeight.value = computedStyle.lineHeight
     lines.value = Math.floor(
         (elementHeight.value + 10) /
-        Math.max(configStore.config.code_font_size, lineHeight.value.slice(0, -2))
+        Math.max(Number(lineHeight.value.slice(0, -2)), configStore.config.code_line_height)
     ) - 1
 };
 
@@ -38,7 +38,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="pt-2.5 pl-2 pr-1 z-10" :style="{ 'font-size': configStore.config.code_font_size }">
+    <div class="pt-2.5 pl-2 pr-1 z-10" :style="{ 'font-size': configStore.config.code_font_size + 'px' }">
         <div v-for="i in lines" :key="i" class="text-right text-sub select-none" :style="{ 'height': lineHeight }">
             {{ i }}
         </div>
