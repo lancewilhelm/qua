@@ -33,7 +33,7 @@ const mismatch = computed(() => {
 })
 
 function patchConfig() {
-    if (r.value.toString().trim() === r_pre.value.toString().trim()) return
+    if (r.value.toString().trim() === r_pre.value?.toString().trim()) return
     const d: { [key: string]: any } = new Object()
     d[props.configParameter] = r.value.toString().trim()
     configStore.patchConfig(d)
