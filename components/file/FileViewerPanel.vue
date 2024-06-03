@@ -2,7 +2,7 @@
 const codes = defineModel('codes')
 const currentFile = defineModel('currentFile')
 const triggerUpdateHighlights = defineModel('triggerUpdateHighlights')
-const triggerSaveCode = defineModel('triggerSaveCode')
+const triggerCodeSelected = defineModel('triggerCodeSelected')
 const codePanelSelectedCode = defineModel('selectedCode')
 
 const supabase = useSupabaseClient()
@@ -38,9 +38,23 @@ watch(triggerUpdateHighlights, (newVal) => {
     }
 })
 
-watch(triggerSaveCode, (newVal) => {
+watch(triggerCodeSelected, (newVal) => {
     if (newVal) {
-        triggerSaveCode.value = false
+        if (window.getSelection().toString().length > 0) {
+            const selection = window.getSelection()
+            if (
+                selection.baseNode.parentElement.className ===
+                    'editor-segment' &&
+                selection.extentNode.parentElement.className ===
+                    'editor-segment'
+            ) {
+                editorSelection.value.text = selection.toString()
+                editorSelection.value.range = selection.getRangeAt(0)
+                newCode.value = codePanelSelectedCode.value
+                addCodeInstance()
+            }
+        }
+        triggerCodeSelected.value = false
     }
 })
 
@@ -504,7 +518,11 @@ function handleCodeClick(event, segment) {
                     class="context-menu-code group grid grid-cols-color-picker gap-2 p-1 cursor-pointer hover:font-bold hover:text-bg transition-all duration-50"
                     @click.stop="handleOpenCodeExpander($event, c)"
                 >
-                    <div class="group-active:scale-95 group-active:translate-x-2px group-active:translate-y-3px transtion-all duration-300">{{ c.code }}</div>
+                    <div
+                        class="group-active:scale-95 group-active:translate-x-2px group-active:translate-y-3px transtion-all duration-300"
+                    >
+                        {{ c.code }}
+                    </div>
                     <div><Icon name="fa6-solid:caret-right" /></div>
                 </div>
             </div>
@@ -527,7 +545,9 @@ function handleCodeClick(event, segment) {
             @close="showNewCodeModal = false"
             @submit="addCodeInstance"
         >
-            <div class="font-mono text-main font-bold text-base mb-2">quote</div>
+            <div class="font-mono text-main font-bold text-base mb-2">
+                quote
+            </div>
             <div class="overflow-y-auto max-h-96 h-full">
                 <div class="font-mono text-text font-base mb-4">
                     {{ codeModalText.trim() }}
@@ -554,7 +574,9 @@ function handleCodeClick(event, segment) {
             @close="showEditSegmentModal = false"
             @submit="handleEditCodeSubmit"
         >
-            <div class="font-mono text-main font-bold text-base mb-2">quote</div>
+            <div class="font-mono text-main font-bold text-base mb-2">
+                quote
+            </div>
             <div class="overflow-y-auto max-h-96 h-full">
                 <div class="font-mono text-text font-base mb-4">
                     {{ editCode.data }}
@@ -573,9 +595,7 @@ function handleCodeClick(event, segment) {
                 <button class="grow" @click="showEditSegmentModal = false">
                     cancel
                 </button>
-                <button class="grow" @click="handleEditCodeSubmit">
-                    add
-                </button>
+                <button class="grow" @click="handleEditCodeSubmit">add</button>
             </div>
         </BaseModal>
     </div>
