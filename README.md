@@ -18,7 +18,7 @@ SUPABASE_URL=https://your-supabase-url.supabase.co (replace with your supabase u
 SUPABASE_KEY=your-supabase-key (replace with your supabase key)
 BASE_URL=http://localhost:3000 (replace with your local development url)
 SUPABASE_AUTH_GITHUB_CLIENT_ID=your-github-client-id (optional if using github auth)
-SUPABASE_AUTH_GITHUB_CLIENT_SECRET=your-github-client-secret (optional if using github auth)
+SUPABASE_AUTH_GITHUB_SECRET=your-github-client-secret (optional if using github auth)
 LOCAL_DEV=true (optional if you will be resetting your database often)
 ```
 
