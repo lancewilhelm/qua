@@ -3,6 +3,7 @@ definePageMeta({
     middleware: 'auth',
 })
 
+import BaseColorPicker from '~/components/base/BaseColorPicker.vue';
 import themesList from '/assets/themes.json'
 
 const displayName = defineModel('displayName')
@@ -219,8 +220,26 @@ function setRandomTheme(random) {
             </SettingsGroupSection>
         </div>
 
-        <div class="text-3xl font-black font-mono text-main">login</div>
-        <div class="settings-group">TBD</div>
+        <div class="text-3xl font-black font-mono text-main">codes</div>
+        <SettingsGroupSection
+            title="dynamic code text color"
+            icon="fa6-solid:swatchbook"
+            description="Whether to change the text color of the code based on the background color to improve readability. The text color will either be white or black."
+        >
+            <SettingsBooleanButtons configParameter="dynamic_code_text_color" />
+        </SettingsGroupSection>
+
+        <SettingsGroupSection
+            title="code text color"
+            icon="fa6-solid:droplet"
+            description="If not using dynamic code text color, the color of the text of a code."
+        >
+            <SettingsColorPicker configParameter="code_text_color" />
+        </SettingsGroupSection>
+
+        <!-- <div class="text-3xl font-black font-mono text-main">login</div>
+        <div class="settings-group">TBD</div> -->
+
         <div class="text-3xl font-black font-mono text-main">theme</div>
         <SettingsGroupSection
             title="random theme"
@@ -261,7 +280,13 @@ function setRandomTheme(random) {
                     {{ theme.name }}
                 </div>
                 <div
-                    :class="['flex grid-cols-3 gap-1 items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-50', { 'opacity-100': configStore.config.theme === theme.name }]"
+                    :class="[
+                        'flex grid-cols-3 gap-1 items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-50',
+                        {
+                            'opacity-100':
+                                configStore.config.theme === theme.name,
+                        },
+                    ]"
                 >
                     <div
                         class="w-4 h-4 rounded-full"
@@ -306,7 +331,13 @@ function setRandomTheme(random) {
                     {{ theme.name }}
                 </div>
                 <div
-                    :class="['flex grid-cols-3 gap-1 items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-50', { 'opacity-100': configStore.config.theme === theme.name }]"
+                    :class="[
+                        'flex grid-cols-3 gap-1 items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-50',
+                        {
+                            'opacity-100':
+                                configStore.config.theme === theme.name,
+                        },
+                    ]"
                 >
                     <div
                         class="w-4 h-4 rounded-full"

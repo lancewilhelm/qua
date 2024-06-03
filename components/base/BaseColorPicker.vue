@@ -12,6 +12,13 @@ const showColorPicker = ref(false)
 const colorPickerPosition = ref({ left: 0, bottom: 0 })
 const originalValue = ref(JSON.parse(JSON.stringify(currentColor.value)))
 
+const colorPickerShowButton = ref(null)
+const colorPickerPopup = ref(null)
+const colorCursor = ref(null)
+const hueCursor = ref(null)
+const hueCanvas = ref(null)
+const spectrumCanvas = ref(null)
+
 const currentColorTinyColor = computed(() => {
     return tinycolor(currentColor.value)
 })
@@ -36,7 +43,7 @@ window.addEventListener('mouseup', (e) => {
     if (
         showColorPicker.value &&
         (e.target.id === '' ||
-        (!e.target.id === 'color-picker-popup' &&
+        (!e.target.id === 'color-picker-popup'&&
         !e.target.id === 'color-cursor' &&
         !e.target.id === 'hue-cursor'))
     ) {
@@ -46,12 +53,11 @@ window.addEventListener('mouseup', (e) => {
 
 async function toggleColorPicker(e) {
     if (!showColorPicker.value) {
-        const r = document
-            .getElementById('color-picker-show-button')
+        const r = colorPickerShowButton.value
             .getBoundingClientRect()
         colorPickerPosition.value = {
             left: r.left + r.width + 5 + 'px',
-            top: r.top - height.value / 2 + 'px',
+            top: r.top + window.ScrollY - height.value / 2 + 'px',
         }
         showColorPicker.value = true
         await nextTick()
@@ -63,20 +69,18 @@ async function toggleColorPicker(e) {
 }
 
 function createShadeSpectrum() {
-    const spectrumCanvas = document.getElementById(
-        'spectrum-canvas'
-    )
-    const ctxSpectrum = spectrumCanvas.getContext('2d')
+    const sc = spectrumCanvas.value
+    const ctxSpectrum = sc.getContext('2d')
 
     ctxSpectrum.fillStyle = `hsl(${
         currentColorTinyColor.value.toHsl().h
     }, 100%, 50%)`
-    ctxSpectrum.fillRect(0, 0, spectrumCanvas.width, spectrumCanvas.height)
+    ctxSpectrum.fillRect(0, 0, sc.width, sc.height)
 
     const whiteGradient = ctxSpectrum.createLinearGradient(
         0,
         0,
-        spectrumCanvas.width,
+        sc.width,
         0
     )
     whiteGradient.addColorStop(
@@ -85,13 +89,13 @@ function createShadeSpectrum() {
     )
     whiteGradient.addColorStop(1, 'transparent')
     ctxSpectrum.fillStyle = whiteGradient
-    ctxSpectrum.fillRect(0, 0, spectrumCanvas.width, spectrumCanvas.height)
+    ctxSpectrum.fillRect(0, 0, sc.width, sc.height)
 
     const blackGradient = ctxSpectrum.createLinearGradient(
         0,
         0,
         0,
-        spectrumCanvas.height
+        sc.height
     )
     blackGradient.addColorStop(0, 'transparent')
     blackGradient.addColorStop(
@@ -99,11 +103,11 @@ function createShadeSpectrum() {
         `hsl(${currentColorTinyColor.value.toHsl().h}, 100%, 0%)`
     )
     ctxSpectrum.fillStyle = blackGradient
-    ctxSpectrum.fillRect(0, 0, spectrumCanvas.width, spectrumCanvas.height)
+    ctxSpectrum.fillRect(0, 0, sc.width, sc.height)
 }
 
 function createHueSpectrum() {
-    const canvasHue = document.getElementById('hue-canvas')
+    const canvasHue = hueCanvas.value
     const ctxHue = canvasHue.getContext('2d')
 
     const hueGradient = ctxHue.createLinearGradient(0, 0, 0, canvasHue.height)
@@ -119,13 +123,11 @@ function createHueSpectrum() {
 }
 
 function getSpectrumColor(e) {
-    const spectrumCanvas = document.getElementById(
-        'spectrum-canvas'
-    )
-    const spectrumRect = spectrumCanvas.getBoundingClientRect()
+    const sc = spectrumCanvas.value
+    const spectrumRect = sc.getBoundingClientRect()
 
     let x = e.pageX - spectrumRect.left
-    let y = e.pageY - spectrumRect.top
+    let y = e.pageY - window.scrollY - spectrumRect.top
     if (x > spectrumRect.width) {
         x = spectrumRect.width - 1
     }
@@ -151,8 +153,8 @@ function getSpectrumColor(e) {
 }
 
 function getHueColor(e) {
-    const hueCanvas = document.getElementById('hue-canvas')
-    const hueRect = hueCanvas.getBoundingClientRect()
+    const hc = hueCanvas.value
+    const hueRect = hc.getBoundingClientRect()
 
     let y = e.pageY - hueRect.top
     if (y > hueRect.height) {
@@ -197,6 +199,7 @@ function endGetHueColor() {
     <div id="color-picker" class="flex items-center">
         <input v-model="currentColor" type="text" autcomplete="off" class="w-24 mr-2.5"/>
         <div
+            ref="colorPickerShowButton"
             id="color-picker-show-button"
             class="w-8 h-8 rounded cursor-pointer"
             :style="{
@@ -216,8 +219,9 @@ function endGetHueColor() {
         </div>
         <div
             v-if="showColorPicker"
+            ref="colorPickerPopup"
             id="color-picker-popup"
-            class="font-mono fixed grid grid-cols-2 gap-3.5 p-2.5 box-border bg-bg rounded-lg shadow-46-solid grid-cols-color-picker"
+            class="font-mono absolute grid grid-cols-2 gap-3.5 p-2.5 box-border bg-bg rounded-lg shadow-46-solid grid-cols-color-picker"
             :style="colorPickerPosition"
         >
             <div
@@ -226,11 +230,12 @@ function endGetHueColor() {
                 @mousedown="startGetSpectrumColor"
             >
                 <div
+                    ref="colorCursor"
                     id="color-cursor"
                     class="absolute z-10 h-4 w-4 rounded-full border-2 border-white bg-none box-border -ml-2 -mt-2 -mt-2" 
                     :style="{ left: spectrumX + 'px', top: spectrumY + 'px' }"
                 />
-                <canvas id="spectrum-canvas" class="absolute top-0 right-0 left-0 w-full h-full"/>
+                <canvas ref="spectrumCanvas" id="spectrum-canvas" class="absolute top-0 right-0 left-0 w-full h-full"/>
             </div>
             <div
                 id="hue-color"
@@ -239,6 +244,7 @@ function endGetHueColor() {
                 @mousedown="startGetHueColor"
             >
                 <div
+                    ref="hueCursor"
                     id="hue-cursor"
                     class="absolute z-10 top-0 left-1/2 h-2 w-4 translate-y-1/2 rounded border-2 border-white bg-none box-border -ml-2 -mt-2"
                     :style="{
@@ -248,7 +254,7 @@ function endGetHueColor() {
                         top: hueY + 'px',
                     }"
                 />
-                <canvas id="hue-canvas" class="absolute top-0 right-0 bottom-0 left-0 w-full h-full rounded" :height="height + 'px'" />
+                <canvas ref="hueCanvas" id="hue-canvas" class="absolute top-0 right-0 bottom-0 left-0 w-full h-full rounded" :height="height + 'px'" />
             </div>
         </div>
     </div>

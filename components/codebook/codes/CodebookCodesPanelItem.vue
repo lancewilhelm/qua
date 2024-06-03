@@ -1,4 +1,7 @@
 <script setup>
+import tinycolor from 'tinycolor2'
+const configStore = useConfigStore()
+
 const props = defineProps({
     code: {
         type: Object,
@@ -28,7 +31,12 @@ function getAllChildren(code) {
     <div class="flex flex-col cursor-pointer font-mono text-sm">
         <div
             :class="['flex flex-row grow p-1.5']"
-            :style="{ 'background-color': code.color }"
+            :style="{
+                'background-color': code.color,
+                color: configStore.config.dynamic_code_text_color ? tinycolor.mostReadable(code.color, ['black', 'white'], {
+                    includeFallbackColors: false,
+                }) : configStore.config.code_text_color ? configStore.config.code_text_color : 'var(--text-color)',
+            }"
         >
             <div class="mr-1.5">
                 <Icon
@@ -42,7 +50,7 @@ function getAllChildren(code) {
             </div>
             <div
                 :style="{
-                    'font-weight': code.group ? 'bold' : 'inherit',
+                    'font-weight': code.group ? '700' : '500',
                 }"
             >
                 {{ code.code }}
@@ -55,7 +63,13 @@ function getAllChildren(code) {
                     v-for="c in getAllChildren(code).filter((c) => !c.folder)"
                     :key="c.id"
                     class="w-3 h-3 rounded-full"
-                    :style="{ backgroundColor: c.color, border: c.color === '' ? `1px solid var(--error-color)` : 'none' } "
+                    :style="{
+                        backgroundColor: c.color,
+                        border:
+                            c.color === ''
+                                ? `1px solid var(--error-color)`
+                                : 'none',
+                    }"
                 />
             </div>
         </div>

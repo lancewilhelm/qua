@@ -183,7 +183,6 @@ async function updateCodeLocation(cs, target) {
 }
 
 function openContextMenu({ event, target }) {
-    console.log(target)
     contextMenuEvent.value = event
     contextMenuCode.value = target
     showContextMenu.value = true
@@ -288,7 +287,6 @@ function handleDrop({ items, target }) {
     if (items.length === 0) {
         return
     }
-    console.log(items, target)
 
     if (items && (target.group || target === 'root')) {
         updateCodeLocation(items, target)
@@ -383,7 +381,7 @@ function handleDrop({ items, target }) {
                 rows="4"
                 placeholder="enter code..."
             />
-            <div class="code-color">
+            <div>
                 <div class="font-mono text-main text-left">color</div>
                 <BaseColorPicker v-model:current-color="newCode.color" />
             </div>
@@ -463,7 +461,7 @@ function handleDrop({ items, target }) {
                 rows="4"
                 placeholder="enter code..."
             />
-            <div v-if="!contextMenuCode.group" class="code-color">
+            <div v-if="!contextMenuCode.group">
                 <div class="font-mono text-main text-left">color</div>
                 <BaseColorPicker v-model:current-color="editCode.color" />
             </div>

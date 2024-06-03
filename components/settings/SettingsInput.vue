@@ -27,6 +27,8 @@ const r = ref(configStore.config[props.configParameter])
 const mismatch = computed(() => {
     if (r.value && r_pre.value) {
         return r.value.toString().trim() !== r_pre.value.toString().trim()
+    } else if (r.value && !r_pre.value) {
+        return true
     } else {
         return false
     }

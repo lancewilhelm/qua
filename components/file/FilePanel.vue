@@ -74,8 +74,6 @@ function handleDrop({ items, target }) {
     if (items.length === 0) {
         return
     }
-    // console.log('Dropped items:', items)
-    // console.log('Drop target:', target)
     if (items && (target.folder || target === 'root')) {
         updateFileLocation(items, target)
     }

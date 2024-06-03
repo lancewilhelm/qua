@@ -1,4 +1,6 @@
 <script setup>
+import tinycolor from 'tinycolor2'
+
 const codes = defineModel('codes')
 const currentFile = defineModel('currentFile')
 const triggerUpdateHighlights = defineModel('triggerUpdateHighlights')
@@ -484,6 +486,7 @@ function handleCodeClick(event, segment) {
                             segment.codes.length > 0
                                 ? segment.codes[0].color
                                 : 'transparent',
+                        'color': segment.codes.length > 0 ? tinycolor.mostReadable(segment.codes[0].color, ['black', 'white'],{includeFallbackColors:false}) : 'inherit',
                         'text-decoration':
                             segment.codes.length > 1 ? 'underline' : 'none',
                         'font-style':
@@ -525,7 +528,7 @@ function handleCodeClick(event, segment) {
                 <div
                     v-for="c in selectedSegment.codes"
                     :key="c"
-                    :style="{ 'background-color': c.color }"
+                    :style="{ 'background-color': c.color, 'color': tinycolor.mostReadable(c.color, ['black', 'white'],{includeFallbackColors:false}) }"
                     class="context-menu-code group grid grid-cols-color-picker gap-2 p-1 cursor-pointer hover:font-bold hover:text-bg transition-all duration-50"
                     @click.stop="handleOpenCodeExpander($event, c)"
                 >
