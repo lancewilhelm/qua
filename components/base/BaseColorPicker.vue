@@ -209,10 +209,10 @@ function endGetHueColor() {
         />
         <div
             v-if="currentColor !== originalValue"
-            class="undo-btn"
+            class="flex items-center cursor-pointer justify-items-center"
             @click="currentColor = originalValue"
         >
-            <i class="fa-solid fa-rotate-left" />
+            <Icon name="fa6-solid:rotate-left" class="ml-2" />
         </div>
         <div
             v-if="showColorPicker"

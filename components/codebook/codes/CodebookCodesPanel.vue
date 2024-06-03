@@ -145,6 +145,15 @@ function openEditModal() {
     showEditModal.value = true
 }
 
+function handleShowNewCodeModal() {
+    if (configStore.config.new_code_random_color) {
+        newCode.value.color =
+            '#' +
+            ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, '0')
+    }
+    showNewCodeModal.value = true
+}
+
 async function updateCodeLocation(cs, target) {
     if (cs.some((c) => c.id === target.id)) {
         return
@@ -155,7 +164,7 @@ async function updateCodeLocation(cs, target) {
             parent: target.id ? target.id : null,
         }
     })
-    
+
     const { error } = await supabase.from('codes').upsert(patch)
     if (error) {
         console.error(error)
@@ -356,7 +365,7 @@ function handleDrop({ items, target }) {
             >
                 delete
             </button>
-            <button @click="showNewCodeModal = true">new code</button>
+            <button @click="handleShowNewCodeModal">new code</button>
             <button @click="showNewCodeGroupModal = true">new group</button>
         </BaseContextMenu>
 

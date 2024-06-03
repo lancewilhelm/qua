@@ -249,11 +249,12 @@ async function addCodeInstance() {
             const end_offset = calculateOffset(endContainer, range.endOffset)
 
             const code = {
-                color:
-                    '#' +
-                    ((Math.random() * 0xffffff) << 0)
-                        .toString(16)
-                        .padStart(6, '0'),
+                color: configStore.config.new_code_random_color
+                    ? '#' +
+                      ((Math.random() * 0xffffff) << 0)
+                          .toString(16)
+                          .padStart(6, '0')
+                    : null,
                 data: selectedText,
                 end_offset: end_offset,
                 file_id: currentFile.value.id,
