@@ -24,9 +24,7 @@ const draggedFiles = ref(null)
 const dropTarget = ref(null)
 const dragOver = ref(false)
 const uploadTarget = ref(null)
-const numToExpand = ref(0)
-const numToCollapse = ref(0)
-let dragCounter = 0
+const draggableItem = ref([])
 
 watch(dropTarget, () => {
     if (draggedFiles.value && dropTarget.value) {
@@ -92,10 +90,8 @@ function handleDrop({ items, target }) {
 function onDrop(e, file) {
     if (e.dataTransfer.files.length > 0) {
         uploadFile(e.dataTransfer.files, { type: 'root' })
-        dragCounter = 0
         dragOver.value = false
     } else {
-        dragCounter = 0
         dragOver.value = false
         dropTarget.value = file
     }
@@ -320,12 +316,12 @@ function handleSelected(item) {
                 <Icon name="fa6-solid:folder-plus" />
             </button>
             <button
-                @click="numToExpand = files.filter((f) => f.folder).length"
+                @click="() => draggableItem.forEach((item) => item.open())"
             >
                 <Icon name="fa6-solid:up-right-and-down-left-from-center" />
             </button>
             <button
-                @click="numToCollapse = files.filter((f) => f.folder).length"
+                @click="draggableItem.forEach((item) => item.close())"
             >
                 <Icon name="fa6-solid:down-left-and-up-right-to-center" />
             </button>
@@ -338,12 +334,11 @@ function handleSelected(item) {
                 <DraggableItem
                     v-for="file in parsedFiles"
                     :key="file.id"
+                    ref="draggableItem"
                     :item="file"
                     :children="file.children ? file.children : []"
                     :depth="0"
                     :selected-style="() => 'border'"
-                    v-model:num-to-expand="numToExpand"
-                    v-model:num-to-collapse="numToCollapse"
                     @onDrop="handleDrop"
                     @selected="handleSelected"
                     @onContextMenu="openContextMenu"

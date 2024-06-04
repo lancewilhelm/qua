@@ -36,8 +36,7 @@ const newCode = ref({
     name: '',
     color: '',
 })
-const numToExpand = ref(0)
-const numToCollapse = ref(0)
+const draggableItem = ref([])
 
 window.addEventListener('dragover', (e) => e.preventDefault())
 
@@ -323,13 +322,20 @@ function handleDrop({ items, target }) {
         <div class="flex items-center justify-center gap-2">
             <button
                 class="text-sm p-2"
-                @click="numToExpand = codes.filter((c) => c.group).length"
+                @click="() => 
+                    draggableItem.forEach((item) => {
+                        item.open()
+                    })
+                "
             >
                 <Icon name="fa6-solid:up-right-and-down-left-from-center" />
             </button>
             <button
                 class="text-sm p-2"
-                @click="numToCollapse = codes.filter((c) => c.group).length"
+                @click="() => 
+                    draggableItem.forEach((item) => {
+                        item.close()
+                    })"
             >
                 <Icon name="fa6-solid:down-left-and-up-right-to-center" />
             </button>
@@ -343,11 +349,10 @@ function handleDrop({ items, target }) {
                     v-for="c in filterCodes(parsedCodes)"
                     :key="c.id"
                     :item="c"
+                    ref="draggableItem"
                     :children="c.children ? c.children : []"
                     :depth="0"
                     :selected-style="() => 'border'"
-                    v-model:num-to-expand="numToExpand"
-                    v-model:num-to-collapse="numToCollapse"
                     @onDrop="handleDrop"
                     @selected="handleSelected"
                     @onContextMenu="openContextMenu"

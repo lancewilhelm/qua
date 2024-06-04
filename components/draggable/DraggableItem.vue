@@ -1,6 +1,4 @@
 <script setup>
-const numToExpand = defineModel('numToExpand')
-const numToCollapse = defineModel('numToCollapse')
 const emit = defineEmits(['onDrop', 'selected', 'onContextMenu'])
 
 const props = defineProps({
@@ -21,6 +19,7 @@ const props = defineProps({
     },
 })
 
+const draggableItem = ref([])
 const selectedItems = inject('selectedItems')
 const draggedItems = inject('draggedItems')
 const dropTarget = inject('dropTarget')
@@ -32,23 +31,25 @@ const isDragOver = computed(
 )
 const isOpen = ref(false)
 
-watch(numToExpand, (newVal) => {
-    if (newVal && !isOpen.value) {
-        if (props.item.children?.length > 0) {
-            isOpen.value = true
-            numToExpand.value--
-        }
+function open() {
+    if (props.item.children?.length > 0) {
+        isOpen.value = true
+        draggableItem.value.forEach((i) => {
+            i.open()
+        })
     }
-})
+}
 
-watch(numToCollapse, (newVal) => {
-    if (newVal && isOpen.value) {
-        if (props.item.children?.length > 0) {
-            isOpen.value = false
-            numToCollapse.value--
-        }
+function close() {
+    if (props.item.children?.length > 0) {
+        isOpen.value = false
+        draggableItem.value.forEach((i) => {
+            i.close()
+        })
     }
-})
+}
+
+defineExpose({ open, close })
 
 function onSelect(event) {
     if (event.ctrlKey || event.metaKey) {
@@ -160,19 +161,19 @@ function handleContextMenu(event) {
             </div>
         </div>
         <div
-            v-if="children.length > 0 && isOpen"
+            v-if="children.length > 0"
             class="flex flex-col relative pl-4.5"
+            :style="{ display: isOpen ? 'block' : 'none' }"
         >
             <span class="absolute z-10 top-0 bottom-0 w-px bg-text" />
             <DraggableItem
                 v-for="c in children"
                 :key="c.id"
+                ref="draggableItem"
                 :item="c"
                 :children="c.children"
                 :depth="depth + 1"
                 :selected-style="selectedStyle"
-                v-model:num-to-expand="numToExpand"
-                v-model:num-to-collapse="numToCollapse"
                 @onDrop="emit('onDrop', $event)"
                 @selected="emit('selected', $event)"
                 @onContextMenu="emit('onContextMenu', $event)"
