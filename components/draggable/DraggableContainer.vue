@@ -11,6 +11,14 @@ provide('dropTarget', dropTarget)
 
 const isDragOver = computed(() => dropTarget.value === 'root')
 
+watch(dropTarget, (value) => {
+    if (value !== null) {
+    }
+})
+
+useEventListener(window, 'drop', (e) => e.preventDefault())
+useEventListener(window, 'dragover', (e) => e.preventDefault())
+
 function onDropRoot(event) {
     if (draggedItems.value.length > 0) {
         emit('onDrop', { items: draggedItems.value, target: 'root' })
@@ -18,19 +26,6 @@ function onDropRoot(event) {
         dropTarget.value = null
     }
 }
-
-watch(dropTarget, (value) => {
-    if (value !== null) {
-    }
-})
-
-window.addEventListener('drop', (e) => e.preventDefault())
-window.addEventListener('dragover', (e) => e.preventDefault())
-
-onBeforeUnmount(() => {
-    window.removeEventListener('drop', (e) => e.preventDefault())
-    window.removeEventListener('dragover', (e) => e.preventDefault())
-})
 
 function handleContextMenu(event) {
     emit('onContextMenu', { event, target: 'root' })
@@ -59,6 +54,7 @@ function onDragLeave(event) {
         <slot></slot>
         <div
             :class="['grow', { 'bg-sub-alt': isDragOver }]"
+            @click="selectedItems = []"
             @dragenter="onDragEnter"
             @dragleave="onDragLeave"
         />

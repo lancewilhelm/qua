@@ -14,13 +14,15 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
+    selectedStyle: {
+        type: Function,
+    }
 })
 
 const selectedItems = inject('selectedItems')
 const draggedItems = inject('draggedItems')
 const dropTarget = inject('dropTarget')
 
-const configStore = useConfigStore()
 const isSelected = computed(() => selectedItems.value.includes(props.item))
 const isDragOver = computed(() => dropTarget.value?.id === props.item.id && draggedItems.value?.length > 0)
 const isOpen = ref(false)
@@ -34,10 +36,11 @@ function onSelect(event) {
             selectedItems.value.push(props.item)
         }
     } else {
-        selectedItems.value = [props.item]
-        emit('selected', props.item)
         if (props.item.children?.length > 0) {
             isOpen.value = !isOpen.value
+        } else {
+            selectedItems.value = [props.item]
+            emit('selected', props.item)
         }
     }
 }
@@ -112,7 +115,7 @@ function handleContextMenu(event) {
 <template>
     <div>
         <div
-            :class="['cursor-pointer', { 'bg-main text-bg': isSelected, 'bg-sub-alt': isDragOver}]"
+            :class="['cursor-pointer', { 'bg-main': isSelected && selectedStyle(item) === 'bg', 'border-l-8 border-main': isSelected && selectedStyle(item) === 'border', 'bg-sub-alt': isDragOver}]"
             @click="onSelect"
             @dragstart="onDragStart"
             @dragenter="onDragEnter"
@@ -131,11 +134,12 @@ function handleContextMenu(event) {
         >
             <span class="absolute z-10 top-0 bottom-0 w-px bg-text" />
             <DraggableItem
-                v-for="child in children"
-                :key="child.id"
-                :item="child"
-                :children="child.children"
+                v-for="c in children"
+                :key="c.id"
+                :item="c"
+                :children="c.children"
                 :depth="depth + 1"
+                :selected-style="selectedStyle"
                 @onDrop="emit('onDrop', $event)"
                 @selected="emit('selected', $event)"
                 @onContextMenu="emit('onContextMenu', $event)"

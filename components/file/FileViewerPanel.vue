@@ -493,10 +493,10 @@ function handleCodeClick(event, segment) {
                             segment.codes.length > 2 ? 'italic' : 'normal',
                         'font-weight':
                             segment.codes.length > 3 ? 'bold' : 'normal',
-                        'box-shadow':
+                        'box-shadow': configStore.config.code_box_shadow ? 
                             segment.codes.length !== 0
                                 ? '2px 3px 0px #000'
-                                : 'none',
+                                : 'none' : 'none',
                     }"
                     @click="
                         segment.codes.length > 0
