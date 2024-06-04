@@ -289,17 +289,17 @@ INSERT INTO "public"."code_instances" ("id", "created_at", "created_by", "code_i
 -- Data for Name: configs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."configs" ("id", "updated_at", "user_id", "display_name", "theme", "favorite_themes", "editor_theme", "code_font_size", "code_line_numbers", "code_font_family", "code_line_height", "random_theme", "editor_file_panel_width", "editor_code_panel_width", "new_code_random_color") VALUES
-	(1, '2024-05-30 20:31:42.258873+00', '17d97dc9-d482-429e-985b-87d0ea7ec509', NULL, 'camping', NULL, 'theme', 12, false, 'Roboto Mono', 1.2, false, 275, 275, true),
-	(2, '2024-05-30 20:32:02.975203+00', 'e587f4b6-31d4-46ae-9091-205d227813ee', NULL, 'camping', NULL, 'theme', 12, false, 'Roboto Mono', 1.2, false, 275, 275, true),
-	(3, '2024-05-30 20:32:19.178658+00', '3bdbb665-84b5-4d32-8135-7ed80548a059', NULL, 'camping', NULL, 'theme', 12, false, 'Roboto Mono', 1.2, false, 275, 275, true),
-	(4, '2024-05-30 20:32:33.147821+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', NULL, 'camping', NULL, 'theme', 12, false, 'Roboto Mono', 1.2, false, 275, 275, true),
-	(5, '2024-05-30 20:32:46.649457+00', 'ef7bc947-fc26-47a9-b17a-5cf20ac1eb6b', NULL, 'camping', NULL, 'theme', 12, false, 'Roboto Mono', 1.2, false, 275, 275, true),
-	(6, '2024-05-30 20:33:04.985639+00', 'bb55a5f6-4541-48e6-96ac-27d79f36dda4', NULL, 'camping', NULL, 'theme', 12, false, 'Roboto Mono', 1.2, false, 275, 275, true),
-	(7, '2024-05-30 20:33:16.937247+00', 'c3f43634-0da2-43c7-baa7-ed2fef81e85e', NULL, 'camping', NULL, 'theme', 12, false, 'Roboto Mono', 1.2, false, 275, 275, true),
-	(8, '2024-05-30 20:33:32.333476+00', '0748d39e-6d05-451d-9ff1-6125e6dfaf87', NULL, 'camping', NULL, 'theme', 12, false, 'Roboto Mono', 1.2, false, 275, 275, true),
-	(9, '2024-05-30 20:34:03.546106+00', '98faf97b-6e9e-49db-89bf-3388a3b7b098', NULL, 'camping', NULL, 'theme', 12, false, 'Roboto Mono', 1.2, false, 275, 275, true),
-	(10, '2024-05-30 20:34:30.258131+00', '226e0026-bb1c-442e-8237-a5c328c0a9bc', NULL, 'camping', NULL, 'theme', 12, false, 'Roboto Mono', 1.2, false, 275, 275, true);
+INSERT INTO "public"."configs" ("id", "updated_at", "user_id", "display_name", "theme", "favorite_themes", "editor_theme", "code_font_size", "code_line_numbers", "code_font_family", "code_line_height", "random_theme", "editor_file_panel_width", "editor_code_panel_width", "new_code_random_color", "code_text_color", "dynamic_code_text_color", "code_box_shadow") VALUES
+	(1, '2024-05-30 20:31:42.258873+00', '17d97dc9-d482-429e-985b-87d0ea7ec509', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
+	(2, '2024-05-30 20:32:02.975203+00', 'e587f4b6-31d4-46ae-9091-205d227813ee', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
+	(3, '2024-05-30 20:32:19.178658+00', '3bdbb665-84b5-4d32-8135-7ed80548a059', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
+	(5, '2024-05-30 20:32:46.649457+00', 'ef7bc947-fc26-47a9-b17a-5cf20ac1eb6b', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
+	(6, '2024-05-30 20:33:04.985639+00', 'bb55a5f6-4541-48e6-96ac-27d79f36dda4', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
+	(7, '2024-05-30 20:33:16.937247+00', 'c3f43634-0da2-43c7-baa7-ed2fef81e85e', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
+	(8, '2024-05-30 20:33:32.333476+00', '0748d39e-6d05-451d-9ff1-6125e6dfaf87', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
+	(9, '2024-05-30 20:34:03.546106+00', '98faf97b-6e9e-49db-89bf-3388a3b7b098', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
+	(10, '2024-05-30 20:34:30.258131+00', '226e0026-bb1c-442e-8237-a5c328c0a9bc', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
+	(4, '2024-05-30 20:32:33.147821+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true);
 
 
 --
