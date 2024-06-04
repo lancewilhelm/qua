@@ -32,6 +32,7 @@ const contextMenuEvent = ref(null)
 const expanderMenuEvent = ref(null)
 const selectionExists = ref(false)
 const selectionPopupRef = ref(null)
+const clickedSegment = ref(null)
 
 useEventListener(window, 'mouseup', (e) => {
     const selection = window.getSelection()
@@ -49,7 +50,11 @@ useEventListener(window, 'mouseup', (e) => {
 })
 
 useEventListener(window, 'mousedown', (e) => {
-    if (showSelectionPopup.value && e.target.id !== 'add-code-button' && e.target.id !== 'llm-code-button') {
+    if (
+        showSelectionPopup.value &&
+        e.target.id !== 'add-code-button' &&
+        e.target.id !== 'llm-code-button'
+    ) {
         showSelectionPopup.value = false
     }
 })
@@ -503,47 +508,15 @@ function handleCodeClick(event, segment) {
                 spellcheck="false"
                 @keydown="handleEditorKeydown"
             >
-                <span
+                <FileViewerPanelSegment
                     v-for="segment in editorSegments"
                     :key="segment.key"
                     class="editor-segment"
-                    :style="{
-                        'font-size': configStore.config.code_font_size + 'px',
-                        'line-height':
-                            configStore.config.code_line_height + 'px',
-                        'font-family': configStore.config.code_font_family,
-                        'background-color':
-                            segment.codes.length > 0
-                                ? segment.codes[0].color
-                                : 'transparent',
-                        color:
-                            segment.codes.length > 0
-                                ? tinycolor.mostReadable(
-                                      segment.codes[0].color,
-                                      ['black', 'white'],
-                                      { includeFallbackColors: false }
-                                  )
-                                : 'inherit',
-                        'text-decoration':
-                            segment.codes.length > 1 ? 'underline' : 'none',
-                        'font-style':
-                            segment.codes.length > 2 ? 'italic' : 'normal',
-                        'font-weight':
-                            segment.codes.length > 3 ? 'bold' : 'normal',
-                        'box-shadow': configStore.config.code_box_shadow
-                            ? segment.codes.length !== 0
-                                ? '2px 3px 0px #000'
-                                : 'none'
-                            : 'none',
-                    }"
-                    @click="
-                        segment.codes.length > 0
-                            ? handleCodeClick($event, segment)
-                            : null
-                    "
-                    @contextmenu.prevent="openContextMenu($event, segment)"
-                    >{{ segment.data }}</span
-                >
+                    :segment="segment"
+                    v-model:clicked-segment="clickedSegment"
+                    @code-click="handleCodeClick"
+                    @context-menu="openContextMenu"
+                />
             </div>
         </div>
 
