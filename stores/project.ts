@@ -1,21 +1,26 @@
 import { defineStore } from 'pinia'
+import { useStorage } from '@vueuse/core'
 
 export const useProjectStore = defineStore('currentProject', () => {
-    const currentProject = ref(JSON.parse(localStorage.getItem('currentProject') as string) || null)
+    const currentProject: { [key: string]: any } = useStorage('currentProject', {})
 
     function setCurrentProject(project: Object) {
-        currentProject.value = project
-        localStorage.setItem('currentProject', JSON.stringify(project));
+        Object.assign(currentProject.value, project)
+    }
+
+    function patchCurrentProject(patch: Partial<Object>) {
+        Object.assign(currentProject.value, patch)
     }
 
     function clearCurrentProject() {
-        currentProject.value = null
+        Object.assign(currentProject.value, {})
         return
     }
 
     return {
         currentProject,
         setCurrentProject,
+        patchCurrentProject,
         clearCurrentProject,
     }
 })

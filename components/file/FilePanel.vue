@@ -32,6 +32,14 @@ watch(dropTarget, () => {
     }
 })
 
+onMounted(() => {
+    if (projectStore.currentProject.current_file_id) {
+        currentFile.value = files.value.find(
+            (f) => f.id === projectStore.currentProject.current_file_id
+        )
+    }
+})
+
 const parsedFiles = computed(() => {
     const fileMap = new Map()
     const rootItems = []
@@ -287,6 +295,7 @@ async function updateFileLocation(fs, target) {
 function handleSelected(item) {
     if (!item.folder) {
         currentFile.value = item
+        projectStore.patchCurrentProject({ current_file_id: item.id })
     }
 }
 </script>
@@ -326,7 +335,7 @@ function handleSelected(item) {
                     @onContextMenu="openContextMenu"
                 >
                     <template #default="{ item, isOpen }">
-                        <FilePanelItem :file="item" :is-open="isOpen" />
+                        <FilePanelItem :file="item" :is-open="isOpen" :current-file="currentFile"/>
                     </template>
                 </DraggableItem>
             </DraggableContainer>
