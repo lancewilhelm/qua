@@ -11,3 +11,7 @@
     --colorful-error-extra-color: #7e3a39;
     --logo-color: #ad4f4e;
 }
+
+#logo {
+    color: var(--error-color)
+}

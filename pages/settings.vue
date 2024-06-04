@@ -245,6 +245,22 @@ function setRandomTheme(random) {
             <SettingsBooleanButtons configParameter="code_box_shadow" />
         </SettingsGroupSection>
 
+        <SettingsGroupSection
+            title="show group children circles"
+            icon="fa6-solid:circle"
+            description="Enable showing of code group children circles next to the group name"
+        >
+            <SettingsBooleanButtons configParameter="code_group_children_circles" />
+        </SettingsGroupSection>
+
+        <SettingsGroupSection
+            title="show group stats"
+            icon="fa6-solid:graph"
+            description="Enable showing of code group child group and child codes (e.g., '1|8')"
+        >
+            <SettingsBooleanButtons configParameter="code_group_children_stats" />
+        </SettingsGroupSection>
+
         <!-- <div class="text-3xl font-black font-mono text-main">login</div>
         <div class="settings-group">TBD</div> -->
 

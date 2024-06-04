@@ -15,7 +15,7 @@ const logout = async () => {
 
 <template>
     <header class="flex row-start-padding-start z-10 full-width">
-        <div id="logo" class="flex text-4xl m-2 font-alt font-bold text-logo">
+        <div id="logo" class="flex text-4xl text-main m-2 font-alt font-bold text-logo">
             qua
         </div>
         <nav class="flex grow">

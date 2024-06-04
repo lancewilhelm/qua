@@ -50,7 +50,7 @@ function handleCodeTextColor() {
             :class="['flex flex-row grow p-1.5']"
             :style="{
                 'background-color': code.color,
-                color: handleCodeTextColor()
+                color: handleCodeTextColor(),
             }"
         >
             <div v-if="code.group" class="mr-1.5">
@@ -71,20 +71,39 @@ function handleCodeTextColor() {
             </div>
             <div
                 v-if="code.group && code.children.length > 0"
-                class="flex ml-2.5 items-center gap-2"
+                class="flex ml-2.5 items-center gap-2 grow justify-end"
             >
-                <div
-                    v-for="c in getAllChildren(code).filter((c) => !c.folder)"
-                    :key="c.id"
-                    class="w-3 h-3 rounded-full"
-                    :style="{
-                        backgroundColor: c.color,
-                        border:
-                            c.color === ''
-                                ? `1px solid var(--error-color)`
-                                : 'none',
-                    }"
-                />
+                <div class="flex flex-row items-center gap-1">
+                    <div
+                        v-if="configStore.config.code_group_children_circles"
+                        v-for="c in getAllChildren(code).filter(
+                            (c) => !c.group
+                        )"
+                        :key="c.id"
+                        class="w-3 h-3 rounded-full"
+                        :style="{
+                            backgroundColor: c.color,
+                            border:
+                                c.color === ''
+                                    ? `1px solid var(--error-color)`
+                                    : 'none',
+                        }"
+                    />
+                    <div
+                        v-if="configStore.config.code_group_children_stats"
+                        class="text-sub"
+                    >
+                        {{
+                            getAllChildren(code)
+                                .filter((c) => c.group)
+                                .length.toString()
+                        }}|{{
+                            getAllChildren(code)
+                                .filter((c) => !c.group)
+                                .length.toString()
+                        }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
