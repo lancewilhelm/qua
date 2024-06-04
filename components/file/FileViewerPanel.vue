@@ -26,8 +26,33 @@ const editorSelection = ref({})
 const showNewCodeModal = ref(false)
 const showEditSegmentModal = ref(false)
 const showContextMenu = ref(false)
+const showSelectionPopup = ref(false)
+const selectionPopupPosition = ref({ top: 0, left: 0 })
 const contextMenuEvent = ref(null)
 const expanderMenuEvent = ref(null)
+const selectionExists = ref(false)
+const selectionPopupRef = ref(null)
+
+useEventListener(window, 'mouseup', (e) => {
+    const selection = window.getSelection()
+    if (selection.toString().length > 0 && !selectionExists.value) {
+        const boundingRect = selection.getRangeAt(0).getBoundingClientRect()
+        selectionPopupPosition.value = {
+            top: boundingRect.y - 50 + 'px',
+            left: boundingRect.x + boundingRect.width / 2 + 'px',
+        }
+        showSelectionPopup.value = true
+        selectionExists.value = true
+    } else {
+        selectionExists.value = false
+    }
+})
+
+useEventListener(window, 'mousedown', (e) => {
+    if (showSelectionPopup.value && e.target.id !== 'add-code-button' && e.target.id !== 'llm-code-button') {
+        showSelectionPopup.value = false
+    }
+})
 
 watch(currentFile, (newCurrentFile) => {
     handleOpenFile(newCurrentFile)
@@ -42,23 +67,26 @@ watch(triggerUpdateHighlights, (newVal) => {
 
 watch(triggerCodeSelected, (newVal) => {
     if (newVal) {
-        if (window.getSelection().toString().length > 0) {
-            const selection = window.getSelection()
-            if (
-                selection.baseNode.parentElement.className ===
-                    'editor-segment' &&
-                selection.extentNode.parentElement.className ===
-                    'editor-segment'
-            ) {
-                editorSelection.value.text = selection.toString()
-                editorSelection.value.range = selection.getRangeAt(0)
-                newCode.value = codePanelSelectedCode.value
-                addCodeInstance()
-            }
-        }
+        prepAndAddCode()
         triggerCodeSelected.value = false
+        showSelectionPopup.value = false
     }
 })
+
+function prepAndAddCode() {
+    if (window.getSelection().toString().length > 0) {
+        const selection = window.getSelection()
+        if (
+            selection.baseNode.parentElement.className === 'editor-segment' &&
+            selection.extentNode.parentElement.className === 'editor-segment'
+        ) {
+            editorSelection.value.text = selection.toString()
+            editorSelection.value.range = selection.getRangeAt(0)
+            newCode.value = codePanelSelectedCode.value
+            addCodeInstance()
+        }
+    }
+}
 
 function openEditSegmentModal() {
     showEditSegmentModal.value = true
@@ -181,7 +209,9 @@ function openContextMenu(event, segment) {
     showSecondMenu.value = false
     editorRightClickContext.value = null
     if (checkForHighlight(event)) {
-        editorRightClickContext.value = 'selection'
+        // editorRightClickContext.value = 'selection'
+        window.getSelection().empty()
+        return
     } else if (segment.codes.length > 0) {
         editorRightClickContext.value = 'code'
         selectedSegment.value = segment
@@ -230,7 +260,7 @@ function calculateOffset(node, offset) {
     return totalOffset + offset
 }
 
-function openCodeModal() {
+function openNewCodeModal() {
     editorSelection.value.text = window.getSelection().toString()
     editorSelection.value.range = window.getSelection().getRangeAt(0)
     codeModalText.value = editorSelection.value.text
@@ -486,17 +516,25 @@ function handleCodeClick(event, segment) {
                             segment.codes.length > 0
                                 ? segment.codes[0].color
                                 : 'transparent',
-                        'color': segment.codes.length > 0 ? tinycolor.mostReadable(segment.codes[0].color, ['black', 'white'],{includeFallbackColors:false}) : 'inherit',
+                        color:
+                            segment.codes.length > 0
+                                ? tinycolor.mostReadable(
+                                      segment.codes[0].color,
+                                      ['black', 'white'],
+                                      { includeFallbackColors: false }
+                                  )
+                                : 'inherit',
                         'text-decoration':
                             segment.codes.length > 1 ? 'underline' : 'none',
                         'font-style':
                             segment.codes.length > 2 ? 'italic' : 'normal',
                         'font-weight':
                             segment.codes.length > 3 ? 'bold' : 'normal',
-                        'box-shadow': configStore.config.code_box_shadow ? 
-                            segment.codes.length !== 0
+                        'box-shadow': configStore.config.code_box_shadow
+                            ? segment.codes.length !== 0
                                 ? '2px 3px 0px #000'
-                                : 'none' : 'none',
+                                : 'none'
+                            : 'none',
                     }"
                     @click="
                         segment.codes.length > 0
@@ -508,6 +546,14 @@ function handleCodeClick(event, segment) {
                 >
             </div>
         </div>
+
+        <FileViewerPanelSelectionPopup
+            v-if="showSelectionPopup"
+            ref="selectionPopupRef"
+            :position="selectionPopupPosition"
+            @add="openNewCodeModal"
+        />
+
         <BaseContextMenu
             v-if="showContextMenu"
             :event="contextMenuEvent"
@@ -520,7 +566,7 @@ function handleCodeClick(event, segment) {
         >
             <button
                 v-if="editorRightClickContext === 'selection'"
-                @click="openCodeModal"
+                @click="openNewCodeModal"
             >
                 new code
             </button>
@@ -528,7 +574,14 @@ function handleCodeClick(event, segment) {
                 <div
                     v-for="c in selectedSegment.codes"
                     :key="c"
-                    :style="{ 'background-color': c.color, 'color': tinycolor.mostReadable(c.color, ['black', 'white'],{includeFallbackColors:false}) }"
+                    :style="{
+                        'background-color': c.color,
+                        color: tinycolor.mostReadable(
+                            c.color,
+                            ['black', 'white'],
+                            { includeFallbackColors: false }
+                        ),
+                    }"
                     class="context-menu-code group grid grid-cols-color-picker gap-2 p-1 cursor-pointer hover:font-bold hover:text-bg transition-all duration-50"
                     @click.stop="handleOpenCodeExpander($event, c)"
                 >

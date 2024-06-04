@@ -37,7 +37,7 @@ function handleClickOutside(event) {
 </script>
 
 <template>
-    <div id="modal" class="fixed flex items-center justify-center z-10 left-0 top-0 w-full h-full overflow-auto bg-black/60">
+    <div id="modal" class="fixed flex items-center justify-center z-20 left-0 top-0 w-full h-full overflow-auto bg-black/60">
         <div id='modal-content' class="flex flex-col bg-bg p-5 rounded-lg w-96 shadow-68-solid text-text">
             <slot />
         </div>
