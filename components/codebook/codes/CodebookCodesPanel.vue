@@ -329,6 +329,7 @@ function handleDrop({ items, target }) {
                     :item="c"
                     :children="c.children ? c.children : []"
                     :depth="0"
+                    :selected-style="() => 'border'"
                     @onDrop="handleDrop"
                     @selected="handleSelected"
                     @onContextMenu="openContextMenu"

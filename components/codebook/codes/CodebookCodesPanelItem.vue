@@ -25,6 +25,23 @@ function getAllChildren(code) {
     }
     return children
 }
+
+function handleCodeTextColor() {
+    if (configStore.config.dynamic_code_text_color) {
+        if (props.code.group) {
+            return 'var(--text-color)'
+        }
+        return tinycolor.mostReadable(props.code.color, ['black', 'white'], {
+            includeFallbackColors: false,
+        })
+    } else {
+        if (configStore.config.code_text_color) {
+            return configStore.config.code_text_color
+        } else {
+            return 'var(--text-color)'
+        }
+    }
+}
 </script>
 
 <template>
@@ -33,14 +50,11 @@ function getAllChildren(code) {
             :class="['flex flex-row grow p-1.5']"
             :style="{
                 'background-color': code.color,
-                color: configStore.config.dynamic_code_text_color ? tinycolor.mostReadable(code.color, ['black', 'white'], {
-                    includeFallbackColors: false,
-                }) : configStore.config.code_text_color ? configStore.config.code_text_color : 'var(--text-color)',
+                color: handleCodeTextColor()
             }"
         >
-            <div class="mr-1.5">
+            <div v-if="code.group" class="mr-1.5">
                 <Icon
-                    v-if="code.group"
                     name="fa6-solid:angle-right"
                     :style="{
                         transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',

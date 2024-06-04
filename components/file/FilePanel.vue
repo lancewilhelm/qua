@@ -320,6 +320,7 @@ function handleSelected(item) {
                     :item="file"
                     :children="file.children ? file.children : []"
                     :depth="0"
+                    :selected-style="() => 'border'"
                     @onDrop="handleDrop"
                     @selected="handleSelected"
                     @onContextMenu="openContextMenu"

@@ -3,7 +3,7 @@ definePageMeta({
     middleware: 'auth',
 })
 
-import BaseColorPicker from '~/components/base/BaseColorPicker.vue';
+import BaseColorPicker from '~/components/base/BaseColorPicker.vue'
 import themesList from '/assets/themes.json'
 
 const displayName = defineModel('displayName')
@@ -235,6 +235,14 @@ function setRandomTheme(random) {
             description="If not using dynamic code text color, the color of the text of a code."
         >
             <SettingsColorPicker configParameter="code_text_color" />
+        </SettingsGroupSection>
+
+        <SettingsGroupSection
+            title="code highlight box shadow"
+            icon="fa6-solid:square"
+            description="Enable box shadow on the code highlight in the file viewer"
+        >
+            <SettingsBooleanButtons configParameter="code_box_shadow" />
         </SettingsGroupSection>
 
         <!-- <div class="text-3xl font-black font-mono text-main">login</div>
