@@ -1,4 +1,6 @@
 <script setup>
+const numToExpand = defineModel('numToExpand')
+const numToCollapse = defineModel('numToCollapse')
 const emit = defineEmits(['onDrop', 'selected', 'onContextMenu'])
 
 const props = defineProps({
@@ -16,7 +18,7 @@ const props = defineProps({
     },
     selectedStyle: {
         type: Function,
-    }
+    },
 })
 
 const selectedItems = inject('selectedItems')
@@ -24,8 +26,29 @@ const draggedItems = inject('draggedItems')
 const dropTarget = inject('dropTarget')
 
 const isSelected = computed(() => selectedItems.value.includes(props.item))
-const isDragOver = computed(() => dropTarget.value?.id === props.item.id && draggedItems.value?.length > 0)
+const isDragOver = computed(
+    () =>
+        dropTarget.value?.id === props.item.id && draggedItems.value?.length > 0
+)
 const isOpen = ref(false)
+
+watch(numToExpand, (newVal) => {
+    if (newVal && !isOpen.value) {
+        if (props.item.children?.length > 0) {
+            isOpen.value = true
+            numToExpand.value--
+        }
+    }
+})
+
+watch(numToCollapse, (newVal) => {
+    if (newVal && isOpen.value) {
+        if (props.item.children?.length > 0) {
+            isOpen.value = false
+            numToCollapse.value--
+        }
+    }
+})
 
 function onSelect(event) {
     if (event.ctrlKey || event.metaKey) {
@@ -115,7 +138,15 @@ function handleContextMenu(event) {
 <template>
     <div>
         <div
-            :class="['cursor-pointer', { 'bg-main': isSelected && selectedStyle(item) === 'bg', 'border-l-8 border-main': isSelected && selectedStyle(item) === 'border', 'bg-sub-alt': isDragOver}]"
+            :class="[
+                'cursor-pointer',
+                {
+                    'bg-main': isSelected && selectedStyle(item) === 'bg',
+                    'border-l-8 border-main':
+                        isSelected && selectedStyle(item) === 'border',
+                    'bg-sub-alt': isDragOver,
+                },
+            ]"
             @click="onSelect"
             @dragstart="onDragStart"
             @dragenter="onDragEnter"
@@ -140,6 +171,8 @@ function handleContextMenu(event) {
                 :children="c.children"
                 :depth="depth + 1"
                 :selected-style="selectedStyle"
+                v-model:num-to-expand="numToExpand"
+                v-model:num-to-collapse="numToCollapse"
                 @onDrop="emit('onDrop', $event)"
                 @selected="emit('selected', $event)"
                 @onContextMenu="emit('onContextMenu', $event)"

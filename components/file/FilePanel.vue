@@ -24,6 +24,8 @@ const draggedFiles = ref(null)
 const dropTarget = ref(null)
 const dragOver = ref(false)
 const uploadTarget = ref(null)
+const numToExpand = ref(0)
+const numToCollapse = ref(0)
 let dragCounter = 0
 
 watch(dropTarget, () => {
@@ -317,6 +319,16 @@ function handleSelected(item) {
             <button @click="createFolder">
                 <Icon name="fa6-solid:folder-plus" />
             </button>
+            <button
+                @click="numToExpand = files.filter((f) => f.folder).length"
+            >
+                <Icon name="fa6-solid:up-right-and-down-left-from-center" />
+            </button>
+            <button
+                @click="numToCollapse = files.filter((f) => f.folder).length"
+            >
+                <Icon name="fa6-solid:down-left-and-up-right-to-center" />
+            </button>
         </div>
         <div v-if="parsedFiles?.length > 0" class="flex grow">
             <DraggableContainer
@@ -330,6 +342,8 @@ function handleSelected(item) {
                     :children="file.children ? file.children : []"
                     :depth="0"
                     :selected-style="() => 'border'"
+                    v-model:num-to-expand="numToExpand"
+                    v-model:num-to-collapse="numToCollapse"
                     @onDrop="handleDrop"
                     @selected="handleSelected"
                     @onContextMenu="openContextMenu"

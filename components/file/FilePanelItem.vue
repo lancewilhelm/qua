@@ -22,12 +22,8 @@ const props = defineProps({
         <div class="text-xl mr-2.5 flex">
             <Icon v-if="!file.folder" name="fa6-solid:file-lines" />
             <Icon
-                v-if="file.folder && (file.children?.length === 0 || !isOpen)"
-                name="fa6-solid:folder"
-            />
-            <Icon
-                v-if="file.folder && file.children?.length > 0 && isOpen"
-                name="fa6-solid:folder-open"
+                v-if="file.folder"
+                :name="isOpen ? 'fa6-solid:folder-open' : 'fa6-solid:folder'"
             />
         </div>
         <div class="text-sm truncate font-mono">
