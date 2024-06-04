@@ -9,7 +9,7 @@
   --colorful-error-color: #ff0008;
 }
 
-header #logo .text {
+#logo {
   background: linear-gradient(
     90deg,
     #60b6ce,

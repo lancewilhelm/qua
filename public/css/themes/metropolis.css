@@ -11,26 +11,10 @@
   --colorful-error-extra-color: #8f2f19;
 }
 
-header #logo .bottom {
+#logo {
   color: #f4bc46;
 }
 
-nav .textButton:nth-child(1) {
-  color: #d44729;
-}
-
-nav .textButton:nth-child(2) {
-  color: #d44729;
-}
-
-nav .textButton:nth-child(3) {
-  color: #d44729;
-}
-
-nav .textButton:nth-child(4) {
-  color: #d44729;
-}
-
-nav .textButton:nth-child(5) {
+nav .nav-button {
   color: #d44729;
 }

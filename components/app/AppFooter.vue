@@ -4,10 +4,10 @@ const showThemePicker = ref(false)
 </script>
 
 <template>
-    <div class="grid grid-cols-3 col-content row-start-content-end p-2 items-center text-sub font-mono text-center">
+    <footer class="grid grid-cols-3 col-content row-start-content-end p-2 items-center text-sub font-mono text-center">
         <div class="left" />
         <div class="center">
-            <div class="font-alt text-main font-semibold">qua</div>
+            <div id="logo" class="font-alt text-main font-semibold">qua</div>
         </div>
         <div class="right">
             <div class="flex items-center justify-center gap-2 cursor-pointer text-sm text-main" @click="showThemePicker = true">
@@ -16,5 +16,5 @@ const showThemePicker = ref(false)
             </div>
         </div>
         <BaseThemePicker v-if="showThemePicker" @close="showThemePicker = false" />
-    </div>
+    </footer>
 </template>

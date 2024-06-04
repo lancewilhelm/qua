@@ -11,6 +11,9 @@
   --colorful-error-extra-color: #b13535;
 }
 
+#logo {
+  color: var(--main-color);
+}
 header #logo .text {
   background: linear-gradient(
     90deg,

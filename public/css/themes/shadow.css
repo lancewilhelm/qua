@@ -15,13 +15,13 @@ header #logo .icon {
   color: #8c3230;
 }
 
-header #logo .text {
+#logo {
   color: #557d8d;
 }
 
 @keyframes shadow {
   to {
-    color: #000;
+    color: #111;
   }
 }
 
