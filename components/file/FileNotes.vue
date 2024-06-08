@@ -52,6 +52,7 @@ function debounce(f, delay) {
 
 <template>
     <div
+        v-if="currentFile"
         :class="[
             'self-start p-2 w-full h-full flex items-center justify-start whitespace-pre-wrap text-base font-mono border-main border-y-3 outline-0 outline-transparent',
             {
@@ -66,5 +67,17 @@ function debounce(f, delay) {
         contenteditable="true"
     >
         {{ notes }}
+    </div>
+    <div v-else :class="[
+            'self-start p-2 w-full h-full flex items-center justify-start whitespace-pre-wrap text-base font-mono border-main border-y-3 outline-0 outline-transparent',
+            {
+                'editor-theme-light':
+                    configStore.config.editor_theme === 'light',
+                'editor-theme-dark': configStore.config.editor_theme === 'dark',
+                'editor-theme-theme':
+                    configStore.config.editor_theme === 'theme',
+            },
+        ]">
+        <div class="opacity-60">open a file to take notes on it...</div>
     </div>
 </template>
