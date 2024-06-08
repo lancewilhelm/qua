@@ -57,7 +57,38 @@ INSERT INTO "auth"."audit_log_entries" ("instance_id", "id", "payload", "created
 	('00000000-0000-0000-0000-000000000000', '019e2204-3a79-4256-af9c-4554864d019d', '{"action":"logout","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"account"}', '2024-05-30 21:28:36.374145+00', ''),
 	('00000000-0000-0000-0000-000000000000', 'c83478a1-2d49-4eb7-9307-759818d6f3c4', '{"action":"login","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2024-05-30 21:28:47.582106+00', ''),
 	('00000000-0000-0000-0000-000000000000', 'f3bd7ce5-832e-4443-895e-0d5504be0bf5', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-05-30 22:26:50.894218+00', ''),
-	('00000000-0000-0000-0000-000000000000', 'f84dc89e-b51f-4408-9aa0-f3ae4112d8ba', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-05-30 22:26:50.895918+00', '');
+	('00000000-0000-0000-0000-000000000000', 'f84dc89e-b51f-4408-9aa0-f3ae4112d8ba', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-05-30 22:26:50.895918+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9d9226d8-a381-4a94-9719-02fbf06ae879', '{"action":"login","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2024-06-04 16:58:03.794121+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'acd363fa-934d-4c6a-a89c-609dc3ae1fe6', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-04 17:56:26.654849+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ec018c88-1992-4432-8b1f-b1f60e2c3131', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-04 17:56:26.656298+00', ''),
+	('00000000-0000-0000-0000-000000000000', '87434000-18c1-481f-b9cc-86f2df7f2d3c', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-04 18:55:38.244947+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9233ac13-e640-493b-aa67-111ca754ec1e', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-04 18:55:38.246291+00', ''),
+	('00000000-0000-0000-0000-000000000000', '209855e7-e08a-4fee-b1e7-4f69dc7c4ec6', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-04 19:54:00.162711+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a559541e-9155-4618-a958-ea283e89e4e6', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-04 19:54:00.163862+00', ''),
+	('00000000-0000-0000-0000-000000000000', '745a5360-2078-445c-be76-abcd250018b3', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-04 20:52:27.903314+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c729a189-bba0-4fe6-9a73-d8072aa50f77', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-04 20:52:27.905011+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b465cf36-2d58-4c2b-8008-bdf1bdacf25c', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-04 23:46:09.859194+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8cb0a9ba-dd17-40ba-8a83-a5c54703b7ea', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-04 23:46:09.860336+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'bf263c55-6354-420a-ae71-77c818e8bd18', '{"action":"logout","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"account"}', '2024-06-04 23:46:24.925722+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3a52ffb1-6d28-48f5-b722-e57c855746c8', '{"action":"login","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2024-06-04 23:46:33.940794+00', ''),
+	('00000000-0000-0000-0000-000000000000', '358cf758-d3f2-441d-b232-a75f04cf7721', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 04:13:18.868127+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0a892d2a-9c78-4549-9b3b-67f572d4f852', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 04:13:18.869114+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6f6851af-b651-44ea-936f-490cbbf371ac', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 13:13:21.092947+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e63539c5-d4d9-4998-92ff-61e3a68114f9', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 13:13:21.093975+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e1c3194e-70a5-49d5-99ad-cf01dafc64b1', '{"action":"logout","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"account"}', '2024-06-05 13:13:26.784717+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'eeaf7925-92da-4e58-9dfa-c96bef985955', '{"action":"login","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2024-06-05 13:13:34.375874+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5bb5ef93-a2ed-443c-81b6-8de9e13ccff8', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 14:12:11.466414+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd73cac25-abc9-4c30-a62a-75c1e687e6a6', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 14:12:11.467688+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f51b2e05-cc75-495f-a126-60178602b274', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 15:15:17.054124+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dd7403cb-bfa4-4899-967a-b93075f60e2b', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 15:15:17.056624+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9be96d53-1b44-450c-be91-1dd3982f5099', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 16:31:22.532306+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9a02e878-d34f-469d-a6db-1d8ee93980d3', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 16:31:22.533796+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b6b605ca-a13c-4323-b491-eb2a9237370f', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 20:30:35.92563+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ce360954-65d6-47be-be6f-03813c78ce24', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-05 20:30:35.926993+00', ''),
+	('00000000-0000-0000-0000-000000000000', '693b0d53-2629-42ec-85f1-962a5a08ff88', '{"action":"token_refreshed","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-08 02:27:29.518091+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5c3f533c-1f84-444d-8df5-1d9f99d4262f', '{"action":"token_revoked","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"token"}', '2024-06-08 02:27:29.531899+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ddacec77-cc3f-402b-bc00-bce7314fd6f7', '{"action":"login","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2024-06-08 02:32:31.689084+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e333a599-e861-4607-a56e-395a805925cf', '{"action":"login","actor_id":"c58deed9-5778-4d6a-b2b1-516dd1f9325b","actor_username":"louis@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2024-06-08 02:57:31.370465+00', '');
 
 
 --
@@ -80,7 +111,7 @@ INSERT INTO "auth"."users" ("instance_id", "id", "aud", "role", "email", "encryp
 	('00000000-0000-0000-0000-000000000000', '3bdbb665-84b5-4d32-8135-7ed80548a059', 'authenticated', 'authenticated', 'alan@gmail.com', '$2a$10$m.HJ8jg1tn11dn0vOrUuR.zFdDxEY7wJwIbjK5hGMxYF4P8vyfxZi', '2024-05-30 20:32:19.184544+00', NULL, '', NULL, '', NULL, '', '', NULL, '2024-05-30 20:32:19.187446+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "3bdbb665-84b5-4d32-8135-7ed80548a059", "email": "alan@gmail.com", "email_verified": false, "phone_verified": false}', NULL, '2024-05-30 20:32:19.179135+00', '2024-05-30 20:32:19.189235+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false),
 	('00000000-0000-0000-0000-000000000000', '98faf97b-6e9e-49db-89bf-3388a3b7b098', 'authenticated', 'authenticated', 'mittens@gmail.com', '$2a$10$THdVAZMZaGRSSRyGLW8KbeUM54ESOw/oDWexriY0QmQOUxABvTq6O', '2024-05-30 20:34:03.553308+00', NULL, '', NULL, '', NULL, '', '', NULL, '2024-05-30 20:34:03.556168+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "98faf97b-6e9e-49db-89bf-3388a3b7b098", "email": "mittens@gmail.com", "email_verified": false, "phone_verified": false}', NULL, '2024-05-30 20:34:03.546611+00', '2024-05-30 20:34:03.558028+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false),
 	('00000000-0000-0000-0000-000000000000', '0748d39e-6d05-451d-9ff1-6125e6dfaf87', 'authenticated', 'authenticated', 'katie@gmail.com', '$2a$10$gja4ItUkb2Arbp3DEeit.OFD1CsruWFbSAfVJgW/nyPeD2JnU6WYS', '2024-05-30 20:33:32.340527+00', NULL, '', NULL, '', NULL, '', '', NULL, '2024-05-30 20:33:32.344304+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "0748d39e-6d05-451d-9ff1-6125e6dfaf87", "email": "katie@gmail.com", "email_verified": false, "phone_verified": false}', NULL, '2024-05-30 20:33:32.334203+00', '2024-05-30 20:33:32.346959+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false),
-	('00000000-0000-0000-0000-000000000000', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 'authenticated', 'authenticated', 'louis@gmail.com', '$2a$10$U2un/5Nn8aGh5keXWbe3lujRaBj0ltmIB6XgqdK9gYWw3T3qOCUFW', '2024-05-30 20:32:33.157523+00', NULL, '', NULL, '', NULL, '', '', NULL, '2024-05-30 21:28:47.583124+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "c58deed9-5778-4d6a-b2b1-516dd1f9325b", "email": "louis@gmail.com", "email_verified": false, "phone_verified": false}', NULL, '2024-05-30 20:32:33.148298+00', '2024-05-30 22:26:50.900935+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false);
+	('00000000-0000-0000-0000-000000000000', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 'authenticated', 'authenticated', 'louis@gmail.com', '$2a$10$U2un/5Nn8aGh5keXWbe3lujRaBj0ltmIB6XgqdK9gYWw3T3qOCUFW', '2024-05-30 20:32:33.157523+00', NULL, '', NULL, '', NULL, '', '', NULL, '2024-06-08 02:57:31.37415+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "c58deed9-5778-4d6a-b2b1-516dd1f9325b", "email": "louis@gmail.com", "email_verified": false, "phone_verified": false}', NULL, '2024-05-30 20:32:33.148298+00', '2024-06-08 02:57:31.381194+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false);
 
 
 --
@@ -111,7 +142,9 @@ INSERT INTO "auth"."identities" ("provider_id", "user_id", "identity_data", "pro
 --
 
 INSERT INTO "auth"."sessions" ("id", "user_id", "created_at", "updated_at", "factor_id", "aal", "not_after", "refreshed_at", "user_agent", "ip", "tag") VALUES
-	('f1d4fcbf-f72b-4030-93bc-1ffc0b40c3c0', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', '2024-05-30 21:28:47.58326+00', '2024-05-30 22:26:50.903021+00', NULL, 'aal1', NULL, '2024-05-30 22:26:50.902977', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36', '172.28.0.1', NULL);
+	('6d558919-c323-4870-90e8-c82dcb5e4c36', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', '2024-06-05 13:13:34.377036+00', '2024-06-08 02:27:29.541602+00', NULL, 'aal1', NULL, '2024-06-08 02:27:29.541573', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36', '192.168.65.1', NULL),
+	('0700dd16-9375-4651-adb4-873744a714be', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', '2024-06-08 02:32:31.690409+00', '2024-06-08 02:32:31.690409+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36', '192.168.65.1', NULL),
+	('3f0e8e46-5133-4dc2-8a8a-3497044ac5ed', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', '2024-06-08 02:57:31.374191+00', '2024-06-08 02:57:31.374191+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36', '192.168.65.1', NULL);
 
 
 --
@@ -119,7 +152,9 @@ INSERT INTO "auth"."sessions" ("id", "user_id", "created_at", "updated_at", "fac
 --
 
 INSERT INTO "auth"."mfa_amr_claims" ("session_id", "created_at", "updated_at", "authentication_method", "id") VALUES
-	('f1d4fcbf-f72b-4030-93bc-1ffc0b40c3c0', '2024-05-30 21:28:47.586495+00', '2024-05-30 21:28:47.586495+00', 'password', 'bddb4650-8c4f-4f43-9ba9-4c77c87b7f25');
+	('6d558919-c323-4870-90e8-c82dcb5e4c36', '2024-06-05 13:13:34.379063+00', '2024-06-05 13:13:34.379063+00', 'password', 'ccee2367-9091-4c07-9fce-da3889551d4d'),
+	('0700dd16-9375-4651-adb4-873744a714be', '2024-06-08 02:32:31.693145+00', '2024-06-08 02:32:31.693145+00', 'password', '6477b934-8249-46b5-a9d9-386afeff6241'),
+	('3f0e8e46-5133-4dc2-8a8a-3497044ac5ed', '2024-06-08 02:57:31.381592+00', '2024-06-08 02:57:31.381592+00', 'password', '204a3c3c-ec0b-4bb3-884f-cd1e4fb50985');
 
 
 --
@@ -145,8 +180,14 @@ INSERT INTO "auth"."mfa_amr_claims" ("session_id", "created_at", "updated_at", "
 --
 
 INSERT INTO "auth"."refresh_tokens" ("instance_id", "id", "token", "user_id", "revoked", "created_at", "updated_at", "parent", "session_id") VALUES
-	('00000000-0000-0000-0000-000000000000', 12, 'Csev1U6lwzSfkUtagOOSDw', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', true, '2024-05-30 21:28:47.584306+00', '2024-05-30 22:26:50.896524+00', NULL, 'f1d4fcbf-f72b-4030-93bc-1ffc0b40c3c0'),
-	('00000000-0000-0000-0000-000000000000', 13, 'LKKg7AeILNzKbpnfUH6lKg', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', false, '2024-05-30 22:26:50.898915+00', '2024-05-30 22:26:50.898915+00', 'Csev1U6lwzSfkUtagOOSDw', 'f1d4fcbf-f72b-4030-93bc-1ffc0b40c3c0');
+	('00000000-0000-0000-0000-000000000000', 23, 'DQiaoj0fRBiD-erdMzgIog', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', true, '2024-06-05 13:13:34.377945+00', '2024-06-05 14:12:11.467915+00', NULL, '6d558919-c323-4870-90e8-c82dcb5e4c36'),
+	('00000000-0000-0000-0000-000000000000', 24, 'znIeLLV49M3x6m2vuHoOLg', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', true, '2024-06-05 14:12:11.468277+00', '2024-06-05 15:15:17.057616+00', 'DQiaoj0fRBiD-erdMzgIog', '6d558919-c323-4870-90e8-c82dcb5e4c36'),
+	('00000000-0000-0000-0000-000000000000', 25, 'U2iygxWF5rIs-r3EdwUeFQ', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', true, '2024-06-05 15:15:17.060688+00', '2024-06-05 16:31:22.534103+00', 'znIeLLV49M3x6m2vuHoOLg', '6d558919-c323-4870-90e8-c82dcb5e4c36'),
+	('00000000-0000-0000-0000-000000000000', 26, 'u9aWy5HVuOO3FM9eQujL1A', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', true, '2024-06-05 16:31:22.536073+00', '2024-06-05 20:30:35.927366+00', 'U2iygxWF5rIs-r3EdwUeFQ', '6d558919-c323-4870-90e8-c82dcb5e4c36'),
+	('00000000-0000-0000-0000-000000000000', 27, '2V9I-1tJCmSgV50iD0MI_Q', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', true, '2024-06-05 20:30:35.928327+00', '2024-06-08 02:27:29.532239+00', 'u9aWy5HVuOO3FM9eQujL1A', '6d558919-c323-4870-90e8-c82dcb5e4c36'),
+	('00000000-0000-0000-0000-000000000000', 28, '-LkKbKhu4I-GlZM86TrG0w', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', false, '2024-06-08 02:27:29.536581+00', '2024-06-08 02:27:29.536581+00', '2V9I-1tJCmSgV50iD0MI_Q', '6d558919-c323-4870-90e8-c82dcb5e4c36'),
+	('00000000-0000-0000-0000-000000000000', 29, 'qov3s-Uvs3gUnTMkSB1vcg', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', false, '2024-06-08 02:32:31.691882+00', '2024-06-08 02:32:31.691882+00', NULL, '0700dd16-9375-4651-adb4-873744a714be'),
+	('00000000-0000-0000-0000-000000000000', 30, 'gV51kGbMySb9sI46LHMKXw', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', false, '2024-06-08 02:57:31.377573+00', '2024-06-08 02:57:31.377573+00', NULL, '3f0e8e46-5133-4dc2-8a8a-3497044ac5ed');
 
 
 --
@@ -240,20 +281,25 @@ INSERT INTO "public"."codes" ("id", "created_at", "project_id", "code", "color",
 	(28, '2024-05-30 22:30:10.40486+00', 1, 'wants more robust version control', '#b35491', 16, 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', false),
 	(29, '2024-05-30 22:30:20.863774+00', 1, 'in-app chat feature', '#7c6191', 16, 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', false),
 	(19, '2024-05-30 22:19:38.45208+00', 1, 'would recommend', '#81ace2', 18, 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', false),
-	(18, '2024-05-30 22:19:26.852143+00', 1, 'Recommendation', NULL, NULL, 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', true);
+	(18, '2024-05-30 22:19:26.852143+00', 1, 'Recommendation', NULL, 9, 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', true);
 
 
 --
 -- Data for Name: files; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."files" ("id", "created_at", "created_by", "project_id", "parent", "name", "type", "folder") VALUES
-	(11, '2024-05-30 22:31:32.870713+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, NULL, 'user study', NULL, true),
-	(10, '2024-05-30 21:14:02.412917+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 11, 'P1.txt', 'text/plain', false),
-	(9, '2024-05-30 21:14:02.337449+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 11, 'P2.txt', 'text/plain', false),
-	(8, '2024-05-30 21:14:02.248224+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 11, 'P3.txt', 'text/plain', false),
-	(7, '2024-05-30 21:14:02.166394+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 11, 'P4.txt', 'text/plain', false),
-	(6, '2024-05-30 21:14:02.048708+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 11, 'P5.txt', 'text/plain', false);
+INSERT INTO "public"."files" ("id", "created_at", "created_by", "project_id", "parent", "name", "type", "folder", "notes") VALUES
+	(11, '2024-05-30 22:31:32.870713+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, NULL, 'user study', NULL, true, NULL),
+	(13, '2024-06-04 17:04:51.820105+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 12, 'new folder', NULL, true, NULL),
+	(12, '2024-06-04 17:04:50.287591+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 11, 'new folder', NULL, true, NULL),
+	(6, '2024-05-30 21:14:02.048708+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 12, 'P5.txt', 'text/plain', false, NULL),
+	(7, '2024-05-30 21:14:02.166394+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 13, 'P4.txt', 'text/plain', false, NULL),
+	(8, '2024-05-30 21:14:02.248224+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 11, 'P3.txt', 'text/plain', false, NULL),
+	(10, '2024-05-30 21:14:02.412917+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 11, 'P1.txt', 'text/plain', false, '- This is a test
+- This is another test
+
+'),
+	(9, '2024-05-30 21:14:02.337449+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 1, 11, 'P2.txt', 'text/plain', false, '- More notes exist here');
 
 
 --
@@ -289,17 +335,17 @@ INSERT INTO "public"."code_instances" ("id", "created_at", "created_by", "code_i
 -- Data for Name: configs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."configs" ("id", "updated_at", "user_id", "display_name", "theme", "favorite_themes", "editor_theme", "code_font_size", "code_line_numbers", "code_font_family", "code_line_height", "random_theme", "editor_file_panel_width", "editor_code_panel_width", "new_code_random_color", "code_text_color", "dynamic_code_text_color", "code_box_shadow") VALUES
-	(1, '2024-05-30 20:31:42.258873+00', '17d97dc9-d482-429e-985b-87d0ea7ec509', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
-	(2, '2024-05-30 20:32:02.975203+00', 'e587f4b6-31d4-46ae-9091-205d227813ee', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
-	(3, '2024-05-30 20:32:19.178658+00', '3bdbb665-84b5-4d32-8135-7ed80548a059', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
-	(5, '2024-05-30 20:32:46.649457+00', 'ef7bc947-fc26-47a9-b17a-5cf20ac1eb6b', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
-	(6, '2024-05-30 20:33:04.985639+00', 'bb55a5f6-4541-48e6-96ac-27d79f36dda4', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
-	(7, '2024-05-30 20:33:16.937247+00', 'c3f43634-0da2-43c7-baa7-ed2fef81e85e', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
-	(8, '2024-05-30 20:33:32.333476+00', '0748d39e-6d05-451d-9ff1-6125e6dfaf87', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
-	(9, '2024-05-30 20:34:03.546106+00', '98faf97b-6e9e-49db-89bf-3388a3b7b098', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
-	(10, '2024-05-30 20:34:30.258131+00', '226e0026-bb1c-442e-8237-a5c328c0a9bc', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true),
-	(4, '2024-05-30 20:32:33.147821+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true);
+INSERT INTO "public"."configs" ("id", "updated_at", "user_id", "display_name", "theme", "favorite_themes", "editor_theme", "code_font_size", "code_line_numbers", "code_font_family", "code_line_height", "random_theme", "editor_file_panel_width", "editor_code_panel_width", "new_code_random_color", "code_text_color", "dynamic_code_text_color", "code_box_shadow", "code_group_children_circles", "code_group_children_stats") VALUES
+	(1, '2024-05-30 20:31:42.258873+00', '17d97dc9-d482-429e-985b-87d0ea7ec509', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true, true, false),
+	(2, '2024-05-30 20:32:02.975203+00', 'e587f4b6-31d4-46ae-9091-205d227813ee', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true, true, false),
+	(3, '2024-05-30 20:32:19.178658+00', '3bdbb665-84b5-4d32-8135-7ed80548a059', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true, true, false),
+	(5, '2024-05-30 20:32:46.649457+00', 'ef7bc947-fc26-47a9-b17a-5cf20ac1eb6b', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true, true, false),
+	(6, '2024-05-30 20:33:04.985639+00', 'bb55a5f6-4541-48e6-96ac-27d79f36dda4', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true, true, false),
+	(7, '2024-05-30 20:33:16.937247+00', 'c3f43634-0da2-43c7-baa7-ed2fef81e85e', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true, true, false),
+	(8, '2024-05-30 20:33:32.333476+00', '0748d39e-6d05-451d-9ff1-6125e6dfaf87', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true, true, false),
+	(9, '2024-05-30 20:34:03.546106+00', '98faf97b-6e9e-49db-89bf-3388a3b7b098', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true, true, false),
+	(10, '2024-05-30 20:34:30.258131+00', '226e0026-bb1c-442e-8237-a5c328c0a9bc', NULL, 'camping', NULL, 'theme', 16, false, 'Roboto Mono', 16, false, 275, 275, true, NULL, true, true, true, false),
+	(4, '2024-05-30 20:32:33.147821+00', 'c58deed9-5778-4d6a-b2b1-516dd1f9325b', 'louis', 'bouquet', '{camping,dino}', 'light', 16, true, 'Roboto Mono', 16, false, 166, 0, true, NULL, true, true, true, true);
 
 
 --
@@ -350,7 +396,7 @@ INSERT INTO "storage"."objects" ("id", "bucket_id", "name", "owner", "created_at
 -- Name: refresh_tokens_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: supabase_auth_admin
 --
 
-SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 13, true);
+SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 30, true);
 
 
 --
@@ -364,14 +410,14 @@ SELECT pg_catalog.setval('"pgsodium"."key_key_id_seq"', 1, false);
 -- Name: code_instances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."code_instances_id_seq"', 22, true);
+SELECT pg_catalog.setval('"public"."code_instances_id_seq"', 25, true);
 
 
 --
 -- Name: codes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."codes_id_seq"', 29, true);
+SELECT pg_catalog.setval('"public"."codes_id_seq"', 30, true);
 
 
 --
@@ -385,14 +431,14 @@ SELECT pg_catalog.setval('"public"."configs_id_seq"', 10, true);
 -- Name: files_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."files_id_seq"', 11, true);
+SELECT pg_catalog.setval('"public"."files_id_seq"', 13, true);
 
 
 --
 -- Name: projects_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."projects_id_seq"', 4, true);
+SELECT pg_catalog.setval('"public"."projects_id_seq"', 5, true);
 
 
 --

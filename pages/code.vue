@@ -47,7 +47,7 @@ await supabase
             :config-attribute="'editor_file_panel_width'"
         />
 
-        <FileViewerPanel
+        <CodeCenter
             v-model:current-file="currentFile"
             v-model:codes="codes"
             v-model:trigger-update-highlights="triggerUpdateHighlights"

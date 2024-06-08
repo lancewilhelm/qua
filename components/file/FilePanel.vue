@@ -300,7 +300,7 @@ function handleSelected(item) {
 
 <template>
     <div class="flex flex-col bg-sub text-text items-stretch overflow-x-hidden rounded-tl-lg rounded-bl-lg border-main border-y-3 border-l-3" :style="{ width: width + 'px' }">
-        <div class="flex justify-center gap-2">
+        <div class="flex flex-wrap justify-center gap-2 px-2">
             <input
                 id="file"
                 type="file"

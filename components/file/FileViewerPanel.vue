@@ -462,7 +462,7 @@ function handleCodeClick(event, segment) {
 <template>
     <div
         :class="[
-            'overflow-hidden w-full flex items-center justify-start whitespace-pre-wrap text-base font-mono border-main border-y-3',
+            'overflow-hidden w-full h-full flex items-center justify-start whitespace-pre-wrap text-base font-mono border-main border-y-3',
             {
                 'editor-theme-light':
                     configStore.config.editor_theme === 'light',
