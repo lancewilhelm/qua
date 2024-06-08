@@ -2,6 +2,7 @@
 const supabase = useSupabaseClient()
 const currentFile = defineModel('currentFile')
 const configStore = useConfigStore()
+const notificationStore = useNotificationStore()
 const notesContentRef = ref(null)
 const notes = ref('')
 
@@ -31,6 +32,12 @@ async function updateNotes() {
         .eq('id', currentFile.value.id)
     if (error) {
         console.error('Error updating notes:', error)
+    } else {
+        notificationStore.addNotification({
+            type: 'success',
+            message: 'Notes saved',
+            length: 2000,
+        })
     }
 }
 

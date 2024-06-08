@@ -29,6 +29,7 @@ if (user.value) {
         <AppHeader />
         <NuxtPage />
         <AppFooter />
+        <AppNotificationCenter />
     </div>
 </template>
 

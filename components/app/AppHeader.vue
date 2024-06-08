@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const projectStore = useProjectStore()
+const notificationStore = useNotificationStore()
 const supabase = useSupabaseClient()
 const session = useSupabaseSession()
 
