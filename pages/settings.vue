@@ -255,7 +255,7 @@ function setRandomTheme(random) {
 
         <SettingsGroupSection
             title="show group stats"
-            icon="fa6-solid:graph"
+            icon="fa6-solid:chart-simple"
             description="Enable showing of code group child group and child codes (e.g., '1|8')"
         >
             <SettingsBooleanButtons configParameter="code_group_children_stats" />
