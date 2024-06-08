@@ -34,7 +34,7 @@ function deleteProject() {
 <template>
     <div
         :class="[
-            'flex bg-sub border-2 border-sub rounded-lg w-96 h-48 items-center justify-center font-mono p-4 m-2 transition-transform duration-300 cursor-pointer shadow-68-solid',
+            'flex bg-sub border-2 border-sub rounded-lg w-96 h-48 items-center justify-center font-mono p-4 m-2 transition-all duration-300 cursor-pointer shadow-68-solid',
             'active:translate-x-2px active:translate-y-3px active:shadow-23-solid',
             'hover:border-2 hover:border-main',
             {
