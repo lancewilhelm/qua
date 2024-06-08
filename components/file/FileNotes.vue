@@ -31,8 +31,6 @@ async function updateNotes() {
         .eq('id', currentFile.value.id)
     if (error) {
         console.error('Error updating notes:', error)
-    } else {
-        console.log('Notes updated:', content)
     }
 }
 

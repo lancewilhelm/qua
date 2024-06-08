@@ -9,6 +9,9 @@ const computeLines = () => {
     const element = document.getElementById('editor-content')
     const computedStyle = window.getComputedStyle(element)
     elementHeight.value = element.clientHeight
+    if (elementHeight.value === 0) {
+        return
+    }
     lineHeight.value = computedStyle.lineHeight
     lines.value = Math.floor(
         (elementHeight.value + 10) /
