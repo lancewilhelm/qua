@@ -88,7 +88,7 @@ function prepAndAddCode() {
         ) {
             editorSelection.value.text = selection.toString()
             editorSelection.value.range = selection.getRangeAt(0)
-            newCode.value = codePanelSelectedCode.value
+            newCode.value = { ...codePanelSelectedCode.value, memo: '', importance: null }
             addCodeInstance()
         }
     }
@@ -341,6 +341,11 @@ async function addCodeInstance() {
                 memo: newCode.value.memo,
                 importance: newCode.value.importance,
             }
+
+            if (code.new_code.trim() === '') {
+                return
+            }
+
             const { data, error } = await supabase.rpc(
                 'add_code_instance',
                 code
