@@ -14,10 +14,11 @@ const editorSegments = ref([])
 const newCode = ref({
     code: '',
     color: '',
+    memo: '',
+    importance: null,
 })
 const editCode = ref({})
 const codeModalText = ref('')
-const codeModalInput = ref(null)
 const editorRightClickContext = ref('')
 const selectedSegment = ref(null)
 const selectedCode = ref(null)
@@ -95,69 +96,106 @@ function prepAndAddCode() {
 
 function openEditSegmentModal() {
     showEditSegmentModal.value = true
+    console.log(selectedCode.value)
     editCode.value = JSON.parse(JSON.stringify(selectedCode.value))
 }
 
 async function handleEditCodeSubmit() {
-    if (
-        editCode.value.code.trim() === '' ||
-        editCode.value.code === selectedCode.value.code
-    ) {
+    if (editCode.value.code.trim() === '') {
         return
     }
 
     let updatedCodes
 
-    // Delete old instance first
-    const { error: deleteError } = await supabase
-        .from('code_instances')
-        .delete()
-        .eq('id', selectedCode.value.instance_id)
-    if (deleteError) {
-        console.error(deleteError)
-        return
-    } else {
-        updatedCodes = codes.value.map((c) => {
-            if (c.id === selectedCode.value.code_id) {
-                return {
-                    ...c,
-                    code_instances: c.code_instances.filter(
-                        (i) => i.id !== selectedCode.value.instance_id
-                    ),
-                }
-            }
-            return c
-        })
-    }
-
-    // Add new instance
-    const { data, error } = await supabase.rpc('add_code_instance', {
-        color:
-            '#' +
-            ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, '0'),
-        data: editCode.value.data,
-        end_offset: selectedSegment.value.end,
-        file_id: currentFile.value.id,
-        new_code: editCode.value.code.trim(),
-        parent: null,
-        project_id: projectStore.currentProject.id,
-        start_offset: selectedSegment.value.start,
-    })
-    if (error) {
-        console.error(error)
-        return
-    } else {
-        // Update codes array
-        const codeIndex = updatedCodes.findIndex((c) => c.id === data.id)
-        if (codeIndex === -1) {
-            updatedCodes.push(data)
+    if (editCode.value.code !== selectedCode.value.code) {
+        // Delete old instance first
+        const { error: deleteError } = await supabase
+            .from('code_instances')
+            .delete()
+            .eq('id', selectedCode.value.instance_id)
+        if (deleteError) {
+            console.error(deleteError)
+            return
         } else {
-            updatedCodes[codeIndex] = data
+            updatedCodes = codes.value.map((c) => {
+                if (c.id === selectedCode.value.code_id) {
+                    return {
+                        ...c,
+                        code_instances: c.code_instances.filter(
+                            (i) => i.id !== selectedCode.value.instance_id
+                        ),
+                    }
+                }
+                return c
+            })
         }
-        codes.value = updatedCodes
-        showEditSegmentModal.value = false
-        editCode.value = {}
-        processSegments(updatedCodes)
+
+        // Add new instance
+        const { data, error } = await supabase.rpc('add_code_instance', {
+            color:
+                '#' +
+                ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, '0'),
+            data: editCode.value.data,
+            end_offset: selectedSegment.value.end,
+            file_id: currentFile.value.id,
+            new_code: editCode.value.code.trim(),
+            parent: null,
+            project_id: projectStore.currentProject.id,
+            start_offset: selectedSegment.value.start,
+        })
+        if (error) {
+            console.error(error)
+            return
+        } else {
+            // Update codes array
+            const codeIndex = updatedCodes.findIndex((c) => c.id === data.id)
+            if (codeIndex === -1) {
+                updatedCodes.push(data)
+            } else {
+                updatedCodes[codeIndex] = data
+            }
+            codes.value = updatedCodes
+            showEditSegmentModal.value = false
+            editCode.value = {}
+            processSegments(updatedCodes)
+        }
+    } else {
+        // Update the exististing instance
+        const patch = {
+            memo: editCode.value.memo,
+            importance: editCode.value.importance
+        }
+        const { error: deleteError } = await supabase
+            .from('code_instances')
+            .update(patch)
+            .eq('id', selectedCode.value.instance_id)
+        if (deleteError) {
+            console.error(deleteError)
+            return ``
+        } else {
+            updatedCodes = codes.value.map((c) => {
+                if (c.id === selectedCode.value.code_id) {
+                    return {
+                        ...c,
+                        code_instances: c.code_instances.map((i) => {
+                            if (i.id === selectedCode.value.instance_id) {
+                                return {
+                                    ...i,
+                                    memo: editCode.value.memo,
+                                    importance: editCode.value.importance,
+                                }
+                            }
+                            return i
+                        }),
+                    }
+                }
+                return c
+            })
+            codes.value = updatedCodes
+            showEditSegmentModal.value = false
+            editCode.value = {}
+            processSegments(updatedCodes)
+        }
     }
 }
 
@@ -203,6 +241,7 @@ function checkReadyForProcessing() {
 }
 
 async function handleOpenCodeExpander(event, code) {
+    console.log(code)
     selectedCode.value = code
     expanderMenuEvent.value = event
     await nextTick()
@@ -299,6 +338,8 @@ async function addCodeInstance() {
                 parent: null,
                 project_id: projectStore.currentProject.id,
                 start_offset: start_offset,
+                memo: newCode.value.memo,
+                importance: newCode.value.importance,
             }
             const { data, error } = await supabase.rpc(
                 'add_code_instance',
@@ -322,6 +363,8 @@ async function addCodeInstance() {
                 newCode.value = {
                     code: '',
                     color: '',
+                    memo: '',
+                    importance: null,
                 }
                 showNewCodeModal.value = false
             }
@@ -401,6 +444,8 @@ function processSegments(args = codes.value) {
                         end_offset: inst.end_offset,
                         created_by: inst.created_by,
                         data: inst.data,
+                        memo: inst.memo,
+                        importance: inst.importance,
                     })
                 }
             })
@@ -441,6 +486,8 @@ function processSegments(args = codes.value) {
                     color: h.color,
                     created_by: h.created_by,
                     data: h.data,
+                    memo: h.memo,
+                    importance: h.importance,
                 }
                 segment.codes.push(c)
             }
@@ -593,14 +640,36 @@ function handleCodeClick(event, segment) {
                     {{ codeModalText.trim() }}
                 </div>
             </div>
+            <div class="font-mono text-main font-bold text-base mb-1">code</div>
             <textarea
-                ref="codeModalInput"
                 v-model="newCode.code"
-                placeholder="code"
-                name="code-modal-input"
+                placeholder="code (required)"
                 lines="2"
                 @keydown.enter.prevent="addCodeInstance"
             />
+            <div class="font-mono text-main font-bold text-base mb-1">memo</div>
+            <textarea
+                v-model="newCode.memo"
+                placeholder="memo"
+                lines="2"
+                @keydown.enter.prevent="addCodeInstance"
+            />
+            <div class="font-mono text-main font-bold text-base mb-1">
+                importance
+            </div>
+            <div class="flex gap-2 mb-2">
+                <button
+                    v-for="i in 5"
+                    :class="[{ 'bg-main text-bg': newCode.importance === i }]"
+                    @click="
+                        newCode.importance === i
+                            ? (newCode.importance = null)
+                            : (newCode.importance = i)
+                    "
+                >
+                    {{ i }}
+                </button>
+            </div>
             <div class="grid grid-cols-2 gap-4">
                 <button class="grow" @click="showNewCodeModal = false">
                     cancel
@@ -624,18 +693,39 @@ function handleCodeClick(event, segment) {
             </div>
             <div class="font-mono text-main font-bold text-base mb-2">code</div>
             <textarea
-                ref="codeModalInput"
                 v-model="editCode.code"
-                placeholder="code"
-                name="code-modal-input"
+                placeholder="code (required)"
                 lines="2"
                 @keydown.enter.prevent="handleEditCodeSubmit"
             />
+            <div class="font-mono text-main font-bold text-base mb-1">memo</div>
+            <textarea
+                v-model="editCode.memo"
+                placeholder="memo"
+                lines="2"
+                @keydown.enter.prevent="handleEditCodeSubmit"
+            />
+            <div class="font-mono text-main font-bold text-base mb-1">
+                importance
+            </div>
+            <div class="flex gap-2 mb-2">
+                <button
+                    v-for="i in 5"
+                    :class="[{ 'bg-main text-bg': editCode.importance === i }]"
+                    @click="
+                        editCode.importance === i
+                            ? (editCode.importance = null)
+                            : (editCode.importance = i)
+                    "
+                >
+                    {{ i }}
+                </button>
+            </div>
             <div class="grid grid-cols-2 gap-4">
                 <button class="grow" @click="showEditSegmentModal = false">
                     cancel
                 </button>
-                <button class="grow" @click="handleEditCodeSubmit">add</button>
+                <button class="grow" @click="handleEditCodeSubmit">update</button>
             </div>
         </BaseModal>
     </div>

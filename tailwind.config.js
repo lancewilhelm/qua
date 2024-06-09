@@ -2,7 +2,6 @@ const animate = require("tailwindcss-animate")
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: false,
   mode: 'jit',
   theme: {
     container: {
@@ -20,7 +19,7 @@ module.exports = {
       gridTemplateColumns: {
         'color-picker': '1fr auto',
         'code-group': 'auto 1fr',
-        'quote-item': '1fr 3fr',
+        'quote-item': '1fr 3fr 2fr 1fr',
         'code-page': 'auto auto 1fr auto auto',
         '1.5fr-1fr': '1.5fr 1fr',
         'theme-buttons': 'repeat(auto-fit, minmax(17rem, 1fr))',

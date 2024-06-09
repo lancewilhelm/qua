@@ -13,12 +13,18 @@ const props = defineProps({
 
 <template>
   <div class="overflow-hidden w-full flex flex-col items-stretch font-mono border-main rounded-br-lg border-y-3 border-r-3">
-    <div class="grid grid-cols-quote-item bg-main p-2">
+    <div class="grid grid-cols-quote-item bg-main p-2 gap-1">
       <div class="font-bold text-sub-alt">
-        File
+        file
       </div>
       <div class="font-bold text-sub-alt">
-        Quote
+        quote
+      </div>
+      <div class="font-bold text-sub-alt">
+        memo
+      </div>
+      <div class="font-bold text-sub-alt">
+        importance
       </div>
     </div>
     <div class="w-full h-full overflow-y-auto mr-px">
