@@ -8,6 +8,7 @@ export default defineNuxtConfig({
         '@nuxtjs/tailwindcss',
         'nuxt-icon',
         '@vueuse/nuxt',
+        "@nuxt/eslint"
     ],
     css: ['~/assets/css/main.css'],
     app: {

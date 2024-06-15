@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const configStore = useConfigStore()
 const showThemePicker = ref(false)
 const version = ref('v0.0.0')

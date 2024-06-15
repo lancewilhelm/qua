@@ -1,6 +1,9 @@
-<script setup>
-const codes = defineModel('codes')
-const parsedCodes = defineModel('parsedCodes')
+<script setup lang="ts">
+import type { Tables } from '~/types/supabase'
+import type { ParsedCode } from '~/types/types'
+
+const codes = defineModel<Tables<'codes'>[]>('codes')
+const parsedCodes = defineModel<ParsedCode[]>('parsedCodes')
 const props = defineProps({
     filesMap: {
         type: Object,

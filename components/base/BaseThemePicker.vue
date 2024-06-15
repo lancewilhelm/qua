@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import themesList from '~/assets/themes.json';
 
 const emit = defineEmits(['close', 'theme-change']);
@@ -18,13 +18,6 @@ function handleClickOutside(event) {
     if (event.target.id === 'theme-picker' || event.target.id === 'theme-picker-scroll') {
         emit('close');
     }
-};
-
-function getThemeBtnClass(theme) {
-    return {
-        'theme-btn': true,
-        active: config.theme && config.theme === theme.name,
-    };
 };
 
 function handleChangeTheme(theme) {

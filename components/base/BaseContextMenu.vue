@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const props = defineProps({
     event: {
         type: Object,
@@ -52,14 +52,15 @@ document.addEventListener('keydown', (event) => {
     }
 })
 
-function closeContextMenu(event) {
+function closeContextMenu() {
     emit('close')
 }
 
 </script>
 
 <template>
-    <div class="flex flex-col z-50 shadow-46-solid transition-all duration-300 max-w-xs [&>button]:flex [&>button]:bg-transparent [&>button]:p-2 [&>button]:shadow-none [&>button]:rounded-none [&>button]:m-0 [&>button]:justify-start [&>button]:text-base [&>button]:text-black [&>button:hover]:bg-text [&>button:hover]:text-bg [&>button:active]:bg-sub [&>button:active]:text-bg [&>button:active]:transform-none"
+    <div
+class="flex flex-col z-50 shadow-46-solid transition-all duration-300 max-w-xs [&>button]:flex [&>button]:bg-transparent [&>button]:p-2 [&>button]:shadow-none [&>button]:rounded-none [&>button]:m-0 [&>button]:justify-start [&>button]:text-base [&>button]:text-black [&>button:hover]:bg-text [&>button:hover]:text-bg [&>button:active]:bg-sub [&>button:active]:text-bg [&>button:active]:transform-none"
         :style="[{ backgroundColor: bgColor }, computedPosition ]">
         <slot />
     </div>

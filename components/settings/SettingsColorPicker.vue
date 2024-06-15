@@ -1,4 +1,9 @@
 <script setup lang="ts">
+type ConfigKey = keyof typeof configStore.config
+
+type ConfigValueType =
+    (typeof configStore.config)[ConfigKey]
+
 const props = defineProps({
     configParameter: {
         type: String,
@@ -13,13 +18,20 @@ useEventListener('keydown', (event) => {
 })
 
 const configStore = useConfigStore()
-const r_pre = ref(configStore.config[props.configParameter])
-const r = ref(configStore.config[props.configParameter])
+const settingPre = ref(
+    configStore.config[props.configParameter as ConfigKey]
+)
+const setting = ref(
+    configStore.config[props.configParameter as ConfigKey]
+)
 
 const mismatch = computed(() => {
-    if (r.value && r_pre.value) {
-        return r.value.toString().trim() !== r_pre.value.toString().trim()
-    } else if ((r.value && !r_pre.value) || (!r.value && r_pre.value)) {
+    if (setting.value && settingPre.value) {
+        return (
+            setting.value.toString().trim() !==
+            settingPre.value.toString().trim()
+        )
+    } else if (setting.value && !settingPre.value) {
         return true
     } else {
         return false
@@ -27,11 +39,20 @@ const mismatch = computed(() => {
 })
 
 function patchConfig() {
-    if (r.value?.toString().trim() === r_pre.value?.toString().trim()) return
-    const d: { [key: string]: any } = new Object()
-    d[props.configParameter] = r.value ? r.value.toString().trim() : null
-    configStore.patchConfig(d)
-    r_pre.value = r.value ? r.value.toString().trim() : null
+    if (
+        setting.value?.toString().trim() === settingPre.value?.toString().trim()
+    )
+        return
+
+    const patch: Partial<
+        Record<ConfigKey, ConfigValueType>
+    > = {}
+
+    patch[props.configParameter as ConfigKey] =
+        setting.value
+
+    configStore.patchConfig(patch as typeof configStore.config)
+    settingPre.value = setting.value ? setting.value.toString().trim() : ''
 }
 </script>
 
@@ -42,12 +63,12 @@ function patchConfig() {
             :class="[
                 'text-3xl text-main opacity-0 transition-opacity duration-300',
                 {
-                    'opacity-100': r,
+                    'opacity-100': setting,
                 },
             ]"
         />
         <BaseColorPicker
-            v-model:current-color="r"
+            v-model:current-color="setting"
         />
     </div>
     <div class="flex flex-col items-center">
@@ -56,11 +77,11 @@ function patchConfig() {
             :class="[
                 'text-3xl text-main opacity-0 transition-opacity duration-300',
                 {
-                    'opacity-100': !r,
+                    'opacity-100': !setting,
                 },
             ]"
         />
-        <button @click="r = null">theme</button>
+        <button @click="setting = null">theme</button>
     </div>
     <button :class="['flex ml-2 one-to-one border-3 border-transparent', {'!border-error': mismatch }]" @click="patchConfig()">
         <Icon name="fa6-solid:floppy-disk" />

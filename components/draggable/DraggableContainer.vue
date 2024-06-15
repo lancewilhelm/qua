@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const selectedItems = ref([])
 const draggedItems = ref([])
 const dropTarget = ref(null)
@@ -11,15 +11,10 @@ provide('dropTarget', dropTarget)
 
 const isDragOver = computed(() => dropTarget.value === 'root')
 
-watch(dropTarget, (value) => {
-    if (value !== null) {
-    }
-})
-
 useEventListener(window, 'drop', (e) => e.preventDefault())
 useEventListener(window, 'dragover', (e) => e.preventDefault())
 
-function onDropRoot(event) {
+function onDropRoot() {
     if (draggedItems.value.length > 0) {
         emit('onDrop', { items: draggedItems.value, target: 'root' })
         draggedItems.value = []
@@ -51,7 +46,7 @@ function onDragLeave(event) {
         @contextmenu.prevent="handleContextMenu"
         @dragover.prevent
     >
-        <slot></slot>
+        <slot/>
         <div
             :class="['grow', { 'bg-sub-alt': isDragOver }]"
             @click="selectedItems = []"

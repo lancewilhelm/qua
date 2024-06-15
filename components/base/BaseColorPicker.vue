@@ -1,13 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import tinycolor from 'tinycolor2'
+type ConfigKey = keyof typeof configStore.config
 
-const currentColor = defineModel('currentColor')
+type ConfigValueType =
+    (typeof configStore.config)[ConfigKey]
 
+const currentColor = defineModel<ConfigValueType>('currentColor')
+
+const configStore = useConfigStore()
 const height = ref(150)
 const hueY = ref(0)
 const spectrumX = ref(0)
 const spectrumY = ref(0)
-const selectorSize = ref(30)
+// const selectorSize = ref(30)
 const showColorPicker = ref(false)
 const colorPickerPosition = ref({ left: 0, bottom: 0 })
 const originalValue = ref(JSON.parse(JSON.stringify(currentColor.value)))
@@ -51,7 +56,7 @@ window.addEventListener('mouseup', (e) => {
     }
 })
 
-async function toggleColorPicker(e) {
+async function toggleColorPicker() {
     if (!showColorPicker.value) {
         const r = colorPickerShowButton.value
             .getBoundingClientRect()
@@ -197,10 +202,10 @@ function endGetHueColor() {
 
 <template>
     <div id="color-picker" class="flex items-center">
-        <input v-model="currentColor" type="text" autcomplete="off" class="w-24 mr-2.5"/>
+        <input v-model="currentColor" type="text" autcomplete="off" class="w-24 mr-2.5">
         <div
-            ref="colorPickerShowButton"
             id="color-picker-show-button"
+            ref="colorPickerShowButton"
             class="w-8 h-8 rounded cursor-pointer"
             :style="{
                 'background-color': currentColor,
@@ -219,8 +224,8 @@ function endGetHueColor() {
         </div>
         <div
             v-if="showColorPicker"
-            ref="colorPickerPopup"
             id="color-picker-popup"
+            ref="colorPickerPopup"
             class="font-mono absolute grid grid-cols-2 gap-3.5 p-2.5 box-border bg-bg rounded-lg shadow-46-solid grid-cols-color-picker"
             :style="colorPickerPosition"
         >
@@ -230,12 +235,12 @@ function endGetHueColor() {
                 @mousedown="startGetSpectrumColor"
             >
                 <div
-                    ref="colorCursor"
                     id="color-cursor"
+                    ref="colorCursor"
                     class="absolute z-10 h-4 w-4 rounded-full border-2 border-white bg-none box-border -ml-2 -mt-2 -mt-2" 
                     :style="{ left: spectrumX + 'px', top: spectrumY + 'px' }"
                 />
-                <canvas ref="spectrumCanvas" id="spectrum-canvas" class="absolute top-0 right-0 left-0 w-full h-full"/>
+                <canvas id="spectrum-canvas" ref="spectrumCanvas" class="absolute top-0 right-0 left-0 w-full h-full"/>
             </div>
             <div
                 id="hue-color"
@@ -244,8 +249,8 @@ function endGetHueColor() {
                 @mousedown="startGetHueColor"
             >
                 <div
-                    ref="hueCursor"
                     id="hue-cursor"
+                    ref="hueCursor"
                     class="absolute z-10 top-0 left-1/2 h-2 w-4 translate-y-1/2 rounded border-2 border-white bg-none box-border -ml-2 -mt-2"
                     :style="{
                         background: `hsl(${
@@ -254,7 +259,7 @@ function endGetHueColor() {
                         top: hueY + 'px',
                     }"
                 />
-                <canvas ref="hueCanvas" id="hue-canvas" class="absolute top-0 right-0 bottom-0 left-0 w-full h-full rounded" :height="height + 'px'" />
+                <canvas id="hue-canvas" ref="hueCanvas" class="absolute top-0 right-0 bottom-0 left-0 w-full h-full rounded" :height="height + 'px'" />
             </div>
         </div>
     </div>

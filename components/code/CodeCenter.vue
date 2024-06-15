@@ -1,9 +1,12 @@
-<script setup>
-const currentFile = defineModel('currentFile')
-const codes = defineModel('codes')
-const triggerUpdateHighlights = defineModel('triggerUpdateHighlights')
-const triggerCodeSelected = defineModel('triggerCodeSelected')
-const selectedCode = defineModel('selectedCode')
+<script setup lang="ts">
+import type { Tables } from '~/types/supabase'
+import type { ParsedCode, CodesWithInstances } from '~/types/types'
+
+const currentFile = defineModel<Tables<'files'>>('currentFile')
+const codes = defineModel<CodesWithInstances>('codes')
+const triggerUpdateHighlights = defineModel<boolean>('triggerUpdateHighlights')
+const triggerCodeSelected = defineModel<boolean>('triggerCodeSelected')
+const selectedCode = defineModel<ParsedCode>('selectedCode')
 
 const activeTab = ref('code')
 </script>
@@ -31,17 +34,17 @@ const activeTab = ref('code')
             </div>
         </div>
         <FileViewerPanel
-            class="pr-px"
-            :style="{ display: activeTab === 'code' ? 'block' : 'none' }"
             v-model:current-file="currentFile"
             v-model:codes="codes"
             v-model:trigger-update-highlights="triggerUpdateHighlights"
             v-model:trigger-code-selected="triggerCodeSelected"
             v-model:selected-code="selectedCode"
+            class="pr-px"
+            :style="{ display: activeTab === 'code' ? 'block' : 'none' }"
         />
         <FileNotes
-            :style="{ display: activeTab === 'notes' ? 'block' : 'none' }"
             v-model:current-file="currentFile"
+            :style="{ display: activeTab === 'notes' ? 'block' : 'none' }"
         />
     </div>
 </template>

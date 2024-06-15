@@ -1,12 +1,23 @@
-<script setup>
-const emits = defineEmits(['submit'])
-const project = defineModel('project')
-const showModal = defineModel('showModal')
+<script setup lang="ts">
+import type { Tables } from '~/types/supabase'
+
+defineEmits(['submit'])
+const project = defineModel<Tables<'projects'>>('project')
+const showModal = defineModel<boolean>('showModal')
+
+defineProps({
+    newProject: {
+        type: Boolean,
+        default: false,
+    }
+})
 
 const tagInput = ref('')
 
-function deleteTag(tag) {
-    project.value.tags = project.value.tags.filter((t) => t !== tag)
+function deleteTag(tag: string) {
+    if (project.value && project.value.tags) {
+        project.value.tags = project.value.tags.filter((t) => t !== tag)
+    }
 }
 
 function closeModal() {
@@ -17,11 +28,11 @@ function closeModal() {
 
 <template>
     <BaseModal
-        v-if="showModal"
+        v-if="showModal && project"
         @close="closeModal"
         @submit="$emit('submit')"
     >
-        <div class="font-mono font-bold text-lg">New Project</div>
+        <div class="font-mono font-bold text-lg">{{ newProject ? 'new' : 'edit' }} project</div>
         <form class="grid justify-center items-center grid-cols-1">
             <div class="font-mono text-main text-left">name</div>
             <input
@@ -30,7 +41,7 @@ function closeModal() {
                 autocomplete="off"
                 placeholder="project name"
                 name="name"
-            />
+            >
             <div class="font-mono text-main text-left">descritpion</div>
             <textarea
                 v-model="project.description"
@@ -50,13 +61,13 @@ function closeModal() {
                     name="tags"
                     @keydown.enter.stop="
                         () => {
-                            if (tagInput !== '') {
+                            if (tagInput !== '' && project?.tags) {
                                 project.tags.push(tagInput)
                                 tagInput = ''
                             }
                         }
                     "
-                />
+                >
                 <div class="flex flex-row flex-wrap self-center">
                     <div
                         v-for="tag in project.tags"
@@ -86,7 +97,7 @@ function closeModal() {
                     class="modal-btn"
                     @click="$emit('submit')"
                 >
-                    create
+                    {{ newProject ? 'create' : 'save' }}
                 </button>
             </div>
         </form>

@@ -6,7 +6,7 @@ const configStore = useConfigStore()
 
 if (configStore.config.random_theme) {
     const themes = JSON.parse(JSON.stringify(themesList)).sort(
-        (a: { name: string }, b: { name: any }) => a.name.localeCompare(b.name)
+        (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name)
     )
     const randomTheme = themes[Math.floor(Math.random() * themes.length)]
     setTheme(randomTheme.name)
@@ -35,21 +35,21 @@ const handleError = () => {
     <div class="app-content content-grid">
         <AppHeader />
         <div class="flex flex-col items-center w-full h-full full-width no-scroll justify-center">
-            <template v-if="error.statusCode === 404">
+            <template v-if="error?.statusCode === 404">
                 <div class="text-6xl font-bold text-main">404!</div>
                 <div class="text-xl">sorry, that page doesn't exist.</div>
             </template>
             <template v-else>
                 <div class="text-6xl font-bold text-main">dang</div>
                 <div class="text-xl">
-                    <strong>{{ error.message }}</strong>
+                    <strong>{{ error?.message }}</strong>
                 </div>
                 <div class="text-xl">it looks like something broke.</div>
                 <div class="text-xl">sorry about that.</div>
             </template>
             <div class="text-xl">
                 go back to your
-                <a @click="handleError" class="cursor-pointer"> projects. </a>
+                <a class="cursor-pointer" @click="handleError"> projects. </a>
             </div>
         </div>
         <AppFooter />

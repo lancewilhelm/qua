@@ -1,17 +1,22 @@
 <script setup lang="ts">
+const configStore = useConfigStore()
+
+type ConfigKey = keyof typeof configStore.config
+
+type ConfigValueType =
+    (typeof configStore.config)[ConfigKey]
+
 const props = defineProps({
     configParameter: {
-        type: String,
+        type: String as PropType<ConfigKey>,
         default: '',
     },
 })
 
-const configStore = useConfigStore()
-
 function patchConfig(value: boolean) {
-    const d: { [key: string]: any } = new Object()
-    d[props.configParameter] = value
-    configStore.patchConfig(d)
+    const patch: Partial<Record<ConfigKey, ConfigValueType>> = {}
+    patch[props.configParameter as ConfigKey] = value
+    configStore.patchConfig(patch as Partial<typeof configStore.config>)
 }
 </script>
 

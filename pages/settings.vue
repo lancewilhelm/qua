@@ -1,55 +1,81 @@
-<script setup>
+<script setup lang="ts">
+import themesList from '@/assets/themes.json'
+
+interface Theme {
+    name: string
+    bgColor: string
+    mainColor: string
+    subColor: string
+    textColor: string
+}
+
 definePageMeta({
     middleware: 'auth',
 })
 
-import BaseColorPicker from '~/components/base/BaseColorPicker.vue'
-import themesList from '/assets/themes.json'
-
-const displayName = defineModel('displayName')
+const displayName = defineModel<string>('displayName')
 const configStore = useConfigStore()
 const themes = JSON.parse(JSON.stringify(themesList)).sort(
-    (a, b) => hexToHsl(b.bgColor).l - hexToHsl(a.bgColor).l
+    (a: Theme, b: Theme) =>
+        b.bgColor && a.bgColor
+            ? (hexToHsl(b.bgColor)?.l || 0) - (hexToHsl(a.bgColor)?.l || 0)
+            : 0
 )
-const favoriteThemesNames = ref(configStore.config.favorite_themes)
-const favoriteThemes = ref([])
-const nonFavoriteThemes = ref(themes)
+const favoriteThemesNames = ref<string[] | null>(
+    configStore.config.favorite_themes
+)
+const favoriteThemes = ref<Theme[]>([])
+const nonFavoriteThemes = ref<Theme[]>(themes)
 if (favoriteThemesNames.value) {
-    favoriteThemes.value = themes.filter((theme) =>
-        favoriteThemesNames.value.includes(theme.name)
+    favoriteThemes.value = themes.filter((theme: Theme) =>
+        favoriteThemesNames.value?.includes(theme.name)
     )
     nonFavoriteThemes.value = themes.filter(
-        (theme) => !favoriteThemesNames.value.includes(theme.name)
+        (theme: Theme) => !favoriteThemesNames.value?.includes(theme.name)
     )
 }
-displayName.value = configStore.config.display_name
+displayName.value = configStore.config.display_name as string | undefined
 
-function handleChangeTheme(theme) {
+function handleChangeTheme(theme: Theme) {
     setTheme(theme.name)
     configStore.patchConfig({ theme: theme.name })
 }
 
-function toggleFavoriteTheme(theme) {
+function toggleFavoriteTheme(theme: string) {
     if (!favoriteThemesNames.value) {
         favoriteThemesNames.value = [theme]
         configStore.patchConfig({ favorite_themes: favoriteThemesNames.value })
         favoriteThemes.value = [
             ...favoriteThemes.value,
-            themes.find((t) => t.name === theme),
-        ].sort((a, b) => hexToHsl(b.bgColor).l - hexToHsl(a.bgColor).l)
+            themes.find((t: Theme) => t.name === theme),
+        ].sort(
+            (a: Theme, b: Theme) =>
+                (hexToHsl(b.bgColor)?.l || 0) - (hexToHsl(a.bgColor)?.l || 0)
+        )
         nonFavoriteThemes.value = nonFavoriteThemes.value
             .filter((nonFavoriteTheme) => nonFavoriteTheme.name !== theme)
-            .sort((a, b) => hexToHsl(b.bgColor).l - hexToHsl(a.bgColor).l)
+            .sort(
+                (a, b) =>
+                    (hexToHsl(b.bgColor)?.l || 0) -
+                    (hexToHsl(a.bgColor)?.l || 0)
+            )
     } else if (!favoriteThemesNames.value.includes(theme)) {
         favoriteThemesNames.value = [...favoriteThemesNames.value, theme]
         configStore.patchConfig({ favorite_themes: favoriteThemesNames.value })
         favoriteThemes.value = [
             ...favoriteThemes.value,
-            themes.find((t) => t.name === theme),
-        ].sort((a, b) => hexToHsl(b.bgColor).l - hexToHsl(a.bgColor).l)
+            themes.find((t: Theme) => t.name === theme),
+        ].sort(
+            (a, b) =>
+                (hexToHsl(b.bgColor)?.l || 0) - (hexToHsl(a.bgColor)?.l || 0)
+        )
         nonFavoriteThemes.value = nonFavoriteThemes.value
             .filter((nonFavoriteTheme) => nonFavoriteTheme.name !== theme)
-            .sort((a, b) => hexToHsl(b.bgColor).l - hexToHsl(a.bgColor).l)
+            .sort(
+                (a, b) =>
+                    (hexToHsl(b.bgColor)?.l || 0) -
+                    (hexToHsl(a.bgColor)?.l || 0)
+            )
     } else {
         favoriteThemesNames.value = favoriteThemesNames.value.filter(
             (name) => name !== theme
@@ -57,21 +83,18 @@ function toggleFavoriteTheme(theme) {
         configStore.patchConfig({ favorite_themes: favoriteThemesNames.value })
         favoriteThemes.value = favoriteThemes.value
             .filter((favoriteTheme) => favoriteTheme.name !== theme)
-            .sort((a, b) => hexToHsl(b.bgColor).l - hexToHsl(a.bgColor).l)
+            .sort(
+                (a, b) =>
+                    (hexToHsl(b.bgColor)?.l || 0) -
+                    (hexToHsl(a.bgColor)?.l || 0)
+            )
         nonFavoriteThemes.value = [
             ...nonFavoriteThemes.value,
-            themes.find((t) => t.name === theme),
-        ].sort((a, b) => hexToHsl(b.bgColor).l - hexToHsl(a.bgColor).l)
-    }
-}
-
-function setRandomTheme(random) {
-    configStore.patchConfig({ random_theme: random })
-    if (random) {
-        const randomTheme = themes[Math.floor(Math.random() * themes.length)]
-        setTheme(randomTheme.name)
-    } else {
-        setTheme(configStore.config.theme)
+            themes.find((t: Theme) => t.name === theme),
+        ].sort(
+            (a, b) =>
+                (hexToHsl(b.bgColor)?.l || 0) - (hexToHsl(a.bgColor)?.l || 0)
+        )
     }
 }
 </script>
@@ -128,7 +151,7 @@ function setRandomTheme(random) {
                 icon="fa6-solid:arrow-down-1-9"
                 description="Whether or not to display line numbers on the code page. Examples, true, false."
             >
-                <SettingsBooleanButtons configParameter="code_line_numbers" />
+                <SettingsBooleanButtons config-parameter="code_line_numbers" />
             </SettingsGroupSection>
 
             <SettingsGroupSection
@@ -215,7 +238,7 @@ function setRandomTheme(random) {
                 description="Whether or not to assign a random color to a new code"
             >
                 <SettingsBooleanButtons
-                    configParameter="new_code_random_color"
+                    config-parameter="new_code_random_color"
                 />
             </SettingsGroupSection>
         </div>
@@ -226,7 +249,9 @@ function setRandomTheme(random) {
             icon="fa6-solid:swatchbook"
             description="Whether to change the text color of the code based on the background color to improve readability. The text color will either be white or black."
         >
-            <SettingsBooleanButtons configParameter="dynamic_code_text_color" />
+            <SettingsBooleanButtons
+                config-parameter="dynamic_code_text_color"
+            />
         </SettingsGroupSection>
 
         <SettingsGroupSection
@@ -234,7 +259,7 @@ function setRandomTheme(random) {
             icon="fa6-solid:droplet"
             description="If not using dynamic code text color, the color of the text of a code."
         >
-            <SettingsColorPicker configParameter="code_text_color" />
+            <SettingsColorPicker config-parameter="code_text_color" />
         </SettingsGroupSection>
 
         <SettingsGroupSection
@@ -242,7 +267,7 @@ function setRandomTheme(random) {
             icon="fa6-solid:square"
             description="Enable box shadow on the code highlight in the file viewer"
         >
-            <SettingsBooleanButtons configParameter="code_box_shadow" />
+            <SettingsBooleanButtons config-parameter="code_box_shadow" />
         </SettingsGroupSection>
 
         <SettingsGroupSection
@@ -250,7 +275,9 @@ function setRandomTheme(random) {
             icon="fa6-solid:circle"
             description="Enable showing of code group children circles next to the group name"
         >
-            <SettingsBooleanButtons configParameter="code_group_children_circles" />
+            <SettingsBooleanButtons
+                config-parameter="code_group_children_circles"
+            />
         </SettingsGroupSection>
 
         <SettingsGroupSection
@@ -258,7 +285,9 @@ function setRandomTheme(random) {
             icon="fa6-solid:chart-simple"
             description="Enable showing of code group child group and child codes (e.g., '1|8')"
         >
-            <SettingsBooleanButtons configParameter="code_group_children_stats" />
+            <SettingsBooleanButtons
+                config-parameter="code_group_children_stats"
+            />
         </SettingsGroupSection>
 
         <!-- <div class="text-3xl font-black font-mono text-main">login</div>
@@ -270,7 +299,7 @@ function setRandomTheme(random) {
             icon="fa6-solid:brush"
             description="Random theme on every reload of the webpage"
         >
-            <SettingsBooleanButtons configParameter="random_theme" />
+            <SettingsBooleanButtons config-parameter="random_theme" />
         </SettingsGroupSection>
 
         <div
@@ -279,7 +308,7 @@ function setRandomTheme(random) {
         >
             <button
                 v-for="theme in favoriteThemes"
-                :key="theme"
+                :key="theme.name"
                 :class="[
                     'group grid grid-cols-3 text-base font-semibold m-0 items-center',
                     {
@@ -330,7 +359,7 @@ function setRandomTheme(random) {
         <div class="grid gap-2 grid-cols-theme-buttons">
             <button
                 v-for="theme of nonFavoriteThemes"
-                :key="theme"
+                :key="theme.name"
                 :class="[
                     'group grid grid-cols-3 text-base font-semibold m-0 items-center',
                     {

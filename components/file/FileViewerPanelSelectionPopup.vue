@@ -1,9 +1,9 @@
-<script setup>
-const emits = defineEmits(['add', 'llm'])
-const props = defineProps({
+<script setup lang="ts">
+defineEmits(['add', 'llm'])
+defineProps({
     position: {
         type: Object,
-        default: { top: 0, left: 0 },
+        default: () => { return { top: '0', left: '0' }},
     },
 })
 </script>

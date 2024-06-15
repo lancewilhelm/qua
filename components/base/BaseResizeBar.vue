@@ -1,5 +1,5 @@
-<script setup>
-const elementWidth = defineModel('elementWidth')
+<script setup lang="ts">
+const elementWidth = defineModel<number | null>('elementWidth')
 
 const props = defineProps({
     onLeft: {

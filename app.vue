@@ -5,8 +5,9 @@ const user = useSupabaseUser()
 const configStore = useConfigStore()
 
 if (configStore.config.random_theme) {
-    const themes = JSON.parse(JSON.stringify(themesList)).sort((a: { name: string; }, b: { name: any; }) =>
-        a.name.localeCompare(b.name)
+    const themes = JSON.parse(JSON.stringify(themesList)).sort(
+        (a: { name: string }, b: { name: string }) =>
+            a.name.localeCompare(b.name)
     )
     const randomTheme = themes[Math.floor(Math.random() * themes.length)]
     setTheme(randomTheme.name)
@@ -25,7 +26,7 @@ if (user.value) {
 
 <template>
     <div class="app-content content-grid">
-        <NuxtLoadingIndicator :color="'var(--main-color)'"/>
+        <NuxtLoadingIndicator :color="'var(--main-color)'" />
         <AppHeader />
         <NuxtPage />
         <AppFooter />

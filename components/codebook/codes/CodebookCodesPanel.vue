@@ -1,51 +1,54 @@
-<script setup>
+<script setup lang="ts">
+import type { Database } from '~/types/supabase'
 import CodebookCodesPanelItem from './CodebookCodesPanelItem.vue'
+import type { ParsedCode, CodesWithInstances } from '~/types/types'
 
-const codes = defineModel('codes')
-const selectedCode = defineModel('selectedCode')
-const props = defineProps({
-    width: {
-        type: Number,
-        default: 275,
-    },
-    onLeft: {
-        type: Boolean,
-        default: false,
-    },
-    squareTop: {
-        type: Boolean,
-        default: false,
-    },
-})
+interface DraggableItem {
+    open: () => void
+    close: () => void
+}
+
+const codes = defineModel<CodesWithInstances>('codes')
+const selectedCode = defineModel<ParsedCode>('selectedCode')
+defineProps<{
+    width: number | null
+    onLeft: boolean
+    squareTop: boolean
+}>()
+
 const emit = defineEmits(['updateHighlights', 'codeSelected'])
 
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient<Database>()
 const configStore = useConfigStore()
 const projectStore = useProjectStore()
 const codeFilterInput = ref('')
 const showContextMenu = ref(false)
-const contextMenuCode = ref(null)
+const contextMenuCode = ref<ParsedCode | 'root' | null>()
 const showNewCodeGroupModal = ref(false)
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const showNewCodeModal = ref(false)
-const contextMenuEvent = ref(null)
+const contextMenuEvent = ref<MouseEvent>()
 const newCodeGroupName = ref('')
-const editCode = ref({})
+const editCode = ref<ParsedCode>({} as ParsedCode)
 const newCode = ref({
     name: '',
     color: '',
 })
-const draggableItem = ref([])
+const draggableItem = ref<DraggableItem[]>([])
 
 window.addEventListener('dragover', (e) => e.preventDefault())
 
-const parsedCodes = computed(() => {
+// Compute parsed codes
+const parsedCodes = computed((): ParsedCode[] => {
     const codeMap = new Map()
-    const rootItems = []
+    const rootItems: ParsedCode[] = []
 
+    if (!codes.value) {
+        return []
+    }
     codes.value.forEach((c) => {
-        const newCode = { ...c }
+        const newCode = { ...c } as ParsedCode
         if (newCode.group) {
             newCode.children = []
         }
@@ -64,18 +67,17 @@ const parsedCodes = computed(() => {
         }
     })
 
-    const sortedRootItems = rootItems.sort((a, b) =>
+    return rootItems.sort((a, b) =>
         a.group === b.group ? 0 : a.group ? -1 : 1
     )
-    return sortedRootItems
 })
 
-function filterCodes(codes) {
+function filterCodes(codes: ParsedCode[]) {
     if (codeFilterInput.value === '') {
         return codes
     }
 
-    function filterCodeGroup(group) {
+    function filterCodeGroup(group: ParsedCode): ParsedCode | null {
         const children = []
         for (const c of group.children) {
             if (c.group) {
@@ -85,7 +87,7 @@ function filterCodes(codes) {
                 }
             } else if (
                 c.code
-                    .toLowerCase()
+                    ?.toLowerCase()
                     .includes(codeFilterInput.value.toLowerCase())
             ) {
                 children.push(c)
@@ -94,14 +96,14 @@ function filterCodes(codes) {
         if (children.length > 0) {
             return {
                 ...group,
-                codes: children,
+                children: children,
             }
         } else {
             return null
         }
     }
 
-    const filteredCodes = []
+    const filteredCodes = [] as ParsedCode[]
     codes.forEach((c) => {
         if (c.group) {
             const group = filterCodeGroup(c)
@@ -109,7 +111,7 @@ function filterCodes(codes) {
                 filteredCodes.push(group)
             }
         } else if (
-            c.code.toLowerCase().includes(codeFilterInput.value.toLowerCase())
+            c.code?.toLowerCase().includes(codeFilterInput.value.toLowerCase())
         ) {
             filteredCodes.push(c)
         }
@@ -131,7 +133,7 @@ async function handleNewCodeSubmit() {
     if (error) {
         console.error('Error inserting new code:', error)
     } else {
-        codes.value.push(data)
+        codes.value ? codes.value.push(data) : (codes.value = [data])
         newCode.value = {
             name: '',
             color: '',
@@ -155,35 +157,47 @@ function handleShowNewCodeModal() {
     showNewCodeModal.value = true
 }
 
-async function updateCodeLocation(cs, target) {
-    if (cs.some((c) => c.id === target.id)) {
-        return
-    }
-    const patch = cs.map((c) => {
-        return {
-            id: c.id,
-            parent: target.id ? target.id : null,
+async function updateCodeLocation(cs: ParsedCode[], target: ParsedCode | 'root') {
+    let patch: { id: number; parent: number | null }[] = []
+    if (target === 'root') {
+        patch = cs.map((c) => {
+            return {
+                id: c.id,
+                parent: null,
+            }
+        })
+    } else {
+        if (cs.some((c) => c.id === target.id)) {
+            return
         }
-    })
+        patch = cs.map((c) => {
+            return {
+                id: c.id,
+                parent: target.id ? target.id : null,
+            }
+        })
+    }
 
     const { error } = await supabase.from('codes').upsert(patch)
     if (error) {
         console.error(error)
     } else {
+        codes.value ? 
         codes.value = codes.value.map((c) => {
-            if (cs.some((code) => code.id === c.id)) {
-                return {
-                    ...c,
-                    parent: target.id ? target.id : null,
-                }
-            } else {
-                return c
-            }
-        })
+                  if (cs.some((code) => code.id === c.id)) {
+                      return {
+                          ...c,
+                          parent: patch.find((p) => p.id === c.id)?.parent ?? null,
+                      }
+                  } else {
+                      return c
+                  }
+              })
+            : []
     }
 }
 
-function openContextMenu({ event, target }) {
+function openContextMenu(event: MouseEvent, target: ParsedCode) {
     contextMenuEvent.value = event
     contextMenuCode.value = target
     showContextMenu.value = true
@@ -203,50 +217,52 @@ async function handleNewCodeGroupSubmit() {
     if (error) {
         console.error('Error inserting new code group:', error)
     } else {
-        codes.value.push(data)
+        codes.value ? codes.value.push(data) : (codes.value = [data])
         newCodeGroupName.value = ''
         showNewCodeGroupModal.value = false
     }
 }
 
 async function handleEditSubmit() {
-    let body
+    let patch: Partial<ParsedCode> = {}
     if (!editCode.value.group) {
         if (
-            editCode.value.code.trim() === '' ||
-            (editCode.value.code === contextMenuCode.value.code &&
+            editCode.value.code?.trim() === '' ||
+            (contextMenuCode.value !== 'root' && editCode.value.code === contextMenuCode.value?.code &&
                 editCode.value.color === contextMenuCode.value.color)
         ) {
             showEditModal.value = false
             return
         }
-        body = {
+        patch = {
             code: editCode.value.code,
             color: editCode.value.color,
         }
     } else if (editCode.value.group) {
         if (
             editCode.value.code === '' ||
-            editCode.value.code === contextMenuCode.value.code
+            (contextMenuCode.value !== 'root' && editCode.value.code === contextMenuCode.value?.code)
         ) {
             showEditModal.value = false
             return
         }
-        body = {
+        patch = {
             code: editCode.value.code,
         }
     }
     const { error } = await supabase
         .from('codes')
-        .update(body)
+        .update(patch)
         .eq('id', editCode.value.id)
     if (error) {
         console.error('Error updating code:', error)
     } else {
-        const index = codes.value.findIndex((c) => c.id === editCode.value.id)
-        codes.value[index] = {
-            ...codes.value[index],
-            ...body,
+        if (codes.value) {
+            const index = codes.value.findIndex((c) => c.id === editCode.value.id)
+            codes.value[index] = {
+                ...codes.value[index],
+                ...patch,
+            }
         }
         showEditModal.value = false
         emit('updateHighlights')
@@ -254,6 +270,8 @@ async function handleEditSubmit() {
 }
 
 async function handleDeleteSubmit() {
+    if (!contextMenuCode.value || contextMenuCode.value === 'root') return
+
     if (contextMenuCode.value.group) {
         if (contextMenuCode.value.children.length > 0) {
             alert('The group must be empty first before deleting')
@@ -261,7 +279,8 @@ async function handleDeleteSubmit() {
             return
         }
     }
-    const { data, error } = await supabase
+
+    const { error } = await supabase
         .from('codes')
         .delete()
         .eq('id', contextMenuCode.value.id)
@@ -269,27 +288,33 @@ async function handleDeleteSubmit() {
     if (error) {
         console.error('Error deleting code:', error)
     } else {
-        codes.value = codes.value.filter(
-            (c) => c.id !== contextMenuCode.value.id
+        codes.value = codes.value?.filter(
+            (c) => {
+                if (contextMenuCode.value !== 'root'){
+                    return c.id !== contextMenuCode.value?.id
+                } else {
+                    return c
+                }
+            }
         )
         showDeleteModal.value = false
         emit('updateHighlights')
     }
 }
 
-function handleSelected(item) {
+function handleSelected(item: ParsedCode) {
     if (!item.group) {
         selectedCode.value = item
         emit('codeSelected')
     }
 }
 
-function handleDrop({ items, target }) {
+function handleDrop({ items, target }: { items: ParsedCode[]; target: ParsedCode | 'root'}) {
     if (items.length === 0) {
         return
     }
 
-    if (items && (target.group || target === 'root')) {
+    if (items && (target === 'root' || target.group)) {
         updateCodeLocation(items, target)
     }
 }
@@ -301,10 +326,10 @@ function handleDrop({ items, target }) {
             'flex flex-col items-stretch overflow-x-hidden border-main border-y-3 border-r-3 rounded-tr-lg rounded-br-lg',
             {
                 'editor-theme-light':
-                    configStore.config.editorTheme === 'light',
-                'editor-theme-dark': configStore.config.editorTheme === 'dark',
+                    configStore.config.editor_theme === 'light',
+                'editor-theme-dark': configStore.config.editor_theme === 'dark',
                 'editor-theme-theme':
-                    configStore.config.editorTheme === 'theme',
+                    configStore.config.editor_theme === 'theme',
                 'rounded-tl-lg rounded-bl-lg rounded-tr-none rounded-br-none border-r-none border-l-3':
                     onLeft,
                 'rounded-tl-none': squareTop,
@@ -318,44 +343,47 @@ function handleDrop({ items, target }) {
             autocomplete="off"
             class="mx-2 mt-2 mb-0 p-1"
             placeholder="filter codes..."
-        />
+        >
         <div class="flex items-center justify-center gap-2">
             <button
                 class="text-sm p-2"
-                @click="() => 
-                    draggableItem.forEach((item) => {
-                        item.open()
-                    })
+                @click="
+                    () =>
+                        draggableItem.forEach((item) => {
+                            item.open()
+                        })
                 "
             >
                 <Icon name="fa6-solid:up-right-and-down-left-from-center" />
             </button>
             <button
                 class="text-sm p-2"
-                @click="() => 
-                    draggableItem.forEach((item) => {
-                        item.close()
-                    })"
+                @click="
+                    () =>
+                        draggableItem.forEach((item) => {
+                            item.close()
+                        })
+                "
             >
                 <Icon name="fa6-solid:down-left-and-up-right-to-center" />
             </button>
         </div>
-        <div class="flex grow" v-if="parsedCodes.length > 0">
+        <div v-if="parsedCodes.length > 0" class="flex grow">
             <DraggableContainer
-                @onDrop="handleDrop"
-                @onContextMenu="openContextMenu"
+                @on-drop="handleDrop"
+                @on-context-menu="openContextMenu"
             >
                 <DraggableItem
                     v-for="c in filterCodes(parsedCodes)"
                     :key="c.id"
-                    :item="c"
                     ref="draggableItem"
+                    :item="c"
                     :children="c.children ? c.children : []"
                     :depth="0"
                     :selected-style="() => 'border'"
-                    @onDrop="handleDrop"
+                    @on-drop="handleDrop"
                     @selected="handleSelected"
-                    @onContextMenu="openContextMenu"
+                    @on-context-menu="openContextMenu"
                 >
                     <template #default="{ item, isOpen }">
                         <CodebookCodesPanelItem
@@ -400,8 +428,8 @@ function handleDrop({ items, target }) {
             <div class="font-mono text-main text-left">code name</div>
             <textarea
                 id="new-code-name"
-                class="resize-y"
                 v-model="newCode.name"
+                class="resize-y"
                 rows="4"
                 placeholder="enter code..."
             />
@@ -415,8 +443,8 @@ function handleDrop({ items, target }) {
                     @click="
                         () => {
                             showNewCodeModal = false
-                            newCode.name = null
-                            newCode.color = null
+                            newCode.name = ''
+                            newCode.color = ''
                         }
                     "
                 >
@@ -441,14 +469,14 @@ function handleDrop({ items, target }) {
                 type="text"
                 autocomplete="off"
                 placeholder="enter group name..."
-            />
+            >
             <div class="grid grid-cols-2 gap-4">
                 <button
                     class="grow"
                     @click="
                         () => {
                             showNewCodeGroupModal = false
-                            newCodeGroupName = null
+                            newCodeGroupName = ''
                         }
                     "
                 >
@@ -467,25 +495,25 @@ function handleDrop({ items, target }) {
             @submit="handleEditSubmit"
         >
             <div
-                v-if="!contextMenuCode.group"
+                v-if="contextMenuCode !== 'root' && !contextMenuCode?.group"
                 class="font-mono text-main text-left"
             >
                 code name
             </div>
             <div
-                v-if="contextMenuCode.group"
+                v-if="contextMenuCode !== 'root' && contextMenuCode?.group"
                 class="font-mono text-main text-left"
             >
                 code group name
             </div>
             <textarea
                 id="edit-code-name"
-                class="resize-y"
                 v-model="editCode.code"
+                class="resize-y"
                 rows="4"
                 placeholder="enter code..."
             />
-            <div v-if="!contextMenuCode.group">
+            <div v-if="contextMenuCode !== 'root' && !contextMenuCode?.group">
                 <div class="font-mono text-main text-left">color</div>
                 <BaseColorPicker v-model:current-color="editCode.color" />
             </div>
@@ -513,8 +541,8 @@ function handleDrop({ items, target }) {
             <div class="font-mono text-main text-left">delete code</div>
             <div class="font-mono font-bold mb-4 text-error">
                 Are you sure you want to delete the
-                {{ contextMenuCode.group ? 'group' : 'code' }} "{{
-                    contextMenuCode.code
+                {{ contextMenuCode !== 'root' && contextMenuCode?.group ? 'group' : 'code' }} "{{
+                    contextMenuCode !== 'root' && contextMenuCode?.code ? contextMenuCode.code : ''
                 }}"? This will also remove your highlighted instances.
             </div>
             <div class="grid grid-cols-2 gap-4">

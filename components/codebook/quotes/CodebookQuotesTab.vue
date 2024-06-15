@@ -1,7 +1,9 @@
 <script setup lang="ts">
-const codes = defineModel('codes')
+import type { Tables } from '~/types/supabase'
 
-const props = defineProps({
+const codes = defineModel<Tables<'codes'>[]>('codes')
+
+defineProps({
     filesMap: {
         type: Object,
         default: () => {},

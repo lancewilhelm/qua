@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import tinycolor from 'tinycolor2'
 const configStore = useConfigStore()
 
@@ -73,9 +73,11 @@ function handleCodeTextColor() {
                 v-if="code.group && code.children.length > 0"
                 class="flex ml-2.5 items-center gap-2 grow justify-end"
             >
-                <div class="flex flex-row items-center gap-1">
+                <div
+                    v-if="configStore.config.code_group_children_circles"
+                    class="flex flex-row items-center gap-1"
+                >
                     <div
-                        v-if="configStore.config.code_group_children_circles"
                         v-for="c in getAllChildren(code).filter(
                             (c) => !c.group
                         )"

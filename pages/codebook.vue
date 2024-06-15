@@ -1,4 +1,8 @@
-<script setup>
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue'
+import type { Tables } from '~/types/supabase'
+import type { ParsedCode } from '~/types/types'
+
 definePageMeta({
     middleware: 'auth',
 })
@@ -6,46 +10,50 @@ definePageMeta({
 const supabase = useSupabaseClient()
 const projectStore = useProjectStore()
 const activeTab = ref('codes')
-const codes = ref([])
+const codes = ref<Tables<'codes'>[]>([])
 const filesMap = ref(new Map())
 const codesHeight = ref(0)
 const el = ref(null)
-const { width, height } = useElementSize(el)
+const { width } = useElementSize(el)
 
-// Fetch codes
-await supabase
-    .from('codes')
-    .select(
-        `
-        *,
-        code_instances (
-            *
-        )`
-    )
-    .eq('project_id', projectStore.currentProject.id)
-    .then((res) => {
-        codes.value = res.data
-    })
+// Fetch codes and files in onMounted lifecycle hook
+onMounted(async () => {
+    // Fetch codes
+    const { data: codesData } = await supabase
+        .from('codes')
+        .select(
+            `
+            *,
+            code_instances (
+                *
+            )`
+        )
+        .eq('project_id', projectStore.currentProject.id)
 
-// Get the files
-await supabase
-    .from('files')
-    .select('*')
-    .eq('project_id', projectStore.currentProject.id)
-    .then((res) => {
-        res.data.forEach((file) => {
+    codes.value = codesData as Tables<'codes'>[]
+
+    // Fetch files
+    const { data: filesData } = await supabase
+        .from('files')
+        .select('*')
+        .eq('project_id', projectStore.currentProject.id)
+
+    if (filesData) {
+        filesData.forEach((file: Tables<'files'>) => {
             if (!file.folder) {
                 filesMap.value.set(file.id.toString(), file)
             }
         })
-    })
+    }
+})
 
-const parsedCodes = computed(() => {
+// Compute parsed codes
+const parsedCodes = computed((): ParsedCode[] => {
     const codeMap = new Map()
-    const rootItems = []
+    const rootItems: ParsedCode[] = []
 
     codes.value.forEach((c) => {
-        const newCode = { ...c }
+        const newCode = { ...c } as ParsedCode
         if (newCode.group) {
             newCode.children = []
         }
@@ -64,14 +72,20 @@ const parsedCodes = computed(() => {
         }
     })
 
-    codesHeight.value = getCodesHeight(rootItems)
-    const sortedRootItems = rootItems.sort((a, b) => a.group === b.group ? 0 : a.group ? -1 : 1)
-    return sortedRootItems
+    return rootItems.sort((a, b) =>
+        a.group === b.group ? 0 : a.group ? -1 : 1
+    )
 })
 
-function getCodesHeight(codes) {
+// Watch parsedCodes for changes and update codesHeight
+watch(parsedCodes, (newParsedCodes) => {
+    codesHeight.value = getCodesHeight(newParsedCodes)
+})
+
+// Function to calculate codes height
+function getCodesHeight(codes: ParsedCode[]): number {
     let height = 0
-    for (let code of codes) {
+    for (const code of codes) {
         if (code.group) {
             const depth = getCodesHeight(code.children)
             if (depth > height) {
@@ -85,21 +99,32 @@ function getCodesHeight(codes) {
 
 <template>
     <div
-        :class="['flex flex-col h-full full-width', {
-            'no-scroll': activeTab === 'quotes',
-            scroll: activeTab === 'codes',
-        }]"
         ref="el"
+        :class="[
+            'flex flex-col h-full full-width',
+            {
+                'no-scroll': activeTab === 'quotes',
+                scroll: activeTab === 'codes',
+            },
+        ]"
     >
-        <div class="flex px-2.5 text-base font-mono bg-main text-sub-alt rounded-tl-lg rounded-tr-lg border-b-1 border-bg">
+        <div
+            class="flex px-2.5 text-base font-mono bg-main text-sub-alt rounded-tl-lg rounded-tr-lg border-b-1 border-bg"
+        >
             <div
-                :class="['py-1 px-2 cursor-pointer transition-all duration-300 hover:bg-sub', { 'bg-sub': activeTab === 'codes' }]"
+                :class="[
+                    'py-1 px-2 cursor-pointer transition-all duration-300 hover:bg-sub',
+                    { 'bg-sub': activeTab === 'codes' },
+                ]"
                 @click="activeTab = 'codes'"
             >
                 Codes
             </div>
             <div
-                :class="['py-1 px-2 cursor-pointer transition-all duration-300 hover:bg-sub', { 'bg-sub': activeTab === 'quotes' }]"
+                :class="[
+                    'py-1 px-2 cursor-pointer transition-all duration-300 hover:bg-sub',
+                    { 'bg-sub': activeTab === 'quotes' },
+                ]"
                 @click="activeTab = 'quotes'"
             >
                 Quotes

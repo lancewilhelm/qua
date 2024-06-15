@@ -8,9 +8,11 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "start": "node .output/server/index.mjs"
+    "start": "node .output/server/index.mjs",
+    "update-types": "npx supabase gen types typescript --project-id \"$PROJECT_REF\" > types/supabase.ts"
   },
   "dependencies": {
+    "@nuxt/eslint": "^0.3.13",
     "@supabase/gotrue-js": "^2.62.2",
     "@vueuse/nuxt": "^10.10.0",
     "nuxt": "^3.11.2",
@@ -24,6 +26,9 @@
     "@nuxtjs/supabase": "^1.2.2",
     "@nuxtjs/tailwindcss": "^6.12.0",
     "@pinia/nuxt": "^0.5.1",
-    "nuxt-icon": "^0.6.10"
+    "@types/tinycolor2": "^1.4.6",
+    "nuxt-icon": "^0.6.10",
+    "typescript": "^5.4.5",
+    "vue-tsc": "^1.8.27"
   }
 }

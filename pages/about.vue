@@ -1,3 +1,6 @@
+<script setup lang="ts">
+</script>
+
 <template>
   <div class="grid gap-4 narrow-width scroll">
     <div class="text-2xl font-mono text-main font-black">
@@ -50,9 +53,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-</script>
 
 <style scoped>
 #title {

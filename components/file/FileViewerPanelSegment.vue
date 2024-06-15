@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import tinycolor from 'tinycolor2'
 
 const clickedSegment = defineModel('clickedSegment')
@@ -25,9 +25,9 @@ function handleClick(e) {
     }
 }
 
-const isSelected = computed(() => {
-    return props.segment.key === clickedSegment.value?.key
-})
+// const isSelected = computed(() => {
+//     return props.segment.key === clickedSegment.value?.key
+// })
 </script>
 <template>
     <span

@@ -1,4 +1,4 @@
-export default function (theme: String) {
+export default function (theme: string) {
     const headScript = document.querySelector('#currentTheme')
     const link = document.createElement('link')
     link.type = 'text/css'

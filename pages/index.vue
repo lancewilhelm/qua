@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import type { Provider } from '@supabase/gotrue-js';
+import type { Database } from '~/types/supabase'
+
 definePageMeta({
     middleware: 'index-redirect',
 })
 
-const supabase = useSupabaseClient()
-const configStore = useConfigStore()
-const registerDisplayname = ref('')
+const supabase = useSupabaseClient<Database>()
 const registerEmail = ref('')
 const registerVerifyEmail = ref('')
 const registerPassword = ref('')
@@ -15,11 +16,14 @@ const loginPassword = ref('')
 
 const redirectTo = `${useRuntimeConfig().public.baseUrl}/confirm`
 
-const signInWithOAuth = async (provider: any) => {
+const signInWithOAuth = async (provider: string) => {
     const { error } = await supabase.auth.signInWithOAuth({
-        provider: provider,
+        provider: provider as Provider,
         options: { redirectTo },
     })
+    if (error) {
+        alert('Error signing in')
+    }
 }
 
 const handleRegister = async () => {
@@ -62,40 +66,40 @@ const signInWithPassword = async () => {
             <form class="grid" @submit.prevent="handleRegister">
                 <input
                     id="registerEmail"
-                    autocomplete="off"
                     v-model="registerEmail"
+                    autocomplete="off"
                     type="email"
                     placeholder="email"
                     class="emailInput"
                     required
-                />
+                >
                 <input
                     id="registerVerifyEmail"
-                    autocomplete="off"
                     v-model="registerVerifyEmail"
+                    autocomplete="off"
                     type="email"
                     placeholder="verify email"
                     class="verifyEmailInput"
                     required
-                />
+                >
                 <input
                     id="password"
-                    autocomplete="off"
                     v-model="registerPassword"
+                    autocomplete="off"
                     type="password"
                     placeholder="password"
                     class="passwordInput"
                     required
-                />
+                >
                 <input
                     id="registerVerifyPassword"
-                    autocomplete="off"
                     v-model="registerVerifyPassword"
+                    autocomplete="off"
                     type="password"
                     placeholder="verify password"
                     class="verifyPasswordInput"
                     required
-                />
+                >
                 <button type="submit">
                     <Icon name="fa6-solid:user-plus" class="icon" /> Sign Up
                 </button>
@@ -111,16 +115,16 @@ const signInWithPassword = async () => {
                     placeholder="email"
                     class="emailInput"
                     required
-                />
+                >
                 <input
                     id="loginPassword"
-                    autocomplete="off"
                     v-model="loginPassword"
+                    autocomplete="off"
                     type="password"
                     placeholder="password"
                     class="passwordInput"
                     required
-                />
+                >
                 <button>
                     <Icon name="fa6-solid:right-to-bracket" class="icon" /> Sign
                     In

@@ -1,25 +1,24 @@
-<script setup>
+<script setup lang="ts">
+import type { Tables, Database } from '~/types/supabase';
+
 definePageMeta({
     middleware: 'auth',
 })
 
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 const projectStore = useProjectStore()
 const showNewProjectModal = ref(false)
 const showEditProjModal = ref(false)
 const showDeleteProjModal = ref(false)
 const deleteConfirmInput = ref('')
-const newProj = ref({
-    name: '',
-    description: '',
-    tags: [],
-})
-const editProj = ref({})
-const deleteProj = ref({})
+const newProj = ref<Tables<'projects'>>()
+const editProj = ref({} as Tables<'projects'>)
+const deleteProj = ref({} as Tables<'projects'>)
 
 // Fetch projects
 const { data: projects } = await useAsyncData('projects', async () => {
+    if (!user.value) return []
     const { data } = await supabase
         .from('projects')
         .select('*')
@@ -28,7 +27,7 @@ const { data: projects } = await useAsyncData('projects', async () => {
     return data
 })
 
-function openProject(project) {
+function openProject(project: Tables<'projects'>) {
     projectStore.setCurrentProject(project)
 }
 
@@ -37,7 +36,7 @@ function toggleNewProjectModal() {
 }
 
 async function createNewProject() {
-    if (newProj.value.name === '') return
+    if (!newProj.value || newProj.value.name === '' || !user.value) return
     const { data, error } = await supabase
         .from('projects')
         .insert({
@@ -52,42 +51,34 @@ async function createNewProject() {
     if (error) {
         console.error(error)
     } else {
-        projects.value.push(data)
+        projects.value ? projects.value.push(data) : (projects.value = [data])
     }
     showNewProjectModal.value = false
-    newProj.value = {
-        name: '',
-        description: '',
-        tags: [],
-    }
+    newProj.value = undefined
 }
 
-function openEditProjectModal(project) {
+function openEditProjectModal(project: Tables<'projects'>) {
     editProj.value = JSON.parse(JSON.stringify(project))
     showEditProjModal.value = true
 }
 
 function closeEditProjectModal() {
-    editProj.value = {}
+    editProj.value = {} as Tables<'projects'>
     showEditProjModal.value = false
 }
 
 function closeNewProjectModal() {
-    newProj.value = {
-        name: '',
-        description: '',
-        tags: [],
-    }
+    newProj.value = undefined
     showNewProjectModal.value = false
 }
 
-function openDeleteProject(project) {
+function openDeleteProject(project: Tables<'projects'>) {
     deleteProj.value = project
     showDeleteProjModal.value = !showDeleteProjModal.value
 }
 
 function closeDeleteProject() {
-    deleteProj.value = {}
+    deleteProj.value = {} as Tables<'projects'>
     deleteConfirmInput.value = ''
     showDeleteProjModal.value = false
 }
@@ -103,18 +94,18 @@ async function updateProject() {
         .eq('id', editProj.value.id)
     if (error) console.error(error)
 
-    projects.value = projects.value.map((p) => {
+    projects.value = projects.value ? projects.value.map((p) => {
         if (p.id === editProj.value.id) {
             return editProj.value
         }
         return p
-    })
+    }) : [editProj.value]
 
     if (projectStore.currentProject.id === editProj.value.id) {
         projectStore.setCurrentProject(editProj.value)
     }
     showEditProjModal.value = false
-    editProj.value = {}
+    editProj.value = {} as Tables<'projects'>
 }
 
 async function deleteProject() {
@@ -122,8 +113,9 @@ async function deleteProject() {
         .from('projects')
         .delete()
         .eq('id', deleteProj.value.id)
+    if (error) console.error(error)
 
-    projects.value = projects.value.filter((p) => p.id !== deleteProj.value.id)
+    projects.value = projects.value ? projects.value.filter((p) => p.id !== deleteProj.value.id) : []
     deleteConfirmInput.value = ''
     showDeleteProjModal.value = false
 }
@@ -132,7 +124,7 @@ async function deleteProject() {
 <template>
     <div class="grid grid-rows-grid text-center justify-center items-center justify-items-center full-width scroll">
         <div class="font-mono font-bold text-3xl">Projects</div>
-        <div v-if="projects?.length > 0" class="flex flex-row flex-wrap justify-center">
+        <div v-if="projects && projects.length > 0" class="flex flex-row flex-wrap justify-center">
             <ProjectCard
                 v-for="project of projects"
                 :key="project.id"
@@ -164,7 +156,7 @@ async function deleteProject() {
                     type="text"
                     autocomplete="off"
                     placeholder="project name"
-                />
+                >
                 <button
                     v-if="deleteConfirmInput === deleteProj.name"
                     class="bg-error text-bg border-none py-2 px-4 cursor-pointer ml-4"
@@ -186,6 +178,7 @@ async function deleteProject() {
         <ProjectModal
             v-model:project="newProj"
             v-model:show-modal="showNewProjectModal"
+            :new-project="true"
             @submit="createNewProject"
             @close="closeNewProjectModal"
         />

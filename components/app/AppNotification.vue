@@ -52,16 +52,16 @@ onUnmounted(() => {
         <div class="flex flex-row p-2 gap-2 items-center">
             <div class="flex text-xl">
                 <Icon
-                    name="fa6-solid:circle-info"
                     v-if="notification.type === 'info'"
+                    name="fa6-solid:circle-info"
                 />
                 <Icon
-                    name="fa6-solid:triangle-exclamation"
                     v-if="notification.type === 'warning'"
+                    name="fa6-solid:triangle-exclamation"
                 />
                 <Icon
-                    name="fa6-solid:circle-check"
                     v-if="notification.type === 'success'"
+                    name="fa6-solid:circle-check"
                 />
             </div>
             <div>
@@ -84,6 +84,6 @@ onUnmounted(() => {
                 },
             ]"
             :style="{ width: width }"
-        ></div>
+        />
     </div>
 </template>

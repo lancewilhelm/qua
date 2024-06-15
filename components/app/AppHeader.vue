@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const projectStore = useProjectStore()
-const notificationStore = useNotificationStore()
 const supabase = useSupabaseClient()
 const session = useSupabaseSession()
 
@@ -22,8 +21,8 @@ const logout = async () => {
         <nav class="flex grow">
             <div class="flex h-14 flex-row items-center m-2">
                 <AppHeaderNavButton
-                    class="nav-button"
                     v-if="loggedIn"
+                    class="nav-button"
                     route="/projects"
                     icon="fa6-solid:rectangle-list"
                     tooltip="projects"
@@ -62,25 +61,25 @@ const logout = async () => {
                     tooltip="about"
                 />
                 <AppHeaderNavButton
-                    class="nav-button"
                     v-if="loggedIn"
+                    class="nav-button"
                     route="/settings"
                     icon="fa6-solid:gear"
                     tooltip="settings"
                 />
                 <AppHeaderNavButton
-                    class="nav-button"
                     v-if="!loggedIn"
+                    class="nav-button"
                     route="/"
                     icon="fa6-solid:right-to-bracket"
                     tooltip="login"
                 />
                 <AppHeaderNavButton
-                    class="nav-button"
                     v-if="loggedIn"
-                    @click="logout"
+                    class="nav-button"
                     icon="fa6-solid:right-from-bracket"
                     tooltip="logout"
+                    @click="logout"
                 />
             </div>
         </nav>

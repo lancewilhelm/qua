@@ -1,43 +1,62 @@
-<script setup>
+<script setup lang="ts">
 import tinycolor from 'tinycolor2'
+import type { Database, Tables } from '~/types/supabase'
+import type { ParsedCode, CodesWithInstances } from '~/types/types'
 
-const codes = defineModel('codes')
-const currentFile = defineModel('currentFile')
-const triggerUpdateHighlights = defineModel('triggerUpdateHighlights')
-const triggerCodeSelected = defineModel('triggerCodeSelected')
-const codePanelSelectedCode = defineModel('selectedCode')
+type SegmentCode = {
+    code_id: number
+    instance_id: number
+    project_id: number
+    code: string
+    color: string
+    start_offset: number
+    end_offset: number
+    created_by: number
+    data: string
+    memo: string
+    importance: number
+}
 
-const supabase = useSupabaseClient()
+type Segment = {
+    start: number
+    end: number
+    data: string
+    codes: SegmentCode[]
+    key: number
+}
+
+const codes = defineModel<CodesWithInstances>('codes')
+const currentFile = defineModel<Tables<'files'>>('currentFile')
+const triggerUpdateHighlights = defineModel<boolean>('triggerUpdateHighlights')
+const triggerCodeSelected = defineModel<boolean>('triggerCodeSelected')
+const codePanelSelectedCode = defineModel<ParsedCode>('selectedCode')
+
+const supabase = useSupabaseClient<Database>()
 const projectStore = useProjectStore()
 const configStore = useConfigStore()
 const editorSegments = ref([])
-const newCode = ref({
-    code: '',
-    color: '',
-    memo: '',
-    importance: null,
-})
-const editCode = ref({})
+const newCode = ref<Partial<Database['public']['Functions']['add_code_instance']['Args']>>()
+const editCode = ref<Partial<Database['public']['Functions']['add_code_instance']['Args']>>()
 const codeModalText = ref('')
 const editorRightClickContext = ref('')
-const selectedSegment = ref(null)
-const selectedCode = ref(null)
+const selectedSegment = ref<Segment>()
+const selectedCode = ref()
 const showSecondMenu = ref(false)
-const editorSelection = ref({})
+const editorSelection = ref<{ text: string | null; range: Range | null}>({ text: null, range: null })
 const showNewCodeModal = ref(false)
 const showEditSegmentModal = ref(false)
 const showContextMenu = ref(false)
 const showSelectionPopup = ref(false)
-const selectionPopupPosition = ref({ top: 0, left: 0 })
-const contextMenuEvent = ref(null)
-const expanderMenuEvent = ref(null)
+const selectionPopupPosition = ref({ top: '0px', left: '0px' })
+const contextMenuEvent = ref<MouseEvent>()
+const expanderMenuEvent = ref<MouseEvent>()
 const selectionExists = ref(false)
 const selectionPopupRef = ref(null)
-const clickedSegment = ref(null)
+const clickedSegment = ref<Segment>()
 
-useEventListener(window, 'mouseup', (e) => {
+useEventListener(window, 'mouseup', () => {
     const selection = window.getSelection()
-    if (selection.toString().length > 0 && !selectionExists.value) {
+    if (selection && selection.toString().length > 0 && !selectionExists.value) {
         const boundingRect = selection.getRangeAt(0).getBoundingClientRect()
         selectionPopupPosition.value = {
             top: boundingRect.y - 50 + 'px',
@@ -51,12 +70,14 @@ useEventListener(window, 'mouseup', (e) => {
 })
 
 useEventListener(window, 'mousedown', (e) => {
-    if (
-        showSelectionPopup.value &&
-        e.target.id !== 'add-code-button' &&
-        e.target.id !== 'llm-code-button'
-    ) {
-        showSelectionPopup.value = false
+    const target = e.target;
+    if (showSelectionPopup.value && target instanceof HTMLElement) {
+        if (
+            target.id !== 'add-code-button' &&
+            target.id !== 'llm-code-button'
+        ) {
+            showSelectionPopup.value = false
+        }
     }
 })
 
@@ -80,19 +101,39 @@ watch(triggerCodeSelected, (newVal) => {
 })
 
 function prepAndAddCode() {
-    if (window.getSelection().toString().length > 0) {
-        const selection = window.getSelection()
+    const selection = window.getSelection();
+    if (!selection || !editorSelection.value) return;
+    if (selection.toString().length > 0) {
+        const anchorNodeParent = selection.anchorNode?.parentElement;
+        const focusNodeParent = selection.focusNode?.parentElement;
+
         if (
-            selection.baseNode.parentElement.className === 'editor-segment' &&
-            selection.extentNode.parentElement.className === 'editor-segment'
+            anchorNodeParent && anchorNodeParent.className === 'editor-segment' &&
+            focusNodeParent && focusNodeParent.className === 'editor-segment'
         ) {
-            editorSelection.value.text = selection.toString()
-            editorSelection.value.range = selection.getRangeAt(0)
-            newCode.value = { ...codePanelSelectedCode.value, memo: '', importance: null }
-            addCodeInstance()
+            editorSelection.value.text = selection.toString();
+            const range = selection.getRangeAt(0);
+            if (range) {
+                editorSelection.value.range = range;
+                if (codePanelSelectedCode.value && currentFile.value) {
+                    newCode.value = {
+                        new_code: codePanelSelectedCode.value.code as string,
+                        file_id: currentFile.value.id,
+                        data: selection.toString(),
+                        start_offset: calculateOffset(range.startContainer, range.startOffset),
+                        end_offset: calculateOffset(range.endContainer, range.endOffset),
+                        project_id: projectStore.currentProject.id,
+                        color: codePanelSelectedCode.value.color as string,
+                        memo: '',
+                    };
+                    addCodeInstance();
+                }
+            }
         }
     }
 }
+
+
 
 function openEditSegmentModal() {
     showEditSegmentModal.value = true
@@ -101,13 +142,13 @@ function openEditSegmentModal() {
 }
 
 async function handleEditCodeSubmit() {
-    if (editCode.value.code.trim() === '') {
+    if (editCode.value?.new_code?.trim() === '') {
         return
     }
 
     let updatedCodes
 
-    if (editCode.value.code !== selectedCode.value.code) {
+    if (editCode.value?.new_code?.trim() !== selectedCode.value.code) {
         // Delete old instance first
         const { error: deleteError } = await supabase
             .from('code_instances')
@@ -117,7 +158,7 @@ async function handleEditCodeSubmit() {
             console.error(deleteError)
             return
         } else {
-            updatedCodes = codes.value.map((c) => {
+            updatedCodes = codes.value?.map((c) => {
                 if (c.id === selectedCode.value.code_id) {
                     return {
                         ...c,
@@ -135,13 +176,13 @@ async function handleEditCodeSubmit() {
             color:
                 '#' +
                 ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, '0'),
-            data: editCode.value.data,
-            end_offset: selectedSegment.value.end,
-            file_id: currentFile.value.id,
-            new_code: editCode.value.code.trim(),
+            data: editCode.value?.data,
+            end_offset: selectedSegment.value?.end,
+            file_id: currentFile.value?.id,
+            new_code: editCode.value?.new_code?.trim(),
             parent: null,
             project_id: projectStore.currentProject.id,
-            start_offset: selectedSegment.value.start,
+            start_offset: selectedSegment.value?.start,
         })
         if (error) {
             console.error(error)
@@ -418,18 +459,18 @@ function handleEditorKeydown(event) {
     }
 }
 
-function getAllChildren(code) {
-    let children = []
-    if (code.group && code.children.length > 0) {
-        for (const c of code.children) {
-            children.push(c)
-            if (c.group) {
-                children = children.concat(getAllChildren(c))
-            }
-        }
-    }
-    return children
-}
+// function getAllChildren(code) {
+//     let children = []
+//     if (code.group && code.children.length > 0) {
+//         for (const c of code.children) {
+//             children.push(c)
+//             if (c.group) {
+//                 children = children.concat(getAllChildren(c))
+//             }
+//         }
+//     }
+//     return children
+// }
 
 function processSegments(args = codes.value) {
     if (!currentFile.value.data) return
@@ -563,9 +604,9 @@ function handleCodeClick(event, segment) {
                 <FileViewerPanelSegment
                     v-for="segment in editorSegments"
                     :key="segment.key"
+                    v-model:clicked-segment="clickedSegment"
                     class="editor-segment"
                     :segment="segment"
-                    v-model:clicked-segment="clickedSegment"
                     @code-click="handleCodeClick"
                     @context-menu="openContextMenu"
                 />
@@ -665,6 +706,7 @@ function handleCodeClick(event, segment) {
             <div class="flex gap-2 mb-2">
                 <button
                     v-for="i in 5"
+                    :key="i"
                     :class="[{ 'bg-main text-bg': newCode.importance === i }]"
                     @click="
                         newCode.importance === i
@@ -716,6 +758,7 @@ function handleCodeClick(event, segment) {
             <div class="flex gap-2 mb-2">
                 <button
                     v-for="i in 5"
+                    :key="i"
                     :class="[{ 'bg-main text-bg': editCode.importance === i }]"
                     @click="
                         editCode.importance === i

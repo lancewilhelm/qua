@@ -1,5 +1,7 @@
-<script setup>
-const supabase = useSupabaseClient()
+<script setup lang="ts">
+import type { Database } from '~/types/supabase'
+
+const supabase = useSupabaseClient<Database>()
 const currentFile = defineModel('currentFile')
 const configStore = useConfigStore()
 const notificationStore = useNotificationStore()
@@ -53,6 +55,7 @@ function debounce(f, delay) {
 <template>
     <div
         v-if="currentFile"
+        ref="notesContentRef"
         :class="[
             'self-start p-2 w-full h-full flex items-center justify-start whitespace-pre-wrap text-base font-mono border-main border-y-3 outline-0 outline-transparent',
             {
@@ -63,12 +66,12 @@ function debounce(f, delay) {
                     configStore.config.editor_theme === 'theme',
             },
         ]"
-        ref="notesContentRef"
         contenteditable="true"
     >
         {{ notes }}
     </div>
-    <div v-else :class="[
+    <div
+v-else :class="[
             'self-start p-2 w-full h-full flex items-center justify-start whitespace-pre-wrap text-base font-mono border-main border-y-3 outline-0 outline-transparent',
             {
                 'editor-theme-light':

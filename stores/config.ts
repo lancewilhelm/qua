@@ -1,21 +1,17 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
-
-interface Config {
-    theme?: string
-    [key: string]: any
-}
+import type { Database, Tables } from '../types/supabase'
 
 export const useConfigStore = defineStore('config', () => {
-    const supabase = useSupabaseClient()
+    const supabase = useSupabaseClient<Database>()
     const user = useSupabaseUser()
-    const config = useStorage('config', {} as Config)
+    const config = useStorage('config', {} as Tables<'configs'>)
 
-    function setConfig(c: Config) {
+    function setConfig(c: Tables<'configs'>) {
         Object.assign(config.value, c)
     }
 
-    async function patchConfig(patch: Partial<Config>) {
+    async function patchConfig(patch: Partial<Tables<'configs'>>) {
         Object.assign(config.value, patch)
         if (!user.value) return null
         const { error } = await supabase

@@ -1,22 +1,25 @@
-<script setup>
+<script setup lang="ts">
+import type { Database, Tables } from '~/types/supabase'
+import type { ParsedCode, CodesWithInstances } from '~/types/types';
+
 definePageMeta({
     middleware: 'auth',
 })
 
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient<Database>()
 const configStore = useConfigStore()
 const projectStore = useProjectStore()
-const currentFile = ref({})
-const files = ref([])
-const codes = ref([])
+const currentFile = ref<Tables<'files'>>({} as Tables<'files'>)
+const files = ref<Tables<'files'>[]>([])
+const codes = ref<CodesWithInstances>()
 const filePanelWidth = ref(configStore.config.editor_file_panel_width)
 const codePanelWidth = ref(configStore.config.editor_code_panel_width)
 const triggerUpdateHighlights = ref(false)
 const triggerCodeSelected = ref(false)
-const selectedCode = ref({})
+const selectedCode = ref<ParsedCode>()
 
 // Fetch codes
-await supabase
+const codesWithInstances = supabase
     .from('codes')
     .select(
         `
@@ -26,9 +29,14 @@ await supabase
         )`
     )
     .eq('project_id', projectStore.currentProject.id)
-    .then((res) => {
-        codes.value = res.data
-    })
+
+const { data, error } = await codesWithInstances
+if (error) {
+    console.error(error)
+} else {
+    codes.value = data
+    console.log(data)
+}
 </script>
 
 <template>
@@ -66,6 +74,8 @@ await supabase
             v-model:codes="codes"
             v-model:selected-code="selectedCode"
             :width="codePanelWidth"
+            :on-left="false"
+            :square-top="false"
             @update-highlights="triggerUpdateHighlights = true"
             @code-selected="triggerCodeSelected = true"
         />

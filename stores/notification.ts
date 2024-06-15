@@ -1,14 +1,21 @@
 import { defineStore } from 'pinia'
-import { useStorage } from '@vueuse/core'
+
+// notification type definition
+interface Notification {
+    id: number;
+    type: 'success' | 'warning' | 'info';
+    message: string;
+    length?: number;
+}
 
 export const useNotificationStore = defineStore('notification', () => {
-    const notificationQueue = ref([])
+    const notificationQueue = ref<Notification[]>([])
     const nextIndex = ref(0)
 
-    function addNotification(notification: Object) {
-        const n = { ...notification, id: nextIndex.value }
-        notificationQueue.value.push(n)
-        nextIndex.value++
+    function addNotification(notification: Partial<Notification>) {
+        const n = { ...notification, id: nextIndex.value } as Notification;
+        notificationQueue.value.push(n);
+        nextIndex.value++;
     }
 
     function removeNotification(index: number) {

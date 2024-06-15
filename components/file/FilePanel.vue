@@ -1,16 +1,15 @@
-<script setup>
-const files = defineModel('files')
+<script setup lang="ts">
+import type { Database, Tables } from '~/types/supabase'
 
-const currentFile = defineModel('currentFile')
+const files = defineModel<Tables<'files'>[]>('files')
 
-const props = defineProps({
-    width: {
-        type: Number,
-        default: 275,
-    },
-})
+const currentFile = defineModel<Tables<'files'>>('currentFile')
 
-const supabase = useSupabaseClient()
+defineProps<{
+    width: number | null
+}>()
+
+const supabase = useSupabaseClient<Database>()
 const projectStore = useProjectStore()
 const showDeleteModal = ref(false)
 const showRenameModal = ref(false)
@@ -308,7 +307,7 @@ function handleSelected(item) {
                 class="hidden"
                 accept=".txt"
                 @change="handleFileUpload"
-            />
+            >
             <button for="file"
                 ><Icon name="fa6-solid:cloud-arrow-up"
             /></button>
@@ -328,8 +327,8 @@ function handleSelected(item) {
         </div>
         <div v-if="parsedFiles?.length > 0" class="flex grow">
             <DraggableContainer
-                @onDrop="handleDrop"
-                @onContextMenu="openContextMenu"
+                @on-drop="handleDrop"
+                @on-context-menu="openContextMenu"
             >
                 <DraggableItem
                     v-for="file in parsedFiles"
@@ -339,9 +338,9 @@ function handleSelected(item) {
                     :children="file.children ? file.children : []"
                     :depth="0"
                     :selected-style="() => 'border'"
-                    @onDrop="handleDrop"
+                    @on-drop="handleDrop"
                     @selected="handleSelected"
-                    @onContextMenu="openContextMenu"
+                    @on-context-menu="openContextMenu"
                 >
                     <template #default="{ item, isOpen }">
                         <FilePanelItem :file="item" :is-open="isOpen" :current-file="currentFile"/>
@@ -408,7 +407,7 @@ function handleSelected(item) {
                 autocomplete="off"
                 placeholder="filename"
                 name="filename"
-            />
+            >
             <div class="grid grid-cols-2 gap-4">
                 <button class="grow" @click="closeRenameModal">
                     cancel

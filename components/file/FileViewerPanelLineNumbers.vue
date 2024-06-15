@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const configStore = useConfigStore()
 const elementHeight = ref(0);
 const lineHeight = ref('');
@@ -6,7 +6,7 @@ const lines = ref(0);
 
 const computeLines = () => {
     if (!document.getElementById('editor-content')) return;
-    const element = document.getElementById('editor-content')
+    const element = document.getElementById('editor-content') as Element;
     const computedStyle = window.getComputedStyle(element)
     elementHeight.value = element.clientHeight
     if (elementHeight.value === 0) {
@@ -15,11 +15,11 @@ const computeLines = () => {
     lineHeight.value = computedStyle.lineHeight
     lines.value = Math.floor(
         (elementHeight.value + 10) /
-        Math.max(Number(lineHeight.value.slice(0, -2)), configStore.config.code_line_height)
+        Math.max(Number(lineHeight.value.slice(0, -2)), configStore.config.code_line_height ?? 0)
     ) - 1
 };
 
-let resizeObserver;
+let resizeObserver: ResizeObserver;
 
 onMounted(() => {
     const element = document.getElementById('editor-content');

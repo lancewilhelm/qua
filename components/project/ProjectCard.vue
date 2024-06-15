@@ -1,6 +1,11 @@
-<script setup>
+<script setup lang="ts">
+import type { Tables } from '~/types/supabase'
+
 const props = defineProps({
-    project: Object,
+    project: {
+        type: Object as PropType<Tables<'projects'>>,
+        required: true,
+    }
 })
 
 const emit = defineEmits([
@@ -22,7 +27,7 @@ function openProject() {
     emit('open-project', props.project)
 }
 
-function toggleEditProjectModal(event) {
+function toggleEditProjectModal() {
     emit('toggle-edit-project-modal', props.project)
 }
 
@@ -51,20 +56,26 @@ function deleteProject() {
                 {{ project.description }}
             </div>
             <div
-                v-if="project.tags.length"
+                v-if="project.tags?.length"
                 class="flex flex-row flex-wrap justify-center mt-2"
             >
                 <span
                     v-for="tag in project.tags"
                     :key="tag"
-                    :class="['bg-main text-sub rounded-lg py-1 px-2 m-1 text-sm font-bold', { '!bg-bg !text-main': isActive }]"
+                    :class="[
+                        'bg-main text-sub rounded-lg py-1 px-2 m-1 text-sm font-bold',
+                        { '!bg-bg !text-main': isActive },
+                    ]"
                     >{{ tag }}</span
                 >
             </div>
         </div>
         <div class="flex flex-col text-xl">
             <span
-                :class="['py-2 cursor pointer hover:text-main active:text-bg', { 'hover:!text-sub': isActive }]"
+                :class="[
+                    'py-2 cursor pointer hover:text-main active:text-bg',
+                    { 'hover:!text-sub': isActive },
+                ]"
                 @click.stop="toggleEditProjectModal"
             >
                 <Icon name="fa6-solid:pencil" />

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const emit = defineEmits(['onDrop', 'selected', 'onContextMenu'])
 
 const props = defineProps({
@@ -16,6 +16,7 @@ const props = defineProps({
     },
     selectedStyle: {
         type: Function,
+        default: () => 'theme',
     },
 })
 
@@ -122,7 +123,7 @@ function onDragLeave(event) {
     }
 }
 
-function onDrop(event) {
+function onDrop() {
     if (draggedItems.value.length > 0) {
         emit('onDrop', { items: draggedItems.value, target: props.item })
         draggedItems.value = []
@@ -148,13 +149,13 @@ function handleContextMenu(event) {
                     'bg-sub-alt': isDragOver,
                 },
             ]"
+            draggable="true"
             @click="onSelect"
             @dragstart="onDragStart"
             @dragenter="onDragEnter"
             @dragleave="onDragLeave"
             @drop.stop="onDrop"
             @contextmenu.stop="handleContextMenu"
-            draggable="true"
         >
             <div class="item-content">
                 <slot :item="item" :is-open="isOpen" />
@@ -174,9 +175,9 @@ function handleContextMenu(event) {
                 :children="c.children"
                 :depth="depth + 1"
                 :selected-style="selectedStyle"
-                @onDrop="emit('onDrop', $event)"
+                @on-drop="emit('onDrop', $event)"
                 @selected="emit('selected', $event)"
-                @onContextMenu="emit('onContextMenu', $event)"
+                @on-context-menu="emit('onContextMenu', $event)"
             >
                 <template #default="{ item, isOpen }">
                     <slot :item="item" :is-open="isOpen" />
