@@ -6,15 +6,15 @@ import type { ParsedCode, CodesWithInstances } from '~/types/types'
 type SegmentCode = {
     code_id: number
     instance_id: number
-    project_id: number
-    code: string
-    color: string
-    start_offset: number
-    end_offset: number
-    created_by: number
-    data: string
-    memo: string
-    importance: number
+    project_id: number | null
+    code: string | null,
+    color: string | null,
+    start_offset: number | null,
+    end_offset: number | null,
+    created_by: string | null,
+    data: string | null,
+    memo: string | null,
+    importance: number | null,
 }
 
 type Segment = {
@@ -25,8 +25,44 @@ type Segment = {
     key: number
 }
 
+interface AddCodeInstanceResult {
+    id: number;
+    code: string;
+    project_id: number;
+    color: string;
+    parent: number | null;
+    code_instances: Array<{
+        id: number;
+        code_id: number;
+        data: string;
+        start_offset: number;
+        end_offset: number;
+        file_id: number;
+        memo: string | null;
+        importance: number | null;
+    }>;
+}
+
+interface ExplodedCode {
+    code_id: number,
+    instance_id: number,
+    project_id: number | null,
+    code: string | null,
+    color: string | null,
+    start_offset: number | null,
+    end_offset: number | null,
+    created_by: string | null,
+    data: string | null,
+    memo: string | null,
+    importance: number | null,
+}
+
+interface ExtendedFile extends Tables<'files'> {
+    data?: string;
+}
+
 const codes = defineModel<CodesWithInstances>('codes')
-const currentFile = defineModel<Tables<'files'>>('currentFile')
+const currentFile = defineModel<ExtendedFile>('currentFile')
 const triggerUpdateHighlights = defineModel<boolean>('triggerUpdateHighlights')
 const triggerCodeSelected = defineModel<boolean>('triggerCodeSelected')
 const codePanelSelectedCode = defineModel<ParsedCode>('selectedCode')
@@ -34,7 +70,7 @@ const codePanelSelectedCode = defineModel<ParsedCode>('selectedCode')
 const supabase = useSupabaseClient<Database>()
 const projectStore = useProjectStore()
 const configStore = useConfigStore()
-const editorSegments = ref([])
+const editorSegments = ref<Segment[]>([])
 const newCode = ref<Partial<Database['public']['Functions']['add_code_instance']['Args']>>()
 const editCode = ref<Partial<Database['public']['Functions']['add_code_instance']['Args']>>()
 const codeModalText = ref('')
@@ -42,7 +78,7 @@ const editorRightClickContext = ref('')
 const selectedSegment = ref<Segment>()
 const selectedCode = ref()
 const showSecondMenu = ref(false)
-const editorSelection = ref<{ text: string | null; range: Range | null}>({ text: null, range: null })
+const editorSelection = ref<{ text: string | null; range: Range | null }>({ text: null, range: null })
 const showNewCodeModal = ref(false)
 const showEditSegmentModal = ref(false)
 const showContextMenu = ref(false)
@@ -82,7 +118,9 @@ useEventListener(window, 'mousedown', (e) => {
 })
 
 watch(currentFile, (newCurrentFile) => {
-    handleOpenFile(newCurrentFile)
+    if (newCurrentFile) {
+        handleOpenFile(newCurrentFile)
+    }
 })
 
 watch(triggerUpdateHighlights, (newVal) => {
@@ -172,39 +210,52 @@ async function handleEditCodeSubmit() {
         }
 
         // Add new instance
-        const { data, error } = await supabase.rpc('add_code_instance', {
+        const newInstance: Database['public']['Functions']['add_code_instance']['Args'] = {
+            new_code: editCode.value?.new_code?.trim() ?? '',
+            project_id: projectStore.currentProject.id,
+            file_id: currentFile.value?.id ?? 0,
+            data: editCode.value?.data ?? '',
+            start_offset: selectedSegment.value?.start ?? 0,
+            end_offset: selectedSegment.value?.end ?? 0,
             color:
                 '#' +
                 ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, '0'),
-            data: editCode.value?.data,
-            end_offset: selectedSegment.value?.end,
-            file_id: currentFile.value?.id,
-            new_code: editCode.value?.new_code?.trim(),
-            parent: null,
-            project_id: projectStore.currentProject.id,
-            start_offset: selectedSegment.value?.start,
-        })
+        }
+
+        const { data, error } = await supabase.rpc('add_code_instance', newInstance)
+
         if (error) {
             console.error(error)
             return
-        } else {
-            // Update codes array
-            const codeIndex = updatedCodes.findIndex((c) => c.id === data.id)
-            if (codeIndex === -1) {
-                updatedCodes.push(data)
-            } else {
-                updatedCodes[codeIndex] = data
+        } else if (data) {
+            // Use a type guard to ensure data is of the correct shape
+            const isAddCodeInstanceResult = (obj: any): obj is AddCodeInstanceResult => {
+                return obj && typeof obj === 'object' && 'id' in obj && 'code' in obj && 'code_instances' in obj;
             }
-            codes.value = updatedCodes
-            showEditSegmentModal.value = false
-            editCode.value = {}
-            processSegments(updatedCodes)
+
+            if (isAddCodeInstanceResult(data)) {
+                // Update codes array
+                if (updatedCodes) {
+                    const codeIndex = updatedCodes.findIndex((c) => c.id === data.id)
+                    if (codeIndex === -1) {
+                        updatedCodes.push(data as any)
+                    } else {
+                        updatedCodes[codeIndex] = data as any
+                    }
+                    codes.value = updatedCodes
+                    showEditSegmentModal.value = false
+                    editCode.value = {}
+                    processSegments(updatedCodes)
+                } else {
+                    console.error('Unexpected data structure returned from add_code_instance')
+                }
+            }
         }
     } else {
         // Update the exististing instance
         const patch = {
-            memo: editCode.value.memo,
-            importance: editCode.value.importance
+            memo: editCode.value?.memo ?? null,
+            importance: editCode.value?.importance ?? null
         }
         const { error: deleteError } = await supabase
             .from('code_instances')
@@ -214,7 +265,7 @@ async function handleEditCodeSubmit() {
             console.error(deleteError)
             return ``
         } else {
-            updatedCodes = codes.value.map((c) => {
+            updatedCodes = codes.value?.map((c) => {
                 if (c.id === selectedCode.value.code_id) {
                     return {
                         ...c,
@@ -222,8 +273,8 @@ async function handleEditCodeSubmit() {
                             if (i.id === selectedCode.value.instance_id) {
                                 return {
                                     ...i,
-                                    memo: editCode.value.memo,
-                                    importance: editCode.value.importance,
+                                    memo: editCode.value?.memo ?? null,
+                                    importance: editCode.value?.importance ?? null,
                                 }
                             }
                             return i
@@ -240,13 +291,15 @@ async function handleEditCodeSubmit() {
     }
 }
 
-async function handleOpenFile(file) {
+async function handleOpenFile(file: ExtendedFile) {
     if (useRuntimeConfig().public.localDev) {
         fetch(`/samples/${file.name}`)
             .then((response) => response.text())
             .then((data) => {
-                currentFile.value.data = data
-                checkReadyForProcessing()
+                if (currentFile.value) {
+                    currentFile.value.data = data
+                    checkReadyForProcessing()
+                }
             })
             .catch((err) => {
                 console.error('Fetch error:', err)
@@ -254,7 +307,7 @@ async function handleOpenFile(file) {
     } else {
         const { data, error } = await supabase.storage
             .from('files')
-            .createSignedUrl(file.id, 60)
+            .createSignedUrl(file.id as unknown as string, 60)
 
         if (error) {
             console.error('Error downloading file:', error)
@@ -264,7 +317,8 @@ async function handleOpenFile(file) {
         fetch(data.signedUrl)
             .then((response) => response.text())
             .then((data) => {
-                currentFile.value.data = data
+                if (currentFile.value)
+                    currentFile.value.data = data
             })
             .then(() => {
                 checkReadyForProcessing()
@@ -276,12 +330,12 @@ async function handleOpenFile(file) {
 }
 
 function checkReadyForProcessing() {
-    if (currentFile.value.data) {
+    if (currentFile.value && currentFile.value.data) {
         processSegments()
     }
 }
 
-async function handleOpenCodeExpander(event, code) {
+async function handleOpenCodeExpander(event: MouseEvent | undefined, code: SegmentCode) {
     console.log(code)
     selectedCode.value = code
     expanderMenuEvent.value = event
@@ -289,15 +343,15 @@ async function handleOpenCodeExpander(event, code) {
     showSecondMenu.value = true
 }
 
-function openContextMenu(event, segment) {
+function openContextMenu(event: MouseEvent | undefined, segment: Segment | undefined) {
     contextMenuEvent.value = event
     showSecondMenu.value = false
-    editorRightClickContext.value = null
+    editorRightClickContext.value = ''
     if (checkForHighlight(event)) {
         // editorRightClickContext.value = 'selection'
-        window.getSelection().empty()
+        window.getSelection()?.empty()
         return
-    } else if (segment.codes.length > 0) {
+    } else if (segment && segment.codes.length > 0) {
         editorRightClickContext.value = 'code'
         selectedSegment.value = segment
     } else {
@@ -307,14 +361,15 @@ function openContextMenu(event, segment) {
     showContextMenu.value = true
 }
 
-function checkForHighlight(event) {
+function checkForHighlight(event: MouseEvent | undefined) {
     const selection = window.getSelection()
-    if (!selection.rangeCount) return false
+    if (!selection?.rangeCount) return false
 
     const range = selection.getRangeAt(0)
     const rect = range.getBoundingClientRect()
 
     if (
+        event &&
         event.clientX >= rect.left &&
         event.clientX <= rect.right &&
         event.clientY >= rect.top &&
@@ -326,30 +381,43 @@ function checkForHighlight(event) {
     }
 }
 
-function calculateOffset(node, offset) {
+function calculateOffset(node: Node, offset: number) {
     let totalOffset = 0
     let currentNode = node
+    const editorContent = document.getElementById('editor-content')
 
     while (currentNode) {
         if (currentNode.previousSibling) {
             currentNode = currentNode.previousSibling
-            totalOffset += currentNode.textContent.length
-        } else {
-            currentNode = currentNode.parentNode
-            if (currentNode === document.getElementById('editor-content')) {
-                break
+            if (currentNode.textContent) {
+                totalOffset += currentNode.textContent.length
             }
+        } else {
+            const parentNode = currentNode.parentNode
+            if (!parentNode || parentNode === editorContent) {
+                break;
+            }
+            currentNode = parentNode
         }
     }
-
     return totalOffset + offset
 }
 
 function openNewCodeModal() {
-    editorSelection.value.text = window.getSelection().toString()
-    editorSelection.value.range = window.getSelection().getRangeAt(0)
-    codeModalText.value = editorSelection.value.text
-    showNewCodeModal.value = true
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0)
+        const selectedText = range.toString()
+
+        editorSelection.value = {
+            text: selectedText,
+            range: range
+        }
+        codeModalText.value = selectedText
+        showNewCodeModal.value = true
+    } else {
+        console.warn('No text selected')
+    }
 }
 
 async function addCodeInstance() {
@@ -365,25 +433,24 @@ async function addCodeInstance() {
             )
             const end_offset = calculateOffset(endContainer, range.endOffset)
 
-            const code = {
+            const code: Database['public']['Functions']['add_code_instance']['Args'] = {
                 color: configStore.config.new_code_random_color
                     ? '#' +
-                      ((Math.random() * 0xffffff) << 0)
-                          .toString(16)
-                          .padStart(6, '0')
-                    : null,
+                    ((Math.random() * 0xffffff) << 0)
+                        .toString(16)
+                        .padStart(6, '0')
+                    : undefined,
                 data: selectedText,
                 end_offset: end_offset,
-                file_id: currentFile.value.id,
-                new_code: newCode.value.code.trim(),
-                parent: null,
+                file_id: currentFile.value?.id ?? 0,
+                new_code: newCode.value?.new_code?.trim() ?? '',
                 project_id: projectStore.currentProject.id,
                 start_offset: start_offset,
-                memo: newCode.value.memo,
-                importance: newCode.value.importance,
+                memo: newCode.value?.memo,
+                importance: newCode.value?.importance,
             }
 
-            if (code.new_code.trim() === '') {
+            if (code.new_code?.trim() === '') {
                 return
             }
 
@@ -391,28 +458,35 @@ async function addCodeInstance() {
                 'add_code_instance',
                 code
             )
+
             if (error) {
-                console.error(error)
-            } else {
-                // check to see if the code already exists in the codes array and replace it or push it
-                const updatedCodes = [...codes.value]
-                const codeIndex = updatedCodes.findIndex(
-                    (c) => c.code === newCode.value.code
-                )
-                if (codeIndex === -1) {
-                    updatedCodes.push(data)
+                console.error(error);
+            } else if (data) {
+                // Type guard function
+                const isAddCodeInstanceResult = (obj: any): obj is AddCodeInstanceResult => {
+                    return obj && typeof obj === 'object' && 'id' in obj && 'code' in obj && 'code_instances' in obj;
+                };
+
+                if (isAddCodeInstanceResult(data)) {
+                    const updatedCodes = codes.value ? [...codes.value] : [];
+                    const codeIndex = updatedCodes.findIndex((c) => c.id === data.id);
+                    if (codeIndex === -1) {
+                        updatedCodes.push(data as any);
+                    } else {
+                        updatedCodes[codeIndex] = data as any;
+                    }
+                    codes.value = updatedCodes;
+                    processSegments(updatedCodes);
+                    newCode.value = {
+                        new_code: '',
+                        color: '',
+                        memo: '',
+                        importance: undefined,
+                    };
+                    showNewCodeModal.value = false;
                 } else {
-                    updatedCodes[codeIndex] = data
+                    console.error('Unexpected data structure returned from add_code_instance');
                 }
-                codes.value = updatedCodes
-                processSegments(updatedCodes)
-                newCode.value = {
-                    code: '',
-                    color: '',
-                    memo: '',
-                    importance: null,
-                }
-                showNewCodeModal.value = false
             }
         }
     }
@@ -428,7 +502,7 @@ async function deleteCodeInstance() {
     if (error) {
         console.error(error)
     } else {
-        const updatedCodes = codes.value.map((c) => {
+        const updatedCodes = codes.value?.map((c) => {
             if (c.id === code_id) {
                 return {
                     ...c,
@@ -441,19 +515,19 @@ async function deleteCodeInstance() {
         })
         codes.value = updatedCodes
         processSegments(updatedCodes)
-        editorSelection.value = {}
+        editorSelection.value = { text: null, range: null }
         selectedCode.value = null
     }
 }
 
-function handleEditorKeydown(event) {
+function handleEditorKeydown(event: KeyboardEvent) {
     // Prevent default except for arrow keys
     if (
         !event.ctrlKey &&
         !event.metaKey &&
         !event.altKey &&
         !event.shiftKey &&
-        ![37, 38, 39, 40].includes(event.keyCode)
+        !['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'].includes(event.key)
     ) {
         event.preventDefault()
     }
@@ -473,47 +547,56 @@ function handleEditorKeydown(event) {
 // }
 
 function processSegments(args = codes.value) {
-    if (!currentFile.value.data) return
+    if (!currentFile.value?.data) return
 
-    const explodedCodes = []
-    args.forEach((c) => {
-        if (!c.group) {
-            c.code_instances.forEach((inst) => {
-                if (inst.file_id === currentFile.value.id) {
-                    explodedCodes.push({
-                        code_id: c.id,
-                        instance_id: inst.id,
-                        project_id: c.project_id,
-                        code: c.code,
-                        color: c.color,
-                        start_offset: inst.start_offset,
-                        end_offset: inst.end_offset,
-                        created_by: inst.created_by,
-                        data: inst.data,
-                        memo: inst.memo,
-                        importance: inst.importance,
-                    })
-                }
-            })
-        }
-    })
+    const explodedCodes: ExplodedCode[] = []
+    if (args) {
+        args.forEach((c) => {
+            if (!c.group) {
+                c.code_instances.forEach((inst) => {
+                    if (inst.file_id === currentFile.value?.id) {
+                        explodedCodes.push({
+                            code_id: c.id,
+                            instance_id: inst.id,
+                            project_id: c.project_id,
+                            code: c.code,
+                            color: c.color,
+                            start_offset: inst.start_offset,
+                            end_offset: inst.end_offset,
+                            created_by: inst.created_by,
+                            data: inst.data,
+                            memo: inst.memo,
+                            importance: inst.importance,
+                        })
+                    }
+                })
+            }
+        })
+    }
 
     const sortedHighlights = explodedCodes.sort(
-        (a, b) => a.start_offset - b.start_offset
+        (a, b) => {
+            if (a.start_offset && b.start_offset) {
+                return a.start_offset - b.start_offset
+            } else {
+                return 0
+            }
+        }
     )
 
-    const offsets = []
+    const offsets: number[] = []
     sortedHighlights.forEach((h) => {
-        offsets.push(h.start_offset)
-        offsets.push(h.end_offset)
+        h.start_offset ? offsets.push(h.start_offset) : null
+        h.end_offset ? offsets.push(h.end_offset) : null
     })
     const sortedOffsets = offsets.sort((a, b) => a - b)
     sortedOffsets.push(currentFile.value.data.length)
 
     let prevOffset = 0
-    const segments = []
+    const segments: Segment[] = []
+
     for (let i = 0; i < sortedOffsets.length; i++) {
-        const segment = {
+        const segment: Segment = {
             start: prevOffset,
             end: sortedOffsets[i],
             data: currentFile.value.data.substring(
@@ -524,7 +607,7 @@ function processSegments(args = codes.value) {
             key: i,
         }
         sortedHighlights.forEach((h) => {
-            if (h.start_offset < segment.end && h.end_offset > segment.start) {
+            if (h.start_offset && h.start_offset < segment.end && h.end_offset && h.end_offset > segment.start) {
                 const c = {
                     code_id: h.code_id,
                     instance_id: h.instance_id,
@@ -534,6 +617,9 @@ function processSegments(args = codes.value) {
                     data: h.data,
                     memo: h.memo,
                     importance: h.importance,
+                    start_offset: h.start_offset,
+                    end_offset: h.end_offset,
+                    project_id: h.project_id
                 }
                 segment.codes.push(c)
             }
@@ -544,30 +630,42 @@ function processSegments(args = codes.value) {
     editorSegments.value = segments
 }
 
-function handleCodeClick(event, segment) {
+function handleCodeClick(segment: Segment) {
     if (segment.codes.length > 1) {
         const c = segment.codes.shift()
-        segment.codes.push(c)
+        c ? segment.codes.push(c) : null
     }
 }
 </script>
 
 <template>
-    <div
-        :class="[
-            'overflow-hidden w-full h-full flex items-center justify-start whitespace-pre-wrap text-base font-mono border-main border-y-3',
+    <div :class="[
+        'overflow-hidden w-full h-full flex items-center justify-start whitespace-pre-wrap text-base font-mono border-main border-y-3',
+        {
+            'editor-theme-light':
+                configStore.config.editor_theme === 'light',
+            'editor-theme-dark': configStore.config.editor_theme === 'dark',
+            'editor-theme-theme':
+                configStore.config.editor_theme === 'theme',
+        },
+    ]">
+        <div :class="[
+            'flex w-full h-full overflow-y-auto mr-px',
             {
                 'editor-theme-light':
                     configStore.config.editor_theme === 'light',
-                'editor-theme-dark': configStore.config.editor_theme === 'dark',
+                'editor-theme-dark':
+                    configStore.config.editor_theme === 'dark',
                 'editor-theme-theme':
                     configStore.config.editor_theme === 'theme',
             },
-        ]"
-    >
-        <div
-            :class="[
-                'flex w-full h-full overflow-y-auto mr-px',
+        ]">
+            <FileViewerPanelLineNumbers v-if="
+                configStore.config.code_line_numbers &&
+                editorSegments.length > 0
+            " />
+            <div id="editor-content" :class="[
+                'self-start p-2.5 outline-0 outline-transparent',
                 {
                     'editor-theme-light':
                         configStore.config.editor_theme === 'light',
@@ -576,108 +674,53 @@ function handleCodeClick(event, segment) {
                     'editor-theme-theme':
                         configStore.config.editor_theme === 'theme',
                 },
-            ]"
-        >
-            <FileViewerPanelLineNumbers
-                v-if="
-                    configStore.config.code_line_numbers &&
-                    editorSegments.length > 0
-                "
-            />
-            <div
-                id="editor-content"
-                :class="[
-                    'self-start p-2.5 outline-0 outline-transparent',
-                    {
-                        'editor-theme-light':
-                            configStore.config.editor_theme === 'light',
-                        'editor-theme-dark':
-                            configStore.config.editor_theme === 'dark',
-                        'editor-theme-theme':
-                            configStore.config.editor_theme === 'theme',
-                    },
-                ]"
-                contenteditable="true"
-                spellcheck="false"
-                @keydown="handleEditorKeydown"
-            >
-                <FileViewerPanelSegment
-                    v-for="segment in editorSegments"
-                    :key="segment.key"
-                    v-model:clicked-segment="clickedSegment"
-                    class="editor-segment"
-                    :segment="segment"
-                    @code-click="handleCodeClick"
-                    @context-menu="openContextMenu"
-                />
+            ]" contenteditable="true" spellcheck="false" @keydown="handleEditorKeydown">
+                <FileViewerPanelSegment v-for="segment in editorSegments" :key="segment.key"
+                    v-model:clicked-segment="clickedSegment" class="editor-segment" :segment="segment"
+                    @code-click="handleCodeClick" @context-menu="openContextMenu" />
             </div>
         </div>
 
-        <FileViewerPanelSelectionPopup
-            v-if="showSelectionPopup"
-            ref="selectionPopupRef"
-            :position="selectionPopupPosition"
-            @add="openNewCodeModal"
-        />
+        <FileViewerPanelSelectionPopup v-if="showSelectionPopup" ref="selectionPopupRef"
+            :position="selectionPopupPosition" @add="openNewCodeModal" />
 
-        <BaseContextMenu
-            v-if="showContextMenu"
-            :event="contextMenuEvent"
-            @close="
-                () => {
-                    showContextMenu = false
-                    showSecondMenu = false
-                }
-            "
-        >
-            <button
-                v-if="editorRightClickContext === 'selection'"
-                @click="openNewCodeModal"
-            >
+        <BaseContextMenu v-if="showContextMenu" :event="contextMenuEvent" @close="() => {
+            showContextMenu = false
+            showSecondMenu = false
+        }
+            ">
+            <button v-if="editorRightClickContext === 'selection'" @click="openNewCodeModal">
                 new code
             </button>
             <div v-if="editorRightClickContext === 'code'" class="grid">
-                <div
-                    v-for="c in selectedSegment.codes"
-                    :key="c"
-                    :style="{
-                        'background-color': c.color,
-                        color: tinycolor.mostReadable(
-                            c.color,
-                            ['black', 'white'],
-                            { includeFallbackColors: false }
-                        ),
-                    }"
-                    class="context-menu-code group grid grid-cols-color-picker gap-2 p-1 cursor-pointer hover:font-bold hover:text-bg transition-all duration-50"
-                    @click.stop="handleOpenCodeExpander($event, c)"
-                >
+                <div v-if="selectedSegment" v-for="c in selectedSegment.codes" :key="c.code_id" :style="{
+                    'background-color': c.color ? c.color : 'transparent',
+                    color: tinycolor.mostReadable(
+                        c.color as string,
+                        ['black', 'white'],
+                        { includeFallbackColors: false }
+                    ).toString('hex'),
+                }" class="context-menu-code group grid grid-cols-color-picker gap-2 p-1 cursor-pointer hover:font-bold hover:text-bg transition-all duration-50"
+                    @click.stop="handleOpenCodeExpander($event, c)">
                     <div
-                        class="group-active:scale-95 group-active:translate-x-2px group-active:translate-y-3px transtion-all duration-300"
-                    >
+                        class="group-active:scale-95 group-active:translate-x-2px group-active:translate-y-3px transtion-all duration-300">
                         {{ c.code }}
                     </div>
-                    <div><Icon name="fa6-solid:caret-right" /></div>
+                    <div>
+                        <Icon name="fa6-solid:caret-right" />
+                    </div>
                 </div>
             </div>
         </BaseContextMenu>
 
-        <BaseContextMenu
-            v-if="showSecondMenu"
-            :event="expanderMenuEvent"
-            :level="1"
-            :bg-color="selectedCode.color"
-            @close="showSecondMenu = false"
-        >
+        <BaseContextMenu v-if="showSecondMenu" :event="expanderMenuEvent" :level="1" :bg-color="selectedCode.color"
+            @close="showSecondMenu = false">
             <!-- <button @click="showSelectCode">show</button> -->
             <button @click="openEditSegmentModal">edit code</button>
             <button @click="deleteCodeInstance">delete instance</button>
         </BaseContextMenu>
 
-        <BaseModal
-            v-if="showNewCodeModal"
-            @close="showNewCodeModal = false"
-            @submit="addCodeInstance"
-        >
+        <BaseModal v-if="showNewCodeModal" @close="showNewCodeModal = false" @submit="addCodeInstance">
             <div class="font-mono text-main font-bold text-base mb-2">
                 quote
             </div>
@@ -687,33 +730,20 @@ function handleCodeClick(event, segment) {
                 </div>
             </div>
             <div class="font-mono text-main font-bold text-base mb-1">code</div>
-            <textarea
-                v-model="newCode.code"
-                placeholder="code (required)"
-                lines="2"
-                @keydown.enter.prevent="addCodeInstance"
-            />
+            <textarea v-if="newCode" v-model="newCode.new_code" placeholder="code (required)" lines="2"
+                @keydown.enter.prevent="addCodeInstance" />
             <div class="font-mono text-main font-bold text-base mb-1">memo</div>
-            <textarea
-                v-model="newCode.memo"
-                placeholder="memo"
-                lines="2"
-                @keydown.enter.prevent="addCodeInstance"
-            />
+            <textarea v-if="newCode" v-model="newCode.memo" placeholder="memo" lines="2"
+                @keydown.enter.prevent="addCodeInstance" />
             <div class="font-mono text-main font-bold text-base mb-1">
                 importance
             </div>
             <div class="flex gap-2 mb-2">
-                <button
-                    v-for="i in 5"
-                    :key="i"
-                    :class="[{ 'bg-main text-bg': newCode.importance === i }]"
-                    @click="
-                        newCode.importance === i
-                            ? (newCode.importance = null)
-                            : (newCode.importance = i)
-                    "
-                >
+                <button v-for="i in 5" :key="i" :class="[{ 'bg-main text-bg': newCode?.importance === i }]" @click="
+                    newCode?.importance === i
+                        ? (newCode.importance = undefined)
+                        : (newCode ? newCode.importance = i : null)
+                    ">
                     {{ i }}
                 </button>
             </div>
@@ -725,47 +755,30 @@ function handleCodeClick(event, segment) {
             </div>
         </BaseModal>
 
-        <BaseModal
-            v-if="showEditSegmentModal"
-            @close="showEditSegmentModal = false"
-            @submit="handleEditCodeSubmit"
-        >
+        <BaseModal v-if="showEditSegmentModal" @close="showEditSegmentModal = false" @submit="handleEditCodeSubmit">
             <div class="font-mono text-main font-bold text-base mb-2">
                 quote
             </div>
             <div class="overflow-y-auto max-h-96 h-full">
                 <div class="font-mono text-text font-base mb-4">
-                    {{ editCode.data }}
+                    {{ editCode?.data }}
                 </div>
             </div>
             <div class="font-mono text-main font-bold text-base mb-2">code</div>
-            <textarea
-                v-model="editCode.code"
-                placeholder="code (required)"
-                lines="2"
-                @keydown.enter.prevent="handleEditCodeSubmit"
-            />
+            <textarea v-if="editCode" v-model="editCode.new_code" placeholder="code (required)" lines="2"
+                @keydown.enter.prevent="handleEditCodeSubmit" />
             <div class="font-mono text-main font-bold text-base mb-1">memo</div>
-            <textarea
-                v-model="editCode.memo"
-                placeholder="memo"
-                lines="2"
-                @keydown.enter.prevent="handleEditCodeSubmit"
-            />
+            <textarea v-if="editCode" v-model="editCode.memo" placeholder="memo" lines="2"
+                @keydown.enter.prevent="handleEditCodeSubmit" />
             <div class="font-mono text-main font-bold text-base mb-1">
                 importance
             </div>
             <div class="flex gap-2 mb-2">
-                <button
-                    v-for="i in 5"
-                    :key="i"
-                    :class="[{ 'bg-main text-bg': editCode.importance === i }]"
-                    @click="
-                        editCode.importance === i
-                            ? (editCode.importance = null)
-                            : (editCode.importance = i)
-                    "
-                >
+                <button v-for="i in 5" :key="i" :class="[{ 'bg-main text-bg': editCode?.importance === i }]" @click="
+                    editCode?.importance === i
+                        ? (editCode.importance = undefined)
+                        : (editCode ? editCode.importance = i : null)
+                    ">
                     {{ i }}
                 </button>
             </div>

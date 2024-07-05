@@ -355,23 +355,10 @@ export type Database = {
           data: string
           start_offset: number
           end_offset: number
-          color: string
-          parent: number
-          memo: string
-          importance: number
-        }
-        Returns: Json
-      }
-      add_code_instance_backup: {
-        Args: {
-          new_code: string
-          project_id: number
-          file_id: number
-          data: string
-          start_offset: number
-          end_offset: number
-          color: string
-          parent: number
+          color?: string
+          parent?: number
+          memo?: string
+          importance?: number
         }
         Returns: Json
       }
