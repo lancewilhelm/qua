@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import type { Database, Tables } from '~/types/supabase'
+import type { DraggableItemInstance } from '~/types/types';
 
-const files = defineModel<Tables<'files'>[]>('files')
+interface ParsedFile extends Tables<'files'> {
+    children?: ParsedFile[]
+}
 
-const currentFile = defineModel<Tables<'files'>>('currentFile')
+const files = defineModel<(Tables<'files'> | null)[] | null>('files')
+
+const currentFile = defineModel<Tables<'files'> | null>('currentFile')
 
 defineProps<{
     width: number | null
@@ -13,55 +18,59 @@ const supabase = useSupabaseClient<Database>()
 const projectStore = useProjectStore()
 const showDeleteModal = ref(false)
 const showRenameModal = ref(false)
-const uploadQueue = ref([])
+const uploadQueue = ref<File[]>([])
 const isUploading = ref(false)
 const showContextMenu = ref(false)
-const contextMenuEvent = ref(false)
-const editFile = ref({})
-const contextMenuFile = ref({})
-const draggedFiles = ref(null)
-const dropTarget = ref(null)
+const contextMenuEvent = ref<MouseEvent>()
+const editFile = ref<Tables<'files'> | null>()
+const contextMenuFile = ref<Tables<'files'> | null>()
+// const draggedFiles = ref(null)
+// const dropTarget = ref(null)
 const dragOver = ref(false)
-const uploadTarget = ref(null)
-const draggableItem = ref([])
+const uploadTarget = ref<{ type: 'root' | 'folder', id?: number }>()
+const draggableItem = ref<DraggableItemInstance[]>([])
 
-watch(dropTarget, () => {
-    if (draggedFiles.value && dropTarget.value) {
-        handleDrop()
-    }
-})
+// watch(dropTarget, () => {
+//     if (draggedFiles.value && dropTarget.value) {
+//         handleDrop()
+//     }
+// })
 
 onMounted(() => {
     if (projectStore.currentProject.current_file_id) {
-        currentFile.value = files.value.find(
-            (f) => f.id === projectStore.currentProject.current_file_id
+        currentFile.value = files.value?.find(
+            (f) => f?.id === projectStore.currentProject.current_file_id
         )
     }
 })
 
 const parsedFiles = computed(() => {
     const fileMap = new Map()
-    const rootItems = []
+    const rootItems: any[] = []
 
-    files.value.forEach((f) => {
-        const newF = { ...f }
-        if (newF.folder) {
-            newF.children = []
-        }
-        fileMap.set(newF.id, newF)
-    })
-
-    files.value.forEach((f) => {
-        const newF = fileMap.get(f.id)
-        if (newF.parent) {
-            const parent = fileMap.get(newF.parent)
-            if (parent) {
-                parent.children.push(newF)
+    if (files.value) {
+        files.value.forEach((f) => {
+            const newF = { ...f } as ParsedFile
+            if (newF.folder) {
+                newF.children = []
             }
-        } else {
-            rootItems.push(newF)
-        }
-    })
+            fileMap.set(newF.id, newF)
+        })
+
+        files.value.forEach((f) => {
+            if (f) {
+                const newF = fileMap.get(f.id)
+                if (newF.parent) {
+                    const parent = fileMap.get(newF.parent)
+                    if (parent) {
+                        parent.children.push(newF)
+                    }
+                } else {
+                    rootItems.push(newF)
+                }
+            }
+        })
+    }
 
     return rootItems
 })
@@ -77,22 +86,19 @@ await supabase
         files.value = res.data
     })
 
-function handleDrop({ items, target }) {
+function handleDrop({ items, target }: { items: Tables<'files'>[], target: ('root' | Tables<'files'>) }) {
     if (items.length === 0) {
         return
     }
-    if (items && (target.folder || target === 'root')) {
+    if (target === 'root' || (target as Tables<'files'>).folder) {
         updateFileLocation(items, target)
     }
 }
 
-function onDrop(e, file) {
-    if (e.dataTransfer.files.length > 0) {
+function onDrop(e: DragEvent) {
+    if (e.dataTransfer && e.dataTransfer.files.length > 0) {
         uploadFile(e.dataTransfer.files, { type: 'root' })
         dragOver.value = false
-    } else {
-        dragOver.value = false
-        dropTarget.value = file
     }
 }
 
@@ -102,17 +108,17 @@ async function processUploadQueue() {
         const file = uploadQueue.value.shift()
 
         // Check file size
-        if (file.size > 50000000) {
+        if (file?.size && file.size > 50000000) {
             isUploading.value = false
             processUploadQueue()
             return alert('File size must be less than 50MB')
         }
 
         const d = {
-            name: file.name,
-            type: file.type,
+            name: file?.name,
+            type: file?.type,
             project_id: projectStore.currentProject.id,
-            parent: uploadTarget.value !== null ? uploadTarget.value.id : null,
+            parent: uploadTarget.value !== null ? uploadTarget.value?.id : null,
         }
 
         try {
@@ -131,17 +137,21 @@ async function processUploadQueue() {
             }
 
             const data = await updateFileDatabase()
-            files.value.push(data)
+            if (data && files.value) {
+                files.value.push(data)
+            }
 
             // Upload file to storage
-            async function upload(d) {
-                const { data, error } = await supabase.storage
-                    .from('files')
-                    .upload(d.id.toString(), file, {
-                        contentType: file.type,
-                    })
-                if (error) {
-                    console.error(error)
+            async function upload(d: { created_at: string; created_by: string | null; folder: boolean | null; id: number; name: string | null; notes: string | null; parent: number | null; project_id: number | null; type: string | null; } | undefined) {
+                if (d && file) {
+                    const { error } = await supabase.storage
+                        .from('files')
+                        .upload(d.id.toString(), file, {
+                            contentType: file.type,
+                        })
+                    if (error) {
+                        console.error(error)
+                    }
                 }
             }
 
@@ -156,24 +166,25 @@ async function processUploadQueue() {
     }
 }
 
-function uploadFile(files, target) {
+function uploadFile(files: FileList, target: { type: 'root' | 'folder', id?: number }) {
     if (target.type === 'folder') {
         uploadTarget.value = target
     } else if (target.type === 'root') {
-        uploadTarget.value = null
+        uploadTarget.value = undefined
     }
     uploadQueue.value.push(...Array.from(files))
     processUploadQueue()
 }
 
-function handleFileUpload(event) {
-    const files = event.target.files
+function handleFileUpload(event: Event) {
+    const target = event.target as HTMLInputElement
+    const files = target.files
     if (files) {
-        uploadFile(files, 'root')
+        uploadFile(files, { type: 'root' })
     }
 }
 
-function openContextMenu({ event, target }) {
+function openContextMenu({ event, target }: { event: MouseEvent, target: 'root' | Tables<'files'> }) {
     if (target !== 'root') {
         contextMenuEvent.value = event
         contextMenuFile.value = target
@@ -187,14 +198,15 @@ function openRenameModal() {
 }
 
 function closeRenameModal() {
-    editFile.value = {}
+    editFile.value = undefined
     showRenameModal.value = false
 }
 
 async function renameFile() {
     showRenameModal.value = false
     if (
-        editFile.value.name &&
+        editFile.value?.name &&
+        contextMenuFile.value &&
         editFile.value.name !== contextMenuFile.value.name
     ) {
         const { error } = await supabase
@@ -206,41 +218,45 @@ async function renameFile() {
         if (error) {
             console.error(error)
         } else {
-            files.value = files.value.map((f) => {
-                if (f.id === contextMenuFile.value.id) {
-                    return { ...f, name: editFile.value.name }
-                } else {
-                    return f
-                }
-            })
+            if (files.value) {
+                files.value = files.value.map((f) => {
+                    if (f && f.id === contextMenuFile.value?.id) {
+                        return { ...f, name: editFile.value?.name ?? f.name }
+                    } else {
+                        return f
+                    }
+                })
+            }
         }
     }
 }
 
 async function deleteFile() {
     async function updateDatabase() {
-        const { error } = await supabase
-            .from('files')
-            .delete()
-            .eq('id', contextMenuFile.value.id)
-        if (error) {
-            console.error(error)
+        if (contextMenuFile.value) {
+            const { error } = await supabase
+                .from('files')
+                .delete()
+                .eq('id', contextMenuFile.value.id)
+            if (error) {
+                console.error(error)
+            }
         }
     }
 
     updateDatabase()
-    files.value = files.value.filter((f) => f.id !== contextMenuFile.value.id)
+    files.value = files.value?.filter((f) => f?.id !== contextMenuFile.value?.id)
     showDeleteModal.value = false
 
     async function deleteStorage() {
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
             .from('files')
-            .remove(contextMenuFile.value.id.toString())
+            .remove([contextMenuFile.value?.id.toString() as string])
         if (error) {
             console.error(error)
         }
     }
-    if (!contextMenuFile.value.folder) {
+    if (!contextMenuFile.value?.folder) {
         deleteStorage()
     }
 }
@@ -259,37 +275,39 @@ async function createFolder() {
     if (error) {
         console.error(error)
     } else {
-        files.value.push(data)
+        files.value?.push(data)
     }
 }
 
-async function updateFileLocation(fs, target) {
-    if (fs.some((f) => f.id === target.id)) {
-        return
-    }
-
-    const patch = fs.map((f) => {
-        return {
-            id: f.id,
-            parent: target.id ? target.id : null,
+async function updateFileLocation(fs: Tables<'files'>[], target: 'root' | Tables<'files'>) {
+    if (target !== 'root') {
+        if (fs.some((f) => f.id === target.id)) {
+            return
         }
-    })
 
-    const { error } = await supabase.from('files').upsert(patch)
-    if (error) {
-        console.error(error)
-    } else {
-        files.value = files.value.map((f) => {
-            if (fs.some((file) => file.id === f.id)) {
-                return { ...f, parent: target.id ? target.id : null }
-            } else {
-                return f
+        const patch = fs.map((f) => {
+            return {
+                id: f.id,
+                parent: target.id ? target.id : null,
             }
         })
+
+        const { error } = await supabase.from('files').upsert(patch)
+        if (error) {
+            console.error(error)
+        } else {
+            files.value = files.value?.map((f) => {
+                if (f && fs.some((file) => file.id === f.id)) {
+                    return { ...f, parent: target.id ? target.id : null }
+                } else {
+                    return f
+                }
+            })
+        }
     }
 }
 
-function handleSelected(item) {
+function handleSelected(item: Tables<'files'>) {
     if (!item.folder) {
         currentFile.value = item
         projectStore.patchCurrentProject({ current_file_id: item.id })
@@ -298,73 +316,49 @@ function handleSelected(item) {
 </script>
 
 <template>
-    <div class="flex flex-col bg-sub text-text items-stretch overflow-x-hidden rounded-tl-lg rounded-bl-lg border-main border-y-3 border-l-3" :style="{ width: width + 'px' }">
+    <div class="flex flex-col bg-sub text-text items-stretch overflow-x-hidden rounded-tl-lg rounded-bl-lg border-main border-y-3 border-l-3"
+        :style="{ width: width + 'px' }">
         <div class="flex flex-wrap justify-center gap-2 px-2">
-            <input
-                id="file"
-                type="file"
-                name="file"
-                class="hidden"
-                accept=".txt"
-                @change="handleFileUpload"
-            >
-            <button for="file"
-                ><Icon name="fa6-solid:cloud-arrow-up"
-            /></button>
+            <input id="file" type="file" name="file" class="hidden" accept=".txt" @change="handleFileUpload">
+            <button for="file">
+                <Icon name="fa6-solid:cloud-arrow-up" />
+            </button>
             <button @click="createFolder">
                 <Icon name="fa6-solid:folder-plus" />
             </button>
-            <button
-                @click="() => draggableItem.forEach((item) => item.open())"
-            >
+            <button @click="() => {
+                if (draggableItem) {
+                    draggableItem.forEach((item) => item.open())
+                }
+            }">
                 <Icon name="fa6-solid:up-right-and-down-left-from-center" />
             </button>
-            <button
-                @click="draggableItem.forEach((item) => item.close())"
-            >
+            <button @click="draggableItem.forEach((item) => item.close())">
                 <Icon name="fa6-solid:down-left-and-up-right-to-center" />
             </button>
         </div>
         <div v-if="parsedFiles?.length > 0" class="flex grow">
-            <DraggableContainer
-                @on-drop="handleDrop"
-                @on-context-menu="openContextMenu"
-            >
-                <DraggableItem
-                    v-for="file in parsedFiles"
-                    :key="file.id"
-                    ref="draggableItem"
-                    :item="file"
-                    :children="file.children ? file.children : []"
-                    :depth="0"
-                    :selected-style="() => 'border'"
-                    @on-drop="handleDrop"
-                    @selected="handleSelected"
-                    @on-context-menu="openContextMenu"
-                >
+            <DraggableContainer @on-drop="handleDrop" @on-context-menu="openContextMenu">
+                <DraggableItem v-for="file in parsedFiles" :key="file.id" ref="draggableItem" :item="file"
+                    :children="file.children ? file.children : []" :depth="0" :selected-style="() => 'border'"
+                    @on-drop="handleDrop" @selected="handleSelected" @on-context-menu="openContextMenu">
                     <template #default="{ item, isOpen }">
-                        <FilePanelItem :file="item" :is-open="isOpen" :current-file="currentFile"/>
+                        <FilePanelItem :file="item" :is-open="isOpen" :current-file="currentFile" />
                     </template>
                 </DraggableItem>
             </DraggableContainer>
         </div>
-        <div
-            v-if="parsedFiles?.length == 0 || !parsedFiles"
-            class="flex flex-col items-center justify-center font-mono text-text h-full text-sm"
-            @drop.prevent="onDrop($event, 'root')"
-        >
+        <div v-if="parsedFiles?.length == 0 || !parsedFiles"
+            class="flex flex-col items-center justify-center font-mono text-text h-full text-sm" @drop.prevent="onDrop">
             <div>
-                click <Icon name="fa6-solid:cloud-arrow-up" /> to upload
+                click
+                <Icon name="fa6-solid:cloud-arrow-up" /> to upload
             </div>
             <div>or</div>
             <div>drag and drop a file here</div>
         </div>
 
-        <BaseContextMenu
-            v-if="showContextMenu"
-            :event="contextMenuEvent"
-            @close="showContextMenu = false"
-        >
+        <BaseContextMenu v-if="showContextMenu" :event="contextMenuEvent" @close="showContextMenu = false">
             <button @click="openRenameModal">rename</button>
             <button @click="showDeleteModal = true">delete</button>
         </BaseContextMenu>
@@ -372,11 +366,11 @@ function handleSelected(item) {
         <BaseModal v-if="showDeleteModal" @close="showDeleteModal = false">
             <div class="font-mono font-bold mb-2">
                 <Icon name="fa6-solid:file-lines" />
-                {{ contextMenuFile.name }}
+                {{ contextMenuFile?.name }}
             </div>
             <div class="font-mono text-left text-base mb-2 text-error font-bold">
                 Are you sure you want to delete this
-                {{ contextMenuFile.folder ? 'folder' : 'file' }}?
+                {{ contextMenuFile?.folder ? 'folder' : 'file' }}?
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <button class="grow" @click="showDeleteModal = false">
@@ -386,28 +380,15 @@ function handleSelected(item) {
             </div>
         </BaseModal>
 
-        <BaseModal
-            v-if="showRenameModal"
-            @close="closeRenameModal"
-            @submit="renameFile"
-        >
+        <BaseModal v-if="showRenameModal" @close="closeRenameModal" @submit="renameFile">
             <div class="font-mono font-bold mb-2">
-                <Icon
-                    v-if="!contextMenuFile.folder"
-                    name="fa6-solid:file-lines"
-                />
-                <Icon v-if="contextMenuFile.folder" name="fa6-solid:folder" />
-                {{ contextMenuFile.name }}
+                <Icon v-if="!contextMenuFile?.folder" name="fa6-solid:file-lines" />
+                <Icon v-if="contextMenuFile?.folder" name="fa6-solid:folder" />
+                {{ contextMenuFile?.name }}
             </div>
             <div class="font-mono text-main text-left">new name</div>
-            <input
-                v-model="editFile.name"
-                class="mb-4"
-                type="text"
-                autocomplete="off"
-                placeholder="filename"
-                name="filename"
-            >
+            <input v-if='editFile' v-model="editFile.name" class="mb-4" type="text" autocomplete="off"
+                placeholder="filename" name="filename">
             <div class="grid grid-cols-2 gap-4">
                 <button class="grow" @click="closeRenameModal">
                     cancel

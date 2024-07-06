@@ -2,14 +2,18 @@ import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import type { Tables } from '~/types/supabase';
 
-export const useProjectStore = defineStore('currentProject', () => {
-    const currentProject = useStorage('currentProject', {} as Tables<'projects'>)
+interface ExtendedProject extends Tables<'projects'> {
+    current_file_id?: number
+}
 
-    function setCurrentProject(project: Tables<'projects'>) {
+export const useProjectStore = defineStore('currentProject', () => {
+    const currentProject = useStorage('currentProject', {} as ExtendedProject)
+
+    function setCurrentProject(project: ExtendedProject) {
         Object.assign(currentProject.value, project)
     }
 
-    function patchCurrentProject(patch: Partial<Tables<'projects'>>) {
+    function patchCurrentProject(patch: Partial<ExtendedProject>) {
         Object.assign(currentProject.value, patch)
     }
 

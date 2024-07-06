@@ -1,29 +1,7 @@
 <script setup lang="ts">
 import tinycolor from 'tinycolor2'
 import type { Database, Tables } from '~/types/supabase'
-import type { ParsedCode, CodesWithInstances } from '~/types/types'
-
-type SegmentCode = {
-    code_id: number
-    instance_id: number
-    project_id: number | null
-    code: string | null,
-    color: string | null,
-    start_offset: number | null,
-    end_offset: number | null,
-    created_by: string | null,
-    data: string | null,
-    memo: string | null,
-    importance: number | null,
-}
-
-type Segment = {
-    start: number
-    end: number
-    data: string
-    codes: SegmentCode[]
-    key: number
-}
+import type { ParsedCode, CodesWithInstances, SegmentCode, Segment } from '~/types/types'
 
 interface AddCodeInstanceResult {
     id: number;
