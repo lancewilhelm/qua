@@ -343,7 +343,7 @@ function handleSelected(item: Tables<'files'>) {
                     :children="file.children ? file.children : []" :depth="0" :selected-style="() => 'border'"
                     @on-drop="handleDrop" @selected="handleSelected" @on-context-menu="openContextMenu">
                     <template #default="{ item, isOpen }">
-                        <FilePanelItem :file="item" :is-open="isOpen" :current-file="currentFile" />
+                        <FilePanelItem :file="item as Tables<'files'>" :is-open="isOpen" :current-file="currentFile" />
                     </template>
                 </DraggableItem>
             </DraggableContainer>

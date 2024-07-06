@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { Database } from '~/types/supabase'
 import CodebookCodesPanelItem from './CodebookCodesPanelItem.vue'
-import type { ParsedCode, CodesWithInstances } from '~/types/types'
+import type { DraggableItemInstance, ParsedCode } from '~/types/types'
 
 interface DraggableItem {
     open: () => void
     close: () => void
 }
 
-const codes = defineModel<CodesWithInstances>('codes')
+const codes = defineModel<ParsedCode[]>('codes')
 const selectedCode = defineModel<ParsedCode>('selectedCode')
 defineProps<{
     width: number | null
@@ -133,7 +133,7 @@ async function handleNewCodeSubmit() {
     if (error) {
         console.error('Error inserting new code:', error)
     } else {
-        codes.value ? codes.value.push(data) : (codes.value = [data])
+        codes.value ? codes.value.push(data as ParsedCode) : (codes.value = [data as ParsedCode])
         newCode.value = {
             name: '',
             color: '',
@@ -182,17 +182,17 @@ async function updateCodeLocation(cs: ParsedCode[], target: ParsedCode | 'root')
     if (error) {
         console.error(error)
     } else {
-        codes.value ? 
-        codes.value = codes.value.map((c) => {
-                  if (cs.some((code) => code.id === c.id)) {
-                      return {
-                          ...c,
-                          parent: patch.find((p) => p.id === c.id)?.parent ?? null,
-                      }
-                  } else {
-                      return c
-                  }
-              })
+        codes.value ?
+            codes.value = codes.value.map((c) => {
+                if (cs.some((code) => code.id === c.id)) {
+                    return {
+                        ...c,
+                        parent: patch.find((p) => p.id === c.id)?.parent ?? null,
+                    }
+                } else {
+                    return c
+                }
+            })
             : []
     }
 }
@@ -217,7 +217,7 @@ async function handleNewCodeGroupSubmit() {
     if (error) {
         console.error('Error inserting new code group:', error)
     } else {
-        codes.value ? codes.value.push(data) : (codes.value = [data])
+        codes.value ? codes.value.push(data as ParsedCode) : (codes.value = [data as ParsedCode])
         newCodeGroupName.value = ''
         showNewCodeGroupModal.value = false
     }
@@ -290,7 +290,7 @@ async function handleDeleteSubmit() {
     } else {
         codes.value = codes.value?.filter(
             (c) => {
-                if (contextMenuCode.value !== 'root'){
+                if (contextMenuCode.value !== 'root') {
                     return c.id !== contextMenuCode.value?.id
                 } else {
                     return c
@@ -309,7 +309,7 @@ function handleSelected(item: ParsedCode) {
     }
 }
 
-function handleDrop({ items, target }: { items: ParsedCode[]; target: ParsedCode | 'root'}) {
+function handleDrop({ items, target }: { items: ParsedCode[]; target: ParsedCode | 'root' }) {
     if (items.length === 0) {
         return
     }
@@ -321,133 +321,81 @@ function handleDrop({ items, target }: { items: ParsedCode[]; target: ParsedCode
 </script>
 
 <template>
-    <div
-        :class="[
-            'flex flex-col items-stretch overflow-x-hidden border-main border-y-3 border-r-3 rounded-tr-lg rounded-br-lg',
-            {
-                'editor-theme-light':
-                    configStore.config.editor_theme === 'light',
-                'editor-theme-dark': configStore.config.editor_theme === 'dark',
-                'editor-theme-theme':
-                    configStore.config.editor_theme === 'theme',
-                'rounded-tl-lg rounded-bl-lg rounded-tr-none rounded-br-none border-r-none border-l-3':
-                    onLeft,
-                'rounded-tl-none': squareTop,
-            },
-        ]"
-        :style="{ width: width + 'px' }"
-    >
-        <input
-            v-model="codeFilterInput"
-            type="text"
-            autocomplete="off"
-            class="mx-2 mt-2 mb-0 p-1"
-            placeholder="filter codes..."
-        >
+    <div :class="[
+        'flex flex-col items-stretch overflow-x-hidden border-main border-y-3 border-r-3 rounded-tr-lg rounded-br-lg',
+        {
+            'editor-theme-light':
+                configStore.config.editor_theme === 'light',
+            'editor-theme-dark': configStore.config.editor_theme === 'dark',
+            'editor-theme-theme':
+                configStore.config.editor_theme === 'theme',
+            'rounded-tl-lg rounded-bl-lg rounded-tr-none rounded-br-none border-r-none border-l-3':
+                onLeft,
+            'rounded-tl-none': squareTop,
+        },
+    ]" :style="{ width: width + 'px' }">
+        <input v-model="codeFilterInput" type="text" autocomplete="off" class="mx-2 mt-2 mb-0 p-1"
+            placeholder="filter codes...">
         <div class="flex items-center justify-center gap-2">
-            <button
-                class="text-sm p-2"
-                @click="
-                    () =>
-                        draggableItem.forEach((item) => {
-                            item.open()
-                        })
-                "
-            >
+            <button class="text-sm p-2" @click="() =>
+                draggableItem.forEach((item) => {
+                    item.open()
+                })
+                ">
                 <Icon name="fa6-solid:up-right-and-down-left-from-center" />
             </button>
-            <button
-                class="text-sm p-2"
-                @click="
-                    () =>
-                        draggableItem.forEach((item) => {
-                            item.close()
-                        })
-                "
-            >
+            <button class="text-sm p-2" @click="() =>
+                draggableItem.forEach((item) => {
+                    item.close()
+                })
+                ">
                 <Icon name="fa6-solid:down-left-and-up-right-to-center" />
             </button>
         </div>
         <div v-if="parsedCodes.length > 0" class="flex grow">
-            <DraggableContainer
-                @on-drop="handleDrop"
-                @on-context-menu="openContextMenu"
-            >
-                <DraggableItem
-                    v-for="c in filterCodes(parsedCodes)"
-                    :key="c.id"
-                    ref="draggableItem"
-                    :item="c"
-                    :children="c.children ? c.children : []"
-                    :depth="0"
-                    :selected-style="() => 'border'"
-                    @on-drop="handleDrop"
-                    @selected="handleSelected"
-                    @on-context-menu="openContextMenu"
-                >
+            <DraggableContainer @on-drop="handleDrop" @on-context-menu="openContextMenu">
+                <DraggableItem v-for="c in filterCodes(parsedCodes)" :key="c.id" ref="draggableItem"
+                    :item="c as DraggableItemInstance"
+                    :children="c.children ? c.children as DraggableItemInstance[] : []" :depth="0"
+                    :selected-style="() => 'border'" @on-drop="handleDrop" @selected="handleSelected"
+                    @on-context-menu="openContextMenu">
                     <template #default="{ item, isOpen }">
-                        <CodebookCodesPanelItem
-                            :code="item"
-                            :is-open="isOpen"
-                        />
+                        <CodebookCodesPanelItem :code="item" :is-open="isOpen" />
                     </template>
                 </DraggableItem>
             </DraggableContainer>
         </div>
-        <div
-            v-if="parsedCodes.length == 0 || !parsedCodes"
-            class="flex flex-col items-center m-auto font-mono text-text text-sm"
-        >
+        <div v-if="parsedCodes.length == 0 || !parsedCodes"
+            class="flex flex-col items-center m-auto font-mono text-text text-sm">
             <div class="instruction">codes will appear here</div>
         </div>
 
-        <BaseContextMenu
-            v-if="showContextMenu"
-            :event="contextMenuEvent"
-            @close="showContextMenu = false"
-        >
+        <BaseContextMenu v-if="showContextMenu" :event="contextMenuEvent" @close="showContextMenu = false">
             <button v-if="contextMenuCode !== 'root'" @click="openEditModal">
                 edit
             </button>
-            <button
-                v-if="contextMenuCode !== 'root'"
-                @click="showDeleteModal = true"
-            >
+            <button v-if="contextMenuCode !== 'root'" @click="showDeleteModal = true">
                 delete
             </button>
             <button @click="handleShowNewCodeModal">new code</button>
             <button @click="showNewCodeGroupModal = true">new group</button>
         </BaseContextMenu>
 
-        <BaseModal
-            v-if="showNewCodeModal"
-            title="New Code"
-            @close="showNewCodeModal = false"
-            @submit="handleNewCodeSubmit"
-        >
+        <BaseModal v-if="showNewCodeModal" title="New Code" @close="showNewCodeModal = false"
+            @submit="handleNewCodeSubmit">
             <div class="font-mono text-main text-left">code name</div>
-            <textarea
-                id="new-code-name"
-                v-model="newCode.name"
-                class="resize-y"
-                rows="4"
-                placeholder="enter code..."
-            />
+            <textarea id="new-code-name" v-model="newCode.name" class="resize-y" rows="4" placeholder="enter code..." />
             <div>
                 <div class="font-mono text-main text-left">color</div>
                 <BaseColorPicker v-model:current-color="newCode.color" />
             </div>
             <div class="grid grid-cols-2 gap-4">
-                <button
-                    class="grow"
-                    @click="
-                        () => {
-                            showNewCodeModal = false
-                            newCode.name = ''
-                            newCode.color = ''
-                        }
-                    "
-                >
+                <button class="grow" @click="() => {
+                    showNewCodeModal = false
+                    newCode.name = ''
+                    newCode.color = ''
+                }
+                    ">
                     cancel
                 </button>
                 <button class="grow" @click="handleNewCodeSubmit">
@@ -456,30 +404,17 @@ function handleDrop({ items, target }: { items: ParsedCode[]; target: ParsedCode
             </div>
         </BaseModal>
 
-        <BaseModal
-            v-if="showNewCodeGroupModal"
-            title="New Code Group"
-            @close="showNewCodeGroupModal = false"
-            @submit="handleNewCodeGroupSubmit"
-        >
+        <BaseModal v-if="showNewCodeGroupModal" title="New Code Group" @close="showNewCodeGroupModal = false"
+            @submit="handleNewCodeGroupSubmit">
             <div class="font-mono text-main text-left">group name</div>
-            <input
-                id="new-code-group-name"
-                v-model="newCodeGroupName"
-                type="text"
-                autocomplete="off"
-                placeholder="enter group name..."
-            >
+            <input id="new-code-group-name" v-model="newCodeGroupName" type="text" autocomplete="off"
+                placeholder="enter group name...">
             <div class="grid grid-cols-2 gap-4">
-                <button
-                    class="grow"
-                    @click="
-                        () => {
-                            showNewCodeGroupModal = false
-                            newCodeGroupName = ''
-                        }
-                    "
-                >
+                <button class="grow" @click="() => {
+                    showNewCodeGroupModal = false
+                    newCodeGroupName = ''
+                }
+                    ">
                     cancel
                 </button>
                 <button class="grow" @click="handleNewCodeGroupSubmit">
@@ -488,56 +423,32 @@ function handleDrop({ items, target }: { items: ParsedCode[]; target: ParsedCode
             </div>
         </BaseModal>
 
-        <BaseModal
-            v-if="showEditModal"
-            title="Edit Code"
-            @close="showEditModal = false"
-            @submit="handleEditSubmit"
-        >
-            <div
-                v-if="contextMenuCode !== 'root' && !contextMenuCode?.group"
-                class="font-mono text-main text-left"
-            >
+        <BaseModal v-if="showEditModal" title="Edit Code" @close="showEditModal = false" @submit="handleEditSubmit">
+            <div v-if="contextMenuCode !== 'root' && !contextMenuCode?.group" class="font-mono text-main text-left">
                 code name
             </div>
-            <div
-                v-if="contextMenuCode !== 'root' && contextMenuCode?.group"
-                class="font-mono text-main text-left"
-            >
+            <div v-if="contextMenuCode !== 'root' && contextMenuCode?.group" class="font-mono text-main text-left">
                 code group name
             </div>
-            <textarea
-                id="edit-code-name"
-                v-model="editCode.code"
-                class="resize-y"
-                rows="4"
-                placeholder="enter code..."
-            />
+            <textarea id="edit-code-name" v-model="editCode.code" class="resize-y" rows="4"
+                placeholder="enter code..." />
             <div v-if="contextMenuCode !== 'root' && !contextMenuCode?.group">
                 <div class="font-mono text-main text-left">color</div>
                 <BaseColorPicker v-model:current-color="editCode.color" />
             </div>
             <div class="grid grid-cols-2 gap-4">
-                <button
-                    class="grow"
-                    @click="
-                        () => {
-                            showEditModal = false
-                            contextMenuCode = null
-                        }
-                    "
-                >
+                <button class="grow" @click="() => {
+                    showEditModal = false
+                    contextMenuCode = null
+                }
+                    ">
                     cancel
                 </button>
                 <button class="grow" @click="handleEditSubmit">submit</button>
             </div>
         </BaseModal>
 
-        <BaseModal
-            v-if="showDeleteModal"
-            title="Delete Code"
-            @close="showDeleteModal = false"
-        >
+        <BaseModal v-if="showDeleteModal" title="Delete Code" @close="showDeleteModal = false">
             <div class="font-mono text-main text-left">delete code</div>
             <div class="font-mono font-bold mb-4 text-error">
                 Are you sure you want to delete the
@@ -546,15 +457,11 @@ function handleDrop({ items, target }: { items: ParsedCode[]; target: ParsedCode
                 }}"? This will also remove your highlighted instances.
             </div>
             <div class="grid grid-cols-2 gap-4">
-                <button
-                    class="grow"
-                    @click="
-                        () => {
-                            showDeleteModal = false
-                            contextMenuCode = null
-                        }
-                    "
-                >
+                <button class="grow" @click="() => {
+                    showDeleteModal = false
+                    contextMenuCode = null
+                }
+                    ">
                     cancel
                 </button>
                 <button class="grow" @click="handleDeleteSubmit">delete</button>

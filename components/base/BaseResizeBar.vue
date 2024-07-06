@@ -1,40 +1,49 @@
 <script setup lang="ts">
+import type { Tables } from '~/types/supabase';
+
+type ConfigKey = keyof Tables<'configs'>
+
 const elementWidth = defineModel<number | null>('elementWidth')
 
-const props = defineProps({
-    onLeft: {
-        type: Boolean,
-        default: false,
-    },
-    minWidth: {
-        type: Number,
-        default: 100,
-    },
-    configAttribute: {
-        type: String,
-        default: '',
-    }
+interface Props {
+    onLeft: boolean,
+    minWidth: number,
+    configAttribute: ConfigKey
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    onLeft: false,
+    minWidth: 100,
+    configAttribute: '' as ConfigKey
 })
 
 const configStore = useConfigStore()
 
-function resizeSidePanel(event) {
+function isValidConfigKey(key: string): key is ConfigKey {
+    return key in (configStore.config as Tables<'configs'>)
+}
+
+function resizeSidePanel(event: MouseEvent | TouchEvent) {
     let startX
     if (event.type === 'touchstart') {
-        startX = event.touches[0].clientX
+        const e = event as TouchEvent
+        startX = e.touches[0].clientX
     } else {
-        startX = event.clientX
+        const e = event as MouseEvent
+        startX = e.clientX
     }
 
     const startWidth = elementWidth.value
     let newWidth
 
-    const doResize = (moveEvent) => {
+    const doResize = (moveEvent: MouseEvent | TouchEvent) => {
         let moveX
         if (moveEvent.type === 'touchmove') {
-            moveX = moveEvent.touches[0].clientX
+            const e = moveEvent as TouchEvent
+            moveX = e.touches[0].clientX
         } else {
-            moveX = moveEvent.clientX
+            const e = moveEvent as MouseEvent
+            moveX = e.clientX
         }
         let factor
         if (props.onLeft) {
@@ -42,7 +51,7 @@ function resizeSidePanel(event) {
         } else {
             factor = -1
         }
-        newWidth = startWidth + factor * (moveX - startX)
+        newWidth = startWidth ?? 0 + factor * (moveX - startX)
         if (newWidth < props.minWidth && newWidth >= props.minWidth / 2) {
             elementWidth.value = props.minWidth
         } else if (newWidth < props.minWidth / 2) {
@@ -53,9 +62,15 @@ function resizeSidePanel(event) {
     }
 
     const stopResize = () => {
-        const patch = {}
-        patch[props.configAttribute] = elementWidth.value
-        configStore.patchConfig(patch)
+        if (isValidConfigKey(props.configAttribute)) {
+            const patch: Partial<Tables<'configs'>> = {
+                [props.configAttribute]: elementWidth.value
+            }
+            configStore.patchConfig(patch)
+        } else {
+            console.error(`Invalid config attribute: ${props.configAttribute}`)
+        }
+
         if (event.type === 'touchstart') {
             document.removeEventListener('touchmove', doResize)
             document.removeEventListener('touchend', stopResize)
@@ -76,29 +91,20 @@ function resizeSidePanel(event) {
 </script>
 
 <template>
-    <div
-        class="flex items-center justify-center min-w-2 cursor-ew-resize bg-main text-bg"
-        @mousedown.prevent="resizeSidePanel"
-        @touchstart.prevent="resizeSidePanel"
-    >
-        <div
-            v-if="
-                (elementWidth > 0 && onLeft) || (elementWidth == 0 && !onLeft)
-            "
-            class="grid items-center justify-center cursor-pointer text-xs transition-all duration-300 hover:text-sub"
-            @click.stop="onLeft ? (elementWidth = 0) : (elementWidth = 275)"
-        >
+    <div class="flex items-center justify-center min-w-2 cursor-ew-resize bg-main text-bg"
+        @mousedown.prevent="resizeSidePanel" @touchstart.prevent="resizeSidePanel">
+        <div v-if="
+            (elementWidth && elementWidth > 0 && onLeft) || (elementWidth == 0 && !onLeft)
+        " class="grid items-center justify-center cursor-pointer text-xs transition-all duration-300 hover:text-sub"
+            @click.stop="onLeft ? (elementWidth = 0) : (elementWidth = 275)">
             <Icon name="fa6-solid:caret-left" />
             <Icon name="fa6-solid:caret-left" />
             <Icon name="fa6-solid:caret-left" />
         </div>
-        <div
-            v-if="
-                (elementWidth == 0 && onLeft) || (elementWidth > 0 && !onLeft)
-            "
-            class="grid items-center justify-center cursor-pointer text-xs transition-all duration-300 hover:text-sub"
-            @click.stop="onLeft ? (elementWidth = 275) : (elementWidth = 0)"
-        >
+        <div v-if="
+            (elementWidth == 0 && onLeft) || (elementWidth && elementWidth > 0 && !onLeft)
+        " class="grid items-center justify-center cursor-pointer text-xs transition-all duration-300 hover:text-sub"
+            @click.stop="onLeft ? (elementWidth = 275) : (elementWidth = 0)">
             <Icon name="fa6-solid:caret-right" />
             <Icon name="fa6-solid:caret-right" />
             <Icon name="fa6-solid:caret-right" />

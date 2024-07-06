@@ -1,47 +1,44 @@
 <script setup lang="ts">
-const props = defineProps({
-    event: {
-        type: Object,
-        default: () => {},
-    },
-    level: {
-        type: Number,
-        default: 0,
-    },
-    bgColor: {
-        type: String,
-        default: 'white',
-    },
+interface Props {
+    event: MouseEvent,
+    level: number,
+    bgColor: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    event: undefined,
+    level: 0,
+    bgColor: 'white'
 })
 
 const emit = defineEmits(['close'])
 
-const computedPosition = computed(() => {
+const computedStyle = computed(() => {
+    let position: { top: string; left: string } = { top: '0px', left: '0px' }
+
     if (props.level === 0) {
-        return {
-            position: 'absolute',
+        position = {
             top: `${props.event.clientY}px`,
             left: `${props.event.clientX}px`,
         }
     } else if (props.level === 1) {
-        let t = props.event.target
-        while (!t.classList.contains('context-menu-code')) {
-            t = t.parentElement
+        let t = props.event.target as HTMLElement
+        while (t && !t.classList.contains('context-menu-code')) {
+            t = t.parentElement as HTMLElement
         }
-        const boundingRect = t.getBoundingClientRect()
-        const top = boundingRect.top + 'px'
-        const left = boundingRect.right + 'px'
-        return {
-            position: 'absolute',
-            top: top,
-            left: left,
+        if (t) {
+            const boundingRect = t.getBoundingClientRect()
+            position = {
+                top: boundingRect.top + 'px',
+                left: boundingRect.right + 'px',
+            }
         }
-    } else {
-        return {
-            position: 'absolute',
-            top: '0px',
-            left: '0px',
-        }
+    }
+
+    return {
+        position: 'absolute' as const,
+        backgroundColor: props.bgColor,
+        ...position
     }
 })
 
@@ -59,9 +56,8 @@ function closeContextMenu() {
 </script>
 
 <template>
-    <div
-class="flex flex-col z-50 shadow-46-solid transition-all duration-300 max-w-xs [&>button]:flex [&>button]:bg-transparent [&>button]:p-2 [&>button]:shadow-none [&>button]:rounded-none [&>button]:m-0 [&>button]:justify-start [&>button]:text-base [&>button]:text-black [&>button:hover]:bg-text [&>button:hover]:text-bg [&>button:active]:bg-sub [&>button:active]:text-bg [&>button:active]:transform-none"
-        :style="[{ backgroundColor: bgColor }, computedPosition ]">
+    <div class="flex flex-col z-50 shadow-46-solid transition-all duration-300 max-w-xs [&>button]:flex [&>button]:bg-transparent [&>button]:p-2 [&>button]:shadow-none [&>button]:rounded-none [&>button]:m-0 [&>button]:justify-start [&>button]:text-base [&>button]:text-black [&>button:hover]:bg-text [&>button:hover]:text-bg [&>button:active]:bg-sub [&>button:active]:text-bg [&>button:active]:transform-none"
+        :style="computedStyle">
         <slot />
     </div>
 </template>

@@ -3,10 +3,6 @@ import type { QueryData } from '@supabase/supabase-js'
 
 const supabase = useSupabaseClient<Database>()
 
-export interface ParsedCode extends Tables<'codes'> {
-    children: ParsedCode[]
-}
-
 const codesWithInstances = supabase
     .from('codes')
     .select(
@@ -18,6 +14,16 @@ const codesWithInstances = supabase
     )
 
 export type CodesWithInstances = QueryData<typeof codesWithInstances>
+
+export type SingleCodeWithInstances = {
+    [K in keyof Tables<'codes'>]: Tables<'codes'>[K]
+} & {
+    code_instances: Tables<'code_instances'>[]
+}
+
+export interface ParsedCode extends SingleCodeWithInstances {
+    children: ParsedCode[]
+}
 
 export interface DraggableItemMethods<T> {
     open: () => void
@@ -49,4 +55,14 @@ export type Segment = {
     data: string
     codes: SegmentCode[]
     key: number
+}
+
+export type FilesMap = Map<string, Tables<'files'>>
+
+export type Theme = {
+    name: string
+    bgColor: string
+    mainColor: string
+    subColor: string
+    textColor: string
 }

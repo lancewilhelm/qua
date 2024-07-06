@@ -1,30 +1,26 @@
 <script setup lang="ts">
-import type { Tables } from '~/types/supabase'
-import type { ParsedCode } from '~/types/types'
+import type { FilesMap, ParsedCode } from '~/types/types'
 
-const codes = defineModel<Tables<'codes'>[]>('codes')
+const codes = defineModel<ParsedCode[]>('codes')
 const parsedCodes = defineModel<ParsedCode[]>('parsedCodes')
-const props = defineProps({
-    filesMap: {
-        type: Object,
-        default: () => {},
-    },
-    columns: {
-        type: Number,
-        default: 1,
-    },
-    width: {
-        type: Number,
-        default: 0,
-    },
+
+interface Props {
+    filesMap: FilesMap,
+    columns: number,
+    width: number
+}
+const props = withDefaults(defineProps<Props>(), {
+    filesMap: undefined,
+    columns: 1,
+    width: 0
 })
 
 const elementWidth = computed(() => {
     return props.width / (props.columns + 1)
 })
 
-function getCodesGroupsByLevel(codes) {
-    const groupsByLevelMap = new Map()
+function getCodesGroupsByLevel(codes: ParsedCode[]): Map<number, number> {
+    const groupsByLevelMap = new Map<number, number>()
     let groups = codes.filter((code) => code.group)
     let nextLevelGroups = []
     let level = 0
@@ -39,6 +35,15 @@ function getCodesGroupsByLevel(codes) {
     }
     return groupsByLevelMap
 }
+
+const groupLevels = computed(() => {
+    if (!parsedCodes.value) return []
+    return Array.from(getCodesGroupsByLevel(parsedCodes.value).values())
+})
+
+const totalCodeGroups = computed(() => {
+    return groupLevels.value.reduce((a, b) => a + b, 0)
+})
 </script>
 
 <template>
@@ -48,29 +53,18 @@ function getCodesGroupsByLevel(codes) {
             <div class="flex flex-col items-center p-2.5">
                 <div class="text-sm text-sub-alt">total codes</div>
                 <div class="text-2xl font-black text-sub-alt">
-                    {{ codes.length }}
+                    {{ codes?.length }}
                 </div>
             </div>
             <span class="w-px my-2 bg-sub-alt" />
             <div class="flex flex-col items-center p-2.5">
                 <div class="text-sm text-sub-alt">total code groups</div>
                 <div class="text-2xl font-black text-sub-alt">
-                    {{
-                        getCodesGroupsByLevel(parsedCodes)
-                            .values()
-                            .toArray()
-                            .reduce((a, b) => a + b, 0)
-                    }}
+                    {{ totalCodeGroups }}
                 </div>
             </div>
             <span class="w-px my-2 bg-sub-alt" />
-            <div
-                v-for="(item, index) in getCodesGroupsByLevel(parsedCodes)
-                    .values()
-                    .toArray()"
-                :key="index"
-                class="flex"
-            >
+            <div v-if="parsedCodes" v-for="(item, index) in groupLevels" :key="index">
                 <div class="flex flex-col items-center p-2.5">
                     <div class="text-sm text-sub-alt">level {{ index }} groups</div>
                     <div class="text-2xl font-black text-sub-alt">
@@ -83,11 +77,7 @@ function getCodesGroupsByLevel(codes) {
 
         <div class="flex bg-main text-sub-alt font-mono p-2.5 border-t-1 border-bg">
             <div v-for="i in columns" :key="i - 1" class="flex flex-col items-center">
-                <div
-                    v-if="i <= columns"
-                    :style="{ width: elementWidth + 'px' }"
-                    class="text-sm text-sub-alt"
-                >
+                <div v-if="i <= columns" :style="{ width: elementWidth + 'px' }" class="text-sm text-sub-alt">
                     level {{ i - 1 }}
                 </div>
                 <!-- <div v-else class="text-sm text-sub-alt">codes</div> -->
@@ -95,16 +85,8 @@ function getCodesGroupsByLevel(codes) {
         </div>
 
         <div class="border-3 border-main">
-            <CodebookCodesGroup
-                v-for="(c, i) in parsedCodes"
-                :key="c.id"
-                :code="c"
-                :files-map="filesMap"
-                :columns="columns"
-                :depth="0"
-                :element-width="elementWidth"
-                :index="i"
-            />
+            <CodebookCodesGroup v-for="(c, i) in parsedCodes" :key="c.id" :code="c" :files-map="filesMap"
+                :columns="columns" :depth="0" :element-width="elementWidth" :index="i" />
         </div>
     </div>
 </template>

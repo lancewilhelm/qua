@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import type { Tables } from '~/types/supabase'
-import type { ParsedCode } from '~/types/types'
+import type { FilesMap, ParsedCode } from '~/types/types'
 
 definePageMeta({
     middleware: 'auth',
@@ -10,8 +10,8 @@ definePageMeta({
 const supabase = useSupabaseClient()
 const projectStore = useProjectStore()
 const activeTab = ref('codes')
-const codes = ref<Tables<'codes'>[]>([])
-const filesMap = ref(new Map())
+const codes = ref<ParsedCode[]>([])
+const filesMap = ref<FilesMap>(new Map())
 const codesHeight = ref(0)
 const el = ref(null)
 const { width } = useElementSize(el)
@@ -30,7 +30,7 @@ onMounted(async () => {
         )
         .eq('project_id', projectStore.currentProject.id)
 
-    codes.value = codesData as Tables<'codes'>[]
+    codes.value = codesData as ParsedCode[]
 
     // Fetch files
     const { data: filesData } = await supabase
@@ -98,50 +98,30 @@ function getCodesHeight(codes: ParsedCode[]): number {
 </script>
 
 <template>
-    <div
-        ref="el"
-        :class="[
-            'flex flex-col h-full full-width',
-            {
-                'no-scroll': activeTab === 'quotes',
-                scroll: activeTab === 'codes',
-            },
-        ]"
-    >
+    <div ref="el" :class="[
+        'flex flex-col h-full full-width',
+        {
+            'no-scroll': activeTab === 'quotes',
+            scroll: activeTab === 'codes',
+        },
+    ]">
         <div
-            class="flex px-2.5 text-base font-mono bg-main text-sub-alt rounded-tl-lg rounded-tr-lg border-b-1 border-bg"
-        >
-            <div
-                :class="[
-                    'py-1 px-2 cursor-pointer transition-all duration-300 hover:bg-sub',
-                    { 'bg-sub': activeTab === 'codes' },
-                ]"
-                @click="activeTab = 'codes'"
-            >
+            class="flex px-2.5 text-base font-mono bg-main text-sub-alt rounded-tl-lg rounded-tr-lg border-b-1 border-bg">
+            <div :class="[
+                'py-1 px-2 cursor-pointer transition-all duration-300 hover:bg-sub',
+                { 'bg-sub': activeTab === 'codes' },
+            ]" @click="activeTab = 'codes'">
                 Codes
             </div>
-            <div
-                :class="[
-                    'py-1 px-2 cursor-pointer transition-all duration-300 hover:bg-sub',
-                    { 'bg-sub': activeTab === 'quotes' },
-                ]"
-                @click="activeTab = 'quotes'"
-            >
+            <div :class="[
+                'py-1 px-2 cursor-pointer transition-all duration-300 hover:bg-sub',
+                { 'bg-sub': activeTab === 'quotes' },
+            ]" @click="activeTab = 'quotes'">
                 Quotes
             </div>
         </div>
-        <CodebookQuotesTab
-            v-if="activeTab === 'quotes'"
-            v-model:codes="codes"
-            :files-map="filesMap"
-        />
-        <CodebookCodesTab
-            v-else-if="activeTab === 'codes'"
-            v-model:codes="codes"
-            v-model:parsed-codes="parsedCodes"
-            :width="width"
-            :files-map="filesMap"
-            :columns="codesHeight"
-        />
+        <CodebookQuotesTab v-if="activeTab === 'quotes'" v-model:codes="codes" :files-map="filesMap" />
+        <CodebookCodesTab v-else-if="activeTab === 'codes'" v-model:codes="codes" v-model:parsed-codes="parsedCodes"
+            :width="width" :files-map="filesMap" :columns="codesHeight" />
     </div>
 </template>
