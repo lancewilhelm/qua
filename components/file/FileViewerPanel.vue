@@ -49,7 +49,7 @@ const supabase = useSupabaseClient<Database>()
 const projectStore = useProjectStore()
 const configStore = useConfigStore()
 const editorSegments = ref<Segment[]>([])
-const newCode = ref<Partial<Database['public']['Functions']['add_code_instance']['Args']>>()
+const newCode = ref<Partial<Database['public']['Functions']['add_code_instance']['Args']>>({} as Partial<Database['public']['Functions']['add_code_instance']['Args']>)
 const editCode = ref<Partial<Database['public']['Functions']['add_code_instance']['Args']>>()
 const codeModalText = ref('')
 const editorRightClickContext = ref('')
@@ -153,7 +153,7 @@ function prepAndAddCode() {
 
 function openEditSegmentModal() {
     showEditSegmentModal.value = true
-    console.log(selectedCode.value)
+    // console.log(selectedCode.value)
     editCode.value = JSON.parse(JSON.stringify(selectedCode.value))
 }
 
@@ -314,7 +314,7 @@ function checkReadyForProcessing() {
 }
 
 async function handleOpenCodeExpander(event: MouseEvent | undefined, code: SegmentCode) {
-    console.log(code)
+    // console.log(code)
     selectedCode.value = code
     expanderMenuEvent.value = event
     await nextTick()

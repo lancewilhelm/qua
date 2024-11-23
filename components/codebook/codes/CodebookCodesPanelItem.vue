@@ -29,7 +29,14 @@ function getAllChildren(code: ParsedCode) {
 function handleCodeTextColor(): string {
     if (configStore.config.dynamic_code_text_color) {
         if (props.code.group) {
-            return 'var(--text-color)'
+            // return 'var(--text-color)'
+            if (configStore.config.editor_theme === 'light') {
+                return 'black'
+            } else if (configStore.config.editor_theme === 'dark') {
+                return '#eceff4'
+            } else {
+                return 'var(--text-color)'
+            }
         }
         const color = props.code?.color || ''
         return tinycolor.mostReadable(color, ['black', 'white'], {
@@ -38,6 +45,18 @@ function handleCodeTextColor(): string {
     } else {
         if (configStore.config.code_text_color) {
             return configStore.config.code_text_color
+        } else {
+            return 'var(--text-color)'
+        }
+    }
+}
+
+function handleStatsTextColor(): string {
+    {
+        if (configStore.config.editor_theme === 'light') {
+            return 'black'
+        } else if (configStore.config.editor_theme === 'dark') {
+            return '#eceff4'
         } else {
             return 'var(--text-color)'
         }
@@ -75,7 +94,9 @@ const backgroundColor = computed(() => props.code?.color || 'transparent')
                                 ? `1px solid var(--error-color)`
                                 : 'none',
                     }" />
-                    <div v-if="configStore.config.code_group_children_stats" class="text-sub">
+                    <div v-if="configStore.config.code_group_children_stats" class="text-sub" :style="{
+                        color: handleStatsTextColor()
+                    }">
                         {{
                             getAllChildren(code)
                                 .filter((c) => c.group)

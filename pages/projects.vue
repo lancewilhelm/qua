@@ -12,7 +12,7 @@ const showNewProjectModal = ref(false)
 const showEditProjModal = ref(false)
 const showDeleteProjModal = ref(false)
 const deleteConfirmInput = ref('')
-const newProj = ref<Tables<'projects'>>()
+const newProj = ref({} as Tables<'projects'>)
 const editProj = ref({} as Tables<'projects'>)
 const deleteProj = ref({} as Tables<'projects'>)
 
@@ -54,7 +54,7 @@ async function createNewProject() {
         projects.value ? projects.value.push(data) : (projects.value = [data])
     }
     showNewProjectModal.value = false
-    newProj.value = undefined
+    newProj.value = {} as Tables<'projects'>
 }
 
 function openEditProjectModal(project: Tables<'projects'>) {
@@ -68,7 +68,7 @@ function closeEditProjectModal() {
 }
 
 function closeNewProjectModal() {
-    newProj.value = undefined
+    newProj.value = {} as Tables<'projects'>
     showNewProjectModal.value = false
 }
 
@@ -125,23 +125,14 @@ async function deleteProject() {
     <div class="grid grid-rows-grid text-center justify-center items-center justify-items-center full-width scroll">
         <div class="font-mono font-bold text-3xl">Projects</div>
         <div v-if="projects && projects.length > 0" class="flex flex-row flex-wrap justify-center">
-            <ProjectCard
-                v-for="project of projects"
-                :key="project.id"
-                :project="project"
-                @toggle-edit-project-modal="openEditProjectModal"
-                @delete-project="openDeleteProject"
-                @open-project="openProject(project)"
-            />
+            <ProjectCard v-for="project of projects" :key="project.id" :project="project"
+                @toggle-edit-project-modal="openEditProjectModal" @delete-project="openDeleteProject"
+                @open-project="openProject(project)" />
         </div>
         <button id="submit-btn" @click="toggleNewProjectModal">
             <Icon name="fa6-solid:circle-plus" /> create new project
         </button>
-        <BaseModal
-            v-if="showDeleteProjModal"
-            :show-modal="showDeleteProjModal"
-            @close="closeDeleteProject"
-        >
+        <BaseModal v-if="showDeleteProjModal" :show-modal="showDeleteProjModal" @close="closeDeleteProject">
             <div class="font-mono font-bold text-lg">Delete Project</div>
             <div class="font-mono">
                 Are you sure? This will delete all files and codes associated
@@ -151,17 +142,9 @@ async function deleteProject() {
                 Type "{{ deleteProj.name }}" to confirm.
             </div>
             <div class="flex flex-row justify-center items-center mt-4">
-                <input
-                    v-model="deleteConfirmInput"
-                    type="text"
-                    autocomplete="off"
-                    placeholder="project name"
-                >
-                <button
-                    v-if="deleteConfirmInput === deleteProj.name"
-                    class="bg-error text-bg border-none py-2 px-4 cursor-pointer ml-4"
-                    @click="deleteProject"
-                >
+                <input v-model="deleteConfirmInput" type="text" autocomplete="off" placeholder="project name">
+                <button v-if="deleteConfirmInput === deleteProj.name"
+                    class="bg-error text-bg border-none py-2 px-4 cursor-pointer ml-4" @click="deleteProject">
                     Delete
                 </button>
             </div>
@@ -169,18 +152,9 @@ async function deleteProject() {
                 cancel
             </button>
         </BaseModal>
-        <ProjectModal
-            v-model:project="editProj"
-            v-model:show-modal="showEditProjModal"
-            @submit="updateProject"
-            @close="closeEditProjectModal"
-        />
-        <ProjectModal
-            v-model:project="newProj"
-            v-model:show-modal="showNewProjectModal"
-            :new-project="true"
-            @submit="createNewProject"
-            @close="closeNewProjectModal"
-        />
+        <ProjectModal v-model:project="editProj" v-model:show-modal="showEditProjModal" @submit="updateProject"
+            @close="closeEditProjectModal" />
+        <ProjectModal v-model:project="newProj" v-model:show-modal="showNewProjectModal" :new-project="true"
+            @submit="createNewProject" @close="closeNewProjectModal" />
     </div>
 </template>

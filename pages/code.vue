@@ -35,7 +35,7 @@ if (error) {
     console.error(error)
 } else {
     codes.value = data as ParsedCode[]
-    console.log(data)
+    // console.log(data)
 }
 </script>
 

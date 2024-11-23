@@ -28,7 +28,7 @@ const isSelected = computed(() => selectedItems?.value.includes(props.item))
 const isDragOver = computed(
     () => {
         if (dropTarget && draggedItems && dropTarget.value !== 'root')
-            dropTarget.value?.id === props.item.id && draggedItems.value?.length > 0
+            return dropTarget.value?.id === props.item.id && draggedItems.value?.length > 0
     }
 )
 const isOpen = ref(false)

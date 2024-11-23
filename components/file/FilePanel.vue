@@ -280,30 +280,30 @@ async function createFolder() {
 }
 
 async function updateFileLocation(fs: Tables<'files'>[], target: 'root' | Tables<'files'>) {
-    if (target !== 'root') {
-        if (fs.some((f) => f.id === target.id)) {
-            return
-        }
+    if (target !== 'root' && fs.some((f) => f.id === target.id)) {
+        return
+    }
 
-        const patch = fs.map((f) => {
-            return {
-                id: f.id,
-                parent: target.id ? target.id : null,
+    const patch = fs.map((f) => {
+        return {
+            id: f.id,
+            parent: target !== 'root' ? target.id : null
+        }
+    })
+
+    const { error } = await supabase.from('files').upsert(patch)
+    if (error) {
+        console.error(error)
+    } else {
+        files.value = files.value?.map((f) => {
+            if (f && fs.some((file) => file.id === f.id)) {
+                return {
+                    ...f, parent: target !== 'root' ? target.id : null
+                }
+            } else {
+                return f
             }
         })
-
-        const { error } = await supabase.from('files').upsert(patch)
-        if (error) {
-            console.error(error)
-        } else {
-            files.value = files.value?.map((f) => {
-                if (f && fs.some((file) => file.id === f.id)) {
-                    return { ...f, parent: target.id ? target.id : null }
-                } else {
-                    return f
-                }
-            })
-        }
     }
 }
 

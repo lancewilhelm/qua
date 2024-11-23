@@ -1,8 +1,8 @@
 <script setup lang="ts">
 interface Props {
     event: MouseEvent,
-    level: number,
-    bgColor: string
+    level?: number,
+    bgColor?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
