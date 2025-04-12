@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1744469412511,
+      "tag": "0000_parched_juggernaut",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1744478729112,
+      "tag": "0001_youthful_archangel",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1744481139022,
+      "tag": "0002_large_silhouette",
+      "breakpoints": true
+    }
+  ]
+}
