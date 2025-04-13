@@ -47,7 +47,9 @@ export default defineNuxtConfig({
     },
   },
   fonts: {
-    families: [{ name: "Poppins", provider: "google", weight: "bold" }],
+    defaults: {
+      weights: ["400", "700"],
+    },
   },
   compatibilityDate: "2025-04-12",
 });
